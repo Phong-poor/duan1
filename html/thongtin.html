@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài Khoản Của Tôi | KICKS HAVEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght=300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CSS TỔNG THỂ (GIỮ NGUYÊN) --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7; 
+            color: #1a1a1a;
+        }
+        .container {
+            width: 90%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* --- HEADER & NAVIGATION (ĐÃ ĐỔI MÀU) --- */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: #007bff; /* MÀU XANH MỚI */
+            text-decoration: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            margin-left: 20px; 
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { 
+            color: #007bff; /* MÀU XANH MỚI */
+        }
+        .search-cart a {
+            font-size: 20px;
+            color: #555;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+
+        /* --- USER PROFILE LAYOUT (ĐÃ ĐỔI MÀU) --- */
+        .profile-container {
+            display: flex;
+            gap: 30px;
+            padding: 40px 0;
+        }
+
+        /* Menu Cột Trái */
+        .profile-sidebar {
+            width: 280px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            align-self: flex-start; 
+        }
+        .profile-info h3 {
+            font-size: 20px;
+            color: #007bff; /* MÀU XANH MỚI */
+            margin-top: 0;
+            border-bottom: 2px solid #007bff; /* MÀU XANH MỚI */
+            padding-bottom: 10px;
+        }
+        .profile-menu a {
+            display: block;
+            text-decoration: none;
+            color: #444;
+            padding: 12px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 500;
+        }
+        .profile-menu a:hover, .profile-menu a.active {
+            background-color: #e0f0ff; /* Nền xanh nhạt */
+            color: #007bff; /* MÀU XANH MỚI */
+        }
+
+        /* Nội dung Cột Phải */
+        .profile-content {
+            flex: 1;
+        }
+        .section-title-profile {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        /* Thông tin chi tiết */
+        .card {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .card h4 {
+            font-size: 20px;
+            color: #007bff; /* MÀU XANH MỚI */
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .info-row span:first-child {
+            font-weight: 500;
+            color: #555;
+        }
+        .info-row span:last-child {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .edit-btn {
+            background-color: #555;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        .edit-btn:hover {
+            background-color: #333;
+        }
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 15px;
+        }
+        .order-table th, .order-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .order-table th {
+            background-color: #f0f0f0;
+            font-weight: 600;
+            color: #333;
+        }
+        .status-shipping {
+            color: orange;
+            font-weight: 500;
+        }
+        .status-paid {
+            color: green;
+            font-weight: 500;
+        }
+        
+        /* --- CSS CHO NÚT HÀNH ĐỘNG MỚI (ĐÃ ĐỔI MÀU) --- */
+        .action-cell {
+            white-space: nowrap; 
+            text-align: right;
+        }
+        .action-btn-custom {
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            text-decoration: none;
+            margin-left: 5px;
+            display: inline-block;
+            transition: opacity 0.2s;
+        }
+        .cancel-btn {
+            background-color: #dc3545; /* Giữ màu đỏ cho nút Hủy */
+            color: white;
+        }
+        .cancel-btn:hover {
+            opacity: 0.8;
+        }
+        .reorder-btn {
+            background-color: #007bff; /* MÀU XANH MỚI cho nút Mua lại */
+            color: white;
+        }
+        .reorder-btn:hover {
+            opacity: 0.8;
+        }
+
+
+        /* --- FOOTER (ĐÃ ĐỔI MÀU) --- */
+        footer {
+            background-color: #1a1a1a;
+            color: #ccc;
+            padding: 40px 0 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #333;
+        }
+        .footer-col {
+            width: 20%;
+            min-width: 180px;
+            margin-bottom: 20px;
+        }
+        .footer-col h4 {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .footer-col a, .footer-col p {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        .footer-col a:hover {
+            color: #007bff; /* MÀU XANH MỚI */
+        }
+        .contact-info {
+            font-size: 16px;
+            font-weight: 500;
+            color: #007bff; /* MÀU XANH MỚI */
+            margin-top: 5px;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">KICKS HAVEN</a>
+                <div class="nav-links">
+                    <a href="#">CỬA HÀNG</a>
+                    <a href="#">VỀ MIRAE</a> 
+                    <a href="#">NIKE</a> 
+                    <a href="#">ADIDAS</a>
+                    <a href="#" class="active">TÀI KHOẢN</a> 
+                </div>
+                <div class="search-cart">
+                    <a href="#" title="Tìm kiếm">🔍</a>
+                    <a href="#" title="Giỏ hàng">🛒</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <div class="profile-container">
+            
+            <aside class="profile-sidebar">
+                <div class="profile-info">
+                    <h3>Xin Chào, Ngọc Anh!</h3>
+                    <p style="font-size: 14px; color: #777;">ngocanh@example.com</p>
+                </div>
+                <div class="profile-menu">
+                    <a href="#" class="active">👤 Thông tin chung</a>
+                    <a href="#">🏠 Sổ địa chỉ</a>
+                    <a href="#">📦 Quản lý đơn hàng</a>
+                    <a href="#">⭐ Sản phẩm yêu thích</a>
+                    <a href="#" style="color: #007bff; font-weight: 700;">Đăng Xuất</a> </div>
+            </aside>
+
+            <section class="profile-content">
+                
+                <h2 class="section-title-profile">👤 Thông Tin Cá Nhân</h2>
+
+                <div class="card">
+                    <h4>Chi Tiết Tài Khoản</h4>
+                    <div class="info-row">
+                        <span>Họ và Tên:</span>
+                        <span>Trần Ngọc Anh</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Email:</span>
+                        <span>ngocanh@example.com</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Số Điện Thoại:</span>
+                        <span>0987 654 321</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Ngày Sinh:</span>
+                        <span>25/10/1999</span>
+                    </div>
+                    <a href="#" class="edit-btn">Chỉnh sửa thông tin</a>
+                </div>
+
+                <h2 class="section-title-profile">📦 Đơn Hàng Gần Đây</h2>
+
+                <div class="card">
+                    <table class="order-table">
+                        <thead>
+                            <tr>
+                                <th>Mã Đơn</th>
+                                <th>Ngày Đặt</th>
+                                <th>Tổng Tiền</th>
+                                <th>Trạng Thái</th>
+                                <th class="action-cell">Hành Động</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#KH10245</td>
+                                <td>01/11/2025</td>
+                                <td>4,800,000 VNĐ</td>
+                                <td><span class="status-shipping">Đang xử lý</span></td>
+                                <td class="action-cell">
+                                    <a href="#" style="color: #007bff; margin-right: 5px;">Xem</a> <a href="#" class="action-btn-custom cancel-btn">Hủy Đơn</a> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#KH10240</td>
+                                <td>15/10/2025</td>
+                                <td>3,500,000 VNĐ</td>
+                                <td><span class="status-paid">Đã giao hàng</span></td>
+                                <td class="action-cell">
+                                    <a href="#" style="color: #007bff; margin-right: 5px;">Xem</a> <a href="#" class="action-btn-custom reorder-btn">Mua lại</a> 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#KH10221</td>
+                                <td>28/09/2025</td>
+                                <td>7,200,000 VNĐ</td>
+                                <td><span class="status-paid">Đã giao hàng</span></td>
+                                <td class="action-cell">
+                                    <a href="#" style="color: #007bff; margin-right: 5px;">Xem</a> <a href="#" class="action-btn-custom reorder-btn">Mua lại</a> 
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>#KH10200</td>
+                                <td>10/09/2025</td>
+                                <td>2,990,000 VNĐ</td>
+                                <td style="color: #777;">Đã hủy</td>
+                                <td class="action-cell">
+                                    <a href="#" style="color: #007bff; margin-right: 5px;">Xem</a> </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                     <a href="#" class="edit-btn" style="background-color: #007bff;">Xem tất cả đơn hàng</a> </div>
+
+            </section>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h4>Giới thiệu Kicks Haven</h4>
+                    <a href="#">Về chúng tôi</a>
+                    <a href="#">Hệ thống cửa hàng</a>
+                    <a href="#">Tuyển dụng</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ khách hàng</h4>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Tra cứu đơn hàng</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Liên hệ tư vấn</h4>
+                    <p>Tư vấn mua hàng (Miễn phí)</p>
+                    <p class="contact-info">1800 6688</p>
+                    <p>Hỗ trợ kỹ thuật (24/7)</p>
+                    <p class="contact-info">1800 6689</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ thanh toán</h4>
+                    <p>VISA | MASTER | MOMO | ZALOPAY</p>
+                    <h4>Chứng nhận</h4>
+                    <p>Đã đăng ký với Bộ Công Thương</p>
+                </div>
+                 <div class="footer-col">
+                    <h4>Theo dõi chúng tôi</h4>
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">TikTok</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2025 Kicks Haven Vietnam. Tất cả quyền được bảo lưu.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
