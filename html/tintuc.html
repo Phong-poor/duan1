@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin Tức | Blog Sneaker Chính Hãng - KICKS HAVEN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- CSS TỔNG THỂ (GIỮ NGUYÊN) --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7; 
+            color: #1a1a1a;
+        }
+        .container {
+            width: 90%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* --- HEADER & NAVIGATION (GIỮ NGUYÊN) --- */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: #007bff; 
+            text-decoration: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            margin-left: 20px; 
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover, .nav-links a.active { 
+            color: #007bff;
+        }
+        .search-cart a {
+            font-size: 20px;
+            color: #555;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+
+        /* --- BLOG SPECIFIC CSS --- */
+        .blog-page {
+            padding: 40px 0;
+        }
+        .blog-content {
+            display: flex;
+            gap: 30px;
+        }
+        
+        /* Main Posts Area */
+        .main-posts {
+            flex: 3; /* Chiếm 2/3 không gian */
+        }
+
+        /* Featured Post */
+        .featured-post {
+            display: flex;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .featured-post:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .featured-post img {
+            width: 50%;
+            height: 400px;
+            object-fit: cover;
+        }
+        .featured-post-info {
+            padding: 30px;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .featured-post-info .category {
+            font-size: 14px;
+            font-weight: 700;
+            color: #007bff;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .featured-post-info h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            margin: 0 0 15px;
+            line-height: 1.3;
+        }
+        .featured-post-info p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .featured-post-info .read-more {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .featured-post-info .read-more:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .post-meta {
+            font-size: 13px;
+            color: #999;
+            margin-top: 10px;
+        }
+        .post-meta i {
+            margin-right: 5px;
+        }
+
+        /* Regular Posts Grid */
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        .post-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .post-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .post-card-info {
+            padding: 15px 20px 25px;
+        }
+        .post-card-info h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin: 10px 0 10px;
+            line-height: 1.3;
+        }
+        .post-card-info .excerpt {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Pagination */
+        .pagination {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .pagination a {
+            text-decoration: none;
+            color: #555;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            margin: 0 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .pagination a.current, .pagination a:hover {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            flex: 1; /* Chiếm 1/3 không gian */
+        }
+        .sidebar-widget {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .sidebar-widget h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #007bff;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+        
+        /* Search Form */
+        .sidebar-widget input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .sidebar-widget button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Recent Posts/Categories */
+        .sidebar-widget ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar-widget ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar-widget ul li a {
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            transition: color 0.2s;
+            display: block;
+        }
+        .sidebar-widget ul li a:hover {
+            color: #007bff;
+        }
+        .sidebar-widget ul li a i {
+            margin-right: 8px;
+        }
+
+        /* Footer (Giữ nguyên) */
+        footer {
+            background-color: #1a1a1a;
+            color: #ccc;
+            padding: 40px 0 20px;
+            font-family: 'Roboto', sans-serif;
+        }
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #333;
+        }
+        .footer-col {
+            width: 20%;
+            min-width: 180px;
+            margin-bottom: 20px;
+        }
+        .footer-col h4 {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .footer-col a, .footer-col p {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        .footer-col a:hover {
+            color: #007bff;
+        }
+        .contact-info {
+            font-size: 16px;
+            font-weight: 500;
+            color: #007bff;
+            margin-top: 5px;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">KICKS HAVEN</a>
+                <div class="nav-links">
+                    <a href="#">CỬA HÀNG</a>
+                    <a href="#">NIKE</a> <a href="#">ADIDAS</a>
+                    <a href="#">JORDAN</a>
+                    <a href="#">CONVERSE</a>
+                    <a href="#">VANS</a>
+                    <a href="#">PUMA</a>
+                </div>
+                <div class="search-cart">
+                    <a href="#" title="Tìm kiếm"><i class="fas fa-search"></i></a>
+                    <a href="#" title="Giỏ hàng"><i class="fas fa-shopping-cart"></i></a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container blog-page">
+        
+        <h1 class="section-title" style="font-family: 'Montserrat', sans-serif; text-align: center; font-size: 40px; margin-bottom: 30px;">
+            <i class="fas fa-newspaper"></i> TIN TỨC & CÂU CHUYỆN SNEAKER
+        </h1>
+
+        <div class="blog-content">
+            
+            <div class="main-posts">
+                
+                <article class="featured-post">
+                    <img src="img/images (1).jpg" alt="Jordan 1 High OG">
+                    <div class="featured-post-info">
+                        <span class="category">Jordan</span>
+                        <h2>Lịch Sử Của Jordan 1: Tại Sao Nó Vẫn Là Huyền Thoại?</h2>
+                        <p>
+                            Khám phá nguồn gốc, những lần bị cấm và sự trỗi dậy của Air Jordan 1 - đôi giày đã thay đổi cả nền văn hóa sneaker và thời trang đường phố mãi mãi. Phiên bản "Chicago" mới nhất...
+                        </p>
+                        <a href="#" class="read-more">Đọc thêm <i class="fas fa-arrow-right"></i></a>
+                        <p class="post-meta">
+                            <i class="far fa-calendar-alt"></i> 05/11/2025 | <i class="far fa-user"></i> Kicks Team | <i class="far fa-comment"></i> 15 bình luận
+                        </p>
+                    </div>
+                </article>
+                
+                <div class="post-grid">
+                    
+                    <article class="post-card">
+                        <img src="img/canhan2.jpg" alt="Nike Air Max Day">
+                        <div class="post-card-info">
+                            <span class="category">Nike | Review</span>
+                            <h3>Air Max Day 2026: Những Phiên Bản Đáng Chờ Đợi</h3>
+                            <p class="excerpt">
+                                Cập nhật sớm nhất về các mẫu Air Max sẽ ra mắt trong ngày hội Air Max lớn nhất năm, từ Air Max 1 cho đến Air Max 97. Đừng bỏ lỡ cơ hội sở hữu...
+                            </p>
+                            <p class="post-meta"><i class="far fa-calendar-alt"></i> 01/11/2025</p>
+                        </div>
+                    </article>
+                    
+                    <article class="post-card">
+                        <img src="img/canhan3.jpg" alt="Adidas Yeezy">
+                        <div class="post-card-info">
+                            <span class="category">Adidas | Tin tức</span>
+                            <h3>Tương Lai Của Yeezy Sau Khi Chia Tay: Điều Gì Sẽ Xảy Ra?</h3>
+                            <p class="excerpt">
+                                Sau thông báo chấm dứt hợp tác, dòng giày Yeezy sẽ đi về đâu? Phân tích chuyên sâu về thị trường resale và các mẫu giày còn lại trên thị trường...
+                            </p>
+                            <p class="post-meta"><i class="far fa-calendar-alt"></i> 28/10/2025</p>
+                        </div>
+                    </article>
+
+                    <article class="post-card">
+                        <img src="img/canhan5.jpg" alt="Vans Old Skool">
+                        <div class="post-card-info">
+                            <span class="category">Phong cách</span>
+                            <h3>Cách Phối Đồ Với Vans Old Skool Cho Mùa Đông</h3>
+                            <p class="excerpt">
+                                Hướng dẫn chi tiết cách mix & match giày Vans Old Skool với áo hoodie, quần jeans rách, và các phụ kiện đơn giản nhưng cực kỳ trendy...
+                            </p>
+                            <p class="post-meta"><i class="far fa-calendar-alt"></i> 25/10/2025</p>
+                        </div>
+                    </article>
+                    
+                    <article class="post-card">
+                        <img src="img/tải xuống (2).jpg" alt="Chăm sóc giày">
+                        <div class="post-card-info">
+                            <span class="category">Kinh nghiệm</span>
+                            <h3>5 Mẹo Bảo Quản Giày Sneaker Luôn Sạch Như Mới</h3>
+                            <p class="excerpt">
+                                Bí quyết đơn giản để loại bỏ các vết bẩn cứng đầu trên giày da lộn, vải canvas, và giày lưới mà không làm hỏng chất liệu. Xem ngay!
+                            </p>
+                            <p class="post-meta"><i class="far fa-calendar-alt"></i> 20/10/2025</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="pagination">
+                    <a href="#"><i class="fas fa-chevron-left"></i></a>
+                    <a href="#" class="current">1</a>
+                    <a href="#">2</a>
+                    <a href="#">3</a>
+                    <a href="#"><i class="fas fa-chevron-right"></i></a>
+                </div>
+
+            </div>
+
+            <div class="sidebar">
+                
+                <div class="sidebar-widget">
+                    <h4><i class="fas fa-search"></i> Tìm kiếm bài viết</h4>
+                    <input type="text" placeholder="Nhập từ khóa...">
+                    <button type="submit">Tìm kiếm</button>
+                </div>
+                
+                <div class="sidebar-widget">
+                    <h4><i class="fas fa-tags"></i> Danh mục phổ biến</h4>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Tin tức phát hành (12)</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Đánh giá sản phẩm (8)</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Hướng dẫn phối đồ (5)</a></li>
+                        <li><a href="#"><i class="fas fa-angle-right"></i> Lịch sử thương hiệu (3)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="sidebar-widget">
+                    <h4><i class="fas fa-bolt"></i> Bài viết gần đây</h4>
+                    <ul>
+                        <li><a href="#">Tuyển chọn 10 đôi giày chạy bộ tốt nhất 2025</a></li>
+                        <li><a href="#">Phân biệt giày Nike Rep 1:1 và Chính Hãng</a></li>
+                        <li><a href="#">BST Adidas Samba Hot nhất mùa này</a></li>
+                        <li><a href="#">Sự trở lại bất ngờ của New Balance 550</a></li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-widget" style="padding: 0; text-align: center; border: none; box-shadow: none;">
+                    <a href="#">
+                        <img src="img/banner1.jpg" alt="Banner quảng cáo" style="width: 100%; border-radius: 8px;">
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h4>Giới thiệu Kicks Haven</h4>
+                    <a href="#">Về chúng tôi</a>
+                    <a href="#">Hệ thống cửa hàng</a>
+                    <a href="#">Tuyển dụng</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ khách hàng</h4>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Tra cứu đơn hàng</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Liên hệ tư vấn</h4>
+                    <p>Tư vấn mua hàng (Miễn phí)</p>
+                    <p class="contact-info">1800 6688</p>
+                    <p>Hỗ trợ kỹ thuật (24/7)</p>
+                    <p class="contact-info">1800 6689</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ thanh toán</h4>
+                    <p>VISA | MASTER | MOMO | ZALOPAY</p>
+                    <h4>Chứng nhận</h4>
+                    <p>Đã đăng ký với Bộ Công Thương</p>
+                </div>
+                 <div class="footer-col">
+                    <h4>Theo dõi chúng tôi</h4>
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">TikTok</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2025 Kicks Haven Vietnam. Tất cả quyền được bảo lưu. Thiết kế và phát triển bởi Kicks Studio.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

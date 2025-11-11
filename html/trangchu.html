@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KICKS HAVEN | Giày Sneaker Chính Hãng & Thời Trang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+    /* --- CSS TỔNG THỂ --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7; 
+            color: #1a1a1a;
+        }
+        .container {
+            width: 90%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 40px 0 20px;
+            text-align: center;
+            color: #333;
+            text-transform: uppercase;
+        }
+
+        /* --- HEADER & NAVIGATION (Giữ nguyên) --- */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: #007bff; 
+            text-decoration: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #555;
+            margin-left: 20px; 
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover {
+            color: #007bff;
+        }
+        .search-cart {
+            display: flex;
+            align-items: center;
+        }
+        .search-cart a {
+            font-size: 20px;
+            color: #555;
+            margin-left: 15px;
+            text-decoration: none;
+        }
+
+        /* --- SLIDE BANNER LỚN --- */
+        .hero-carousel {
+            width: 100%;
+            overflow: hidden; 
+            position: relative;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .slide-container {
+            display: flex;
+            transition: transform 0.5s ease-in-out; 
+            width: 300%; 
+        }
+        .slide {
+            width: calc(100% / 3); 
+            height: 300px; 
+            flex-shrink: 0; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; 
+            color: #fff; 
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            position: relative;
+            padding: 0 5%;
+            box-sizing: border-box;
+        }
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2); 
+            z-index: 1;
+        }
+        .slide h1, .slide p, .slide a {
+            z-index: 2; 
+            position: relative;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-family: 'Montserrat', sans-serif;
+            text-align: left;
+        }
+        .slide h1 {
+            font-size: 40px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        .slide-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 24px;
+            z-index: 10;
+            opacity: 0.8;
+            transition: opacity 0.3s, background-color 0.3s;
+        }
+        .slide-nav-btn:hover {
+            opacity: 1;
+            background-color: #007bff; 
+        }
+        #prevBtn { left: 0; border-radius: 0 5px 5px 0; }
+        #nextBtn { right: 0; border-radius: 5px 0 0 5px; }
+        .slide-cta {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 25px;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 4px;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+        .slide-cta:hover {
+            background-color: #0056b3;
+        }
+
+
+        /* --- FLASH SALE KHUNG GIỜ VÀNG --- */
+        .flash-sale-hour {
+            background-color: #d20505; 
+            color: white;
+            padding: 20px 0 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .sale-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            margin: 0 0 20px;
+            color: #ffc107; 
+            text-transform: uppercase;
+        }
+        .timer-container-new {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .timer-container-new p {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px; 
+            margin-top: 0;
+        }
+        .sale-timer {
+            display: flex;
+            gap: 10px; 
+            font-weight: 700;
+        }
+        .timer-box {
+            background-color: white;
+            color: #d20505;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 24px; 
+            line-height: 1;
+        }
+        .timer-separator {
+            font-size: 24px;
+            line-height: 1.5;
+        }
+        .sale-product-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto 0;
+        }
+        .sale-product-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .sale-product-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+        }
+        .sale-product-card h3 {
+            font-size: 14px;
+            color: #333;
+            margin: 5px 0;
+        }
+        .original-price {
+            color: #888;
+            text-decoration: line-through;
+            font-size: 12px;
+            margin: 0;
+        }
+        .sale-price {
+            color: #d20505;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0;
+        }
+
+
+        /* --- PRODUCT CAROUSEL (SẢN PHẨM) --- */
+        .product-carousel-wrap {
+            position: relative;
+            margin-bottom: 50px;
+            width: 100%; 
+        }
+        .product-list-container {
+            overflow: hidden; 
+        }
+        .product-list {
+            display: flex;
+            gap: 20px;
+            overflow-x: scroll; 
+            scroll-behavior: smooth; 
+            padding-bottom: 15px; 
+            -ms-overflow-style: none;
+            scrollbar-width: none; 
+        }
+        .product-list::-webkit-scrollbar {
+            display: none; 
+        }
+        .product-card-slide, .product-card { /* Áp dụng style chung */
+            flex: 0 0 20%; 
+            min-width: 250px; 
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden; 
+        }
+        .product-card-slide:hover, .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .product-card-slide img, .product-card img {
+            width: 100%;
+            height: 180px; 
+            object-fit: contain; 
+            margin-bottom: 10px;
+        }
+        .product-card-slide h3, .product-card h3 {
+            font-size: 15px; 
+            font-weight: 500;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+        .product-card-slide p, .product-card p {
+            font-size: 17px; 
+            font-weight: 700;
+            color: #007bff; 
+            margin: 5px 0 10px;
+        }
+        .stars {
+            color: #ffc107; 
+            font-size: 14px;
+        }
+
+        /* Nút điều hướng sản phẩm */
+        .carousel-nav-btn {
+            position: absolute;
+            top: 60%; 
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 10;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            line-height: 18px;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .carousel-nav-btn:hover {
+            background-color: #007bff;
+        }
+        #prevProductBtn1, #prevProductBtn2, #prevProductBtn3 { left: -20px; }
+        #nextProductBtn1, #nextProductBtn2, #nextProductBtn3 { right: -20px; }
+        
+        /* --- BUTTONS ON HOVER --- */
+        .product-card-slide .product-actions, .product-card .product-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            transform: translateY(100%); /* Ẩn ban đầu */
+            transition: transform 0.3s ease-out;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .product-card-slide:hover .product-actions, .product-card:hover .product-actions {
+            transform: translateY(0); /* Hiện khi hover */
+        }
+        .action-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 7px 12px; 
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 13px;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+        .action-btn.secondary {
+            background-color: #555;
+        }
+        .action-btn:hover {
+            background-color: #0056b3;
+        }
+        .action-btn.secondary:hover {
+            background-color: #333;
+        }
+
+        /* --- TESTIMONIALS (Đánh giá) --- */
+        .testimonials-section {
+            background-color: #ffffff; 
+            padding: 60px 0;
+            text-align: center;
+            margin-top: 40px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .review-card {
+            background-color: #fcfcfc;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            text-align: left;
+        }
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .reviewer-info img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .reviewer-details {
+            font-size: 14px;
+        }
+        .reviewer-details strong {
+            display: block;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .reviewer-details small {
+            color: #888;
+        }
+        .review-card p {
+            font-style: italic;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+
+        /* --- FOOTER STYLING (ĐÃ LÀM ĐẸP VÀ CÂN ĐỐI) --- */
+        footer {
+            background-color: #212121; /* Nền đen sâu hơn, sang trọng */
+            color: #e0e0e0; /* Chữ trắng ngà, dễ chịu */
+            padding: 40px 0 0; 
+            font-family: 'Open Sans', sans-serif; 
+            border-top: 4px solid #ff7043; /* Viền cam mỏng và ấm áp hơn */
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between; /* Đẩy các cột ra hai bên */
+            flex-wrap: wrap;
+            padding-bottom: 30px;
+            max-width: 1300px;
+            width: 90%;
+            margin: 0 auto;
+        }
+        
+        /* Cấu trúc cột mới: 4 cột đều nhau */
+        .footer-col {
+            flex: 1 1 0; /* Chiếm không gian đồng đều */
+            min-width: 200px; 
+            padding: 0 15px; 
+        }
+
+        .footer-col h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 17px; 
+            color: #ffffff; 
+            margin-bottom: 20px; 
+            text-transform: uppercase;
+            position: relative; 
+            padding-bottom: 8px; 
+        }
+
+        /* Hiệu ứng gạch chân cho tiêu đề cột */
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px; 
+            height: 3px; 
+            background-color: #ff7043; /* Màu cam cho gạch chân */
+            border-radius: 2px;
+        }
+        
+        .footer-col a, .footer-col p {
+            display: block;
+            color: #b0b0b0; 
+            text-decoration: none;
+            margin-bottom: 10px; 
+            font-size: 14px;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+        .footer-col a:hover {
+            color: #ff7043; 
+            transform: translateX(3px);
+        }
+
+        .contact-info {
+            font-weight: 600;
+            color: #ff7043; /* Màu cam cho thông tin liên hệ chính */
+            margin-top: 5px;
+        }
+
+        /* Chứng nhận và Thanh toán */
+        .certifications-payments {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .certifications-payments img {
+            max-height: 30px;
+            vertical-align: middle;
+            filter: grayscale(80%) brightness(150%);
+            transition: filter 0.3s;
+        }
+        .certifications-payments img:hover {
+            filter: grayscale(0%) brightness(100%);
+        }
+
+        /* Copyright section */
+        .footer-bottom {
+            background-color: #151515; /* Nền tối hơn cho copyright */
+            color: #a0a0a0; 
+            font-size: 13px;
+            padding: 20px 0;
+            text-align: center;
+            margin-top: 40px; /* Khoảng cách với phần trên */
+        }
+        .footer-bottom p {
+             margin: 0 auto;
+             max-width: 900px;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .footer-top {
+                flex-direction: column;
+                gap: 25px;
+            }
+            .footer-col {
+                flex: 1 1 100%;
+                padding: 0 20px;
+                text-align: left;
+            }
+            .footer-col h4::after {
+                left: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">KICKS HAVEN</a>
+                <div class="nav-links">
+                    <a href="#">CỬA HÀNG</a>
+                    <a href="#">NIKE</a>
+                    <a href="#">ADIDAS</a>
+                    <a href="#">JORDAN</a>
+                    <a href="#">CONVERSE</a>
+                    <a href="#">VANS</a>
+                    <a href="#">PUMA</a>
+                </div>
+                <div class="search-cart">
+                    <a href="#" title="Tìm kiếm">🔍</a>
+                    <a href="#" title="Giỏ hàng">🛒</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <section class="hero-carousel">
+            <div class="slide-container" id="slideContainer">
+                
+                <div class="slide" style="background-image: url('https://via.placeholder.com/1200x300/183A5A/FFFFFF?text=LI-NING+NEW+DROP+2025');">
+                    <h1 style="font-size: 48px;">GIÀY CHÍNH HÃNG</h1>
+                    <p style="font-size: 36px; font-weight: 600; margin-bottom: 0;">LI-NING</p>
+                    <a href="#" class="slide-cta">TRẢI NGHIỆM KHÔNG GIỚI HẠN</a>
+                </div>
+                
+                <div class="slide" style="background-image: url('https://via.placeholder.com/1200x300/FF4500/FFFFFF?text=ADIDAS+RUNNING+-+SALE+40%25');">
+                    <h1>SALE CUỐI MÙA</h1>
+                    <p>Giảm đến 40% cho các dòng giày chạy bộ Adidas!</p>
+                    <a href="#" class="slide-cta" style="background-color: white; color: #ff4500;">SĂN SALE NGAY</a>
+                </div>
+                
+                <div class="slide" style="background-image: url('https://via.placeholder.com/1200x300/008000/FFFFFF?text=NEW+BALANCE+EXCLUSIVE');">
+                    <h1>NEW BALANCE 550</h1>
+                    <p>Bộ sưu tập retro đã trở lại. Đặt hàng ngay!</p>
+                    <a href="#" class="slide-cta">XEM NGAY</a>
+                </div>
+                
+            </div>
+            
+            <button class="slide-nav-btn" id="prevBtn">❮</button>
+            <button class="slide-nav-btn" id="nextBtn">❯</button>
+        </section>
+        
+        <section class="flash-sale-hour">
+            <div class="container">
+                <div class="sale-header">
+                    <h2 style="color: white; font-size: 30px;">⚡️ FLASH SALE KHUNG GIỜ VÀNG ⚡️</h2>
+                </div>
+                
+                <div class="timer-container-new">
+                    <p>Chỉ còn lại:</p>
+                    <div class="sale-timer">
+                        <div class="timer-box">01</div>
+                        <span class="timer-separator">:</span>
+                        <div class="timer-box">30</div>
+                        <span class="timer-separator">:</span>
+                        <div class="timer-box">55</div>
+                    </div>
+                </div>
+                
+                <div class="sale-product-grid">
+                    
+                    <div class="sale-product-card">
+                        <img src="https://via.placeholder.com/300x200/ffdddd/d20505?text=Sale+Giay+1" alt="Giày Sale 1">
+                        <h3>Nike Blazer Mid '77</h3>
+                        <p class="original-price">2,500,000 VNĐ</p>
+                        <p class="sale-price">1,500,000 VNĐ</p>
+                    </div>
+                    
+                    <div class="sale-product-card">
+                        <img src="https://via.placeholder.com/300x200/ffdddd/d20505?text=Sale+Giay+2" alt="Giày Sale 2">
+                        <h3>Adidas Samba Classic</h3>
+                        <p class="original-price">1,990,000 VNĐ</p>
+                        <p class="sale-price">1,190,000 VNĐ</p>
+                    </div>
+                    
+                    <div class="sale-product-card">
+                        <img src="https://via.placeholder.com/300x200/ffdddd/d20505?text=Sale+Giay+3" alt="Giày Sale 3">
+                        <h3>Puma Caven Dime</h3>
+                        <p class="original-price">1,550,000 VNĐ</p>
+                        <p class="sale-price">999,000 VNĐ</p>
+                    </div>
+                    
+                    <div class="sale-product-card">
+                        <img src="https://via.placeholder.com/300x200/ffdddd/d20505?text=Sale+Giay+4" alt="Giày Sale 4">
+                        <h3>Vans Sk8-Hi Black</h3>
+                        <p class="original-price">1,800,000 VNĐ</p>
+                        <p class="sale-price">900,000 VNĐ</p>
+                    </div>
+                    
+                    <div class="sale-product-card">
+                        <img src="https://via.placeholder.com/300x200/ffdddd/d20505?text=Sale+Giay+5" alt="Giày Sale 5">
+                        <h3>NB 327 Black/White</h3>
+                        <p class="original-price">3,100,000 VNĐ</p>
+                        <p class="sale-price">1,999,000 VNĐ</p>
+                    </div>
+
+                </div>
+                
+            </div>
+        </section>
+
+
+        <h2 class="section-title">🔥 SẢN PHẨM BÁN CHẠY</h2>
+        <section class="product-carousel-wrap">
+            <div class="product-list-container">
+                <div class="product-list" id="bestSellerList">
+                    
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Max" alt="Nike Air Max">
+                        <h3>Nike Air Force 1 Low</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,890,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+UB" alt="Adidas Ultraboost">
+                        <h3>Adidas Ultraboost 22</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+UB" alt="Adidas Ultraboost">
+                        <h3>Adidas Ultraboost 22</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+UB" alt="Adidas Ultraboost">
+                        <h3>Adidas Ultraboost 22</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+UB" alt="Adidas Ultraboost">
+                        <h3>Adidas Ultraboost 22</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+UB" alt="Adidas Ultraboost">
+                        <h3>Adidas Ultraboost 22</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+UB" alt="Adidas Ultraboost">
+                        <h3>Adidas Ultraboost 22</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Converse+High" alt="Converse Chuck">
+                        <h3>Converse Chuck Taylor High</h3>
+                        <div class="stars">★★★☆☆</div>
+                        <p>1,650,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Puma+Suede" alt="Puma Suede">
+                        <h3>Puma Suede Classic</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,100,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Vans+Skool" alt="Vans Old Skool">
+                        <h3>Vans Old Skool Navy</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>1,890,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Jordan+Low" alt="Jordan Low">
+                        <h3>Jordan 1 Low SE Utility</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>4,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <button class="carousel-nav-btn" id="prevProductBtn1" onclick="scrollProducts(-1, 'bestSellerList')">❮</button>
+            <button class="carousel-nav-btn" id="nextProductBtn1" onclick="scrollProducts(1, 'bestSellerList')">❯</button>
+        </section>
+
+
+        <h2 class="section-title">✨ GIÀY MỚI NHẤT</h2>
+        <section class="product-carousel-wrap">
+            <div class="product-list-container">
+                <div class="product-list" id="newArrivalList">
+                    
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Jordan+Low" alt="Jordan Low">
+                        <h3>Jordan 1 Low SE Utility</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>4,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+Dunk" alt="Nike Dunk">
+                        <h3>Nike Dunk Low Retro Panda</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>3,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=New+Balance+550" alt="New Balance 550">
+                        <h3>New Balance 550 White</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>3,200,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Yeezy+Boost" alt="Yeezy Boost">
+                        <h3>Yeezy Boost 350 V2</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>7,800,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Reebok+Club" alt="Reebok Club C">
+                        <h3>Reebok Club C 85 Vintage</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>1,990,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Puma+RS-X" alt="Puma RS-X">
+                        <h3>Puma RS-X Pop</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,200,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <button class="carousel-nav-btn" id="prevProductBtn2" onclick="scrollProducts(-1, 'newArrivalList')">❮</button>
+            <button class="carousel-nav-btn" id="nextProductBtn2" onclick="scrollProducts(1, 'newArrivalList')">❯</button>
+        </section>
+        
+        <h2 class="section-title">👟 GIÀY PHỔ BIẾN KHÁC</h2>
+        <section class="product-carousel-wrap">
+            <div class="product-list-container">
+                <div class="product-list" id="otherPopularList">
+                    
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Nike+VaporMax" alt="Nike VaporMax">
+                        <h3>Nike VaporMax Flyknit 3</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>5,100,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+Forum" alt="Adidas Forum">
+                        <h3>Adidas Forum Low OG</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,590,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+Forum" alt="Adidas Forum">
+                        <h3>Adidas Forum Low OG</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,590,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+Forum" alt="Adidas Forum">
+                        <h3>Adidas Forum Low OG</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,590,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+Forum" alt="Adidas Forum">
+                        <h3>Adidas Forum Low OG</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,590,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+Forum" alt="Adidas Forum">
+                        <h3>Adidas Forum Low OG</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,590,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Adidas+Forum" alt="Adidas Forum">
+                        <h3>Adidas Forum Low OG</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,590,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Converse+Run+Star" alt="Converse Run Star">
+                        <h3>Run Star Hike Platform</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>2,350,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=Puma+RS-X" alt="Puma RS-X">
+                        <h3>Puma RS-X Pop</h3>
+                        <div class="stars">★★★★☆</div>
+                        <p>2,200,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+                    <div class="product-card-slide">
+                        <img src="https://via.placeholder.com/300x200?text=NB+990v5" alt="NB 990v5">
+                        <h3>New Balance 990v5 Gray</h3>
+                        <div class="stars">★★★★★</div>
+                        <p>5,500,000 VNĐ</p>
+                        <div class="product-actions">
+                            <a href="#" class="action-btn">Mua ngay</a>
+                            <a href="#" class="action-btn secondary">Chi tiết</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <button class="carousel-nav-btn" id="prevProductBtn3" onclick="scrollProducts(-1, 'otherPopularList')">❮</button>
+            <button class="carousel-nav-btn" id="nextProductBtn3" onclick="scrollProducts(1, 'otherPopularList')">❯</button>
+        </section>
+
+
+        <section class="testimonials-section">
+            <div class="container">
+                <h2 class="section-title">Khách hàng nói gì</h2>
+                <p class="subtitle">Những phản hồi chân thực từ khách hàng đã tin tưởng chúng tôi</p>
+                
+                <div class="review-grid">
+                    
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p>"Giày đúng chất lượng, giao hàng cực nhanh! Nhân viên tư vấn chọn size chuẩn xác. Rất hài lòng!"</p>
+                        <div class="reviewer-info">
+                            <img src="https://via.placeholder.com/50x50?text=NM" alt="Avatar Nguyễn Minh Anh">
+                            <div class="reviewer-details">
+                                <strong>Nguyễn Minh Anh</strong>
+                                <small>Khách hàng đã mua</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-card">
+                        <div class="stars">★★★★★</div>
+                        <p>"Đã mua 3 đôi cho cả nhà. Chất lượng tuyệt vời, giá cả hợp lý. Dịch vụ sau bán hàng và bảo hành rất chuyên nghiệp."</p>
+                        <div class="reviewer-info">
+                            <img src="https://via.placeholder.com/50x50?text=TH" alt="Avatar Trần Văn Hùng">
+                            <div class="reviewer-details">
+                                <strong>Trần Văn Hùng</strong>
+                                <small>Khách hàng đã mua</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="review-card">
+                        <div class="stars">★★★★☆</div>
+                        <p>"Giày đi êm chân, phối đồ cực đẹp. Đóng gói cẩn thận. Chỉ hơi tiếc là hết size 41. Cảm ơn team hỗ trợ!"</p>
+                        <div class="reviewer-info">
+                            <img src="https://via.placeholder.com/50x50?text=LM" alt="Avatar Lê Thị Mai">
+                            <div class="reviewer-details">
+                                <strong>Lê Thị Mai</strong>
+                                <small>Khách hàng đã mua</small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-col">
+                    <h4>Giới thiệu Kicks Haven</h4>
+                    <a href="#">Về chúng tôi</a>
+                    <a href="#">Hệ thống cửa hàng</a>
+                    <a href="#">Tuyển dụng</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ khách hàng</h4>
+                    <a href="#">Chính sách đổi trả</a>
+                    <a href="#">Chính sách bảo hành</a>
+                    <a href="#">Hướng dẫn mua hàng</a>
+                    <a href="#">Tra cứu đơn hàng</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Liên hệ tư vấn</h4>
+                    <p>Tư vấn mua hàng (Miễn phí)</p>
+                    <p class="contact-info">1800 6688</p>
+                    <p>Hỗ trợ kỹ thuật (24/7)</p>
+                    <p class="contact-info">1800 6689</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Hỗ trợ thanh toán</h4>
+                    <p>VISA | MASTER | MOMO | ZALOPAY</p>
+                    <h4>Chứng nhận</h4>
+                    <p>Đã đăng ký với Bộ Công Thương</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Theo dõi chúng tôi</h4>
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">TikTok</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2025 Kicks Haven Vietnam. Tất cả quyền được bảo lưu. Thiết kế và phát triển bởi Kicks Studio.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- JS CHO BANNER LỚN (hero-carousel) ---
+            const slideContainer = document.getElementById('slideContainer');
+            const totalSlides = 3; 
+            let currentIndex = 0;
+
+            const updateSlide = () => {
+                const offset = -currentIndex * 100;
+                slideContainer.style.transform = `translateX(${offset}%)`;
+            };
+
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlide();
+            });
+
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlide();
+            });
+            
+            // Tự động chuyển slide sau mỗi 3 giây
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlide();
+            }, 3000);
+
+
+            // --- JS CHO SLIDE SẢN PHẨM (product-list) ---
+            // Hàm cuộn sản phẩm
+            function scrollProducts(direction, listId) {
+                const list = document.getElementById(listId);
+                // Ước tính độ rộng của 2 sản phẩm (khoảng 270px)
+                const scrollDistance = 270 * 2; 
+
+                list.scrollBy({
+                    left: direction * scrollDistance, 
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Gán hàm scrollProducts vào các nút. 
+            document.getElementById('prevProductBtn1').addEventListener('click', () => {
+                 scrollProducts(-1, 'bestSellerList');
+            });
+            document.getElementById('nextProductBtn1').addEventListener('click', () => {
+                 scrollProducts(1, 'bestSellerList');
+            });
+            
+            document.getElementById('prevProductBtn2').addEventListener('click', () => {
+                 scrollProducts(-1, 'newArrivalList');
+            });
+            document.getElementById('nextProductBtn2').addEventListener('click', () => {
+                 scrollProducts(1, 'newArrivalList');
+            });
+            
+            document.getElementById('prevProductBtn3').addEventListener('click', () => {
+                 scrollProducts(-1, 'otherPopularList');
+            });
+            document.getElementById('nextProductBtn3').addEventListener('click', () => {
+                 scrollProducts(1, 'otherPopularList');
+            });
+
+        });
+    </script>
+</body>
+</html>
