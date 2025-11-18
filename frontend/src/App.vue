@@ -1,9 +1,9 @@
 <script setup>
-import trangchu from './trangchu.vue';
+import Header from './header.vue';
 import FooterComponent  from './footer.vue';
 </script>
 <template>
-  <trangchu />
+  <Header />
   <main>
     
   </main>
