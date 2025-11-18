@@ -49,7 +49,7 @@
           <div class="sale-product-card">
             <img :src="imgSale1" alt="Giày Sale 1" />
             <h3>Nike Blazer Mid '77</h3>
-            <p class="original-price">2,500,000 VNĐ</p>
+            <p class="original-price">2,600,000 VNĐ</p>
             <p class="sale-price">1,500,000 VNĐ</p>
 
             <div class="sale-actions">
