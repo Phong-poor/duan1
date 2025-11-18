@@ -130,7 +130,7 @@ import logoImage from './assets/logone.png';
   flex-wrap: wrap;
   gap: 15px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #3a3a3a;
+  border-bottom: 1px solid red;
 }
 
 /* COLUMN */
