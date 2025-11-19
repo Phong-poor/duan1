@@ -1,9 +1,5 @@
 <script setup>
-import Trangchu from './trangchu.vue';
-import thongTin from './ThongTin.vue';
-import chitietdonhang from './ChiTietDonHang.vue';
-import sanpham from './SanPham.vue';
-import chitiet from './ChiTiet.vue';
+
 </script>
 <template>
 
@@ -12,7 +8,8 @@ import chitiet from './ChiTiet.vue';
     <!-- <thongTin/> -->
     <!-- <chitietdonhang/> -->
      <!-- <sanpham/> -->
-      <chitiet/>
+      <!-- <chitiet/> -->
+       <router-view />
   </main>
   <FooterComponent  />
 </template>

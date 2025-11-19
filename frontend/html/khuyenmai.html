@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khuyến mãi - ShopName</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: #ff4c4c;
+      color: #fff;
+      padding: 15px 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav ul li a:hover {
+      text-decoration: underline;
+    }
+
+    /* Banner */
+    .promo-banner {
+      background: url('https://images.unsplash.com/photo-1607082349566-1873428a3b43?auto=format&fit=crop&w=1350&q=80') center/cover;
+      color: white;
+      text-align: center;
+      padding: 100px 20px;
+    }
+
+    .promo-banner h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .promo-banner p {
+      font-size: 1.2rem;
+    }
+
+    /* Content */
+    .promo-section {
+      max-width: 1200px;
+      margin: 50px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .promo-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .promo-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .promo-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .promo-card .content {
+      padding: 20px;
+    }
+
+    .promo-card h3 {
+      color: #ff4c4c;
+      margin-bottom: 10px;
+    }
+
+    .promo-card p {
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+
+    .promo-card .price {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .promo-card button {
+      background: #ff4c4c;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .promo-card button:hover {
+      background: #e13b3b;
+    }
+
+    /* Footer */
+    footer {
+      background: #222;
+      color: #bbb;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">ShopName</div>
+    <nav>
+      <ul>
+        <li><a href="#">Trang chủ</a></li>
+        <li><a href="#">Sản phẩm</a></li>
+        <li><a href="#">Khuyến mãi</a></li>
+        <li><a href="#">Liên hệ</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Banner -->
+  <section class="promo-banner">
+    <h1>SIÊU SALE THÁNG 11 🎉</h1>
+    <p>Giảm đến <strong>50%</strong> cho tất cả sản phẩm! Nhanh tay kẻo lỡ!</p>
+  </section>
+
+  <!-- Promotions -->
+  <section class="promo-section">
+    <div class="promo-card">
+      <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=800&q=80" alt="Sản phẩm 1">
+      <div class="content">
+        <h3>Áo Thun Nam</h3>
+        <p>Áo thun cotton cao cấp, thoáng mát, nhiều màu sắc.</p>
+        <div class="price">Giá chỉ: 199.000đ <del>299.000đ</del></div>
+        <button>Mua ngay</button>
+      </div>
+    </div>
+
+    <div class="promo-card">
+      <img src="https://images.unsplash.com/photo-1516822003754-cca485356ecb?auto=format&fit=crop&w=800&q=80" alt="Sản phẩm 2">
+      <div class="content">
+        <h3>Giày Sneaker</h3>
+        <p>Giày thời trang năng động, giảm giá khủng dịp 11.11.</p>
+        <div class="price">Giá chỉ: 499.000đ <del>799.000đ</del></div>
+        <button>Mua ngay</button>
+      </div>
+    </div>
+
+    <div class="promo-card">
+      <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=80" alt="Sản phẩm 3">
+      <div class="content">
+        <h3>Túi Xách Nữ</h3>
+        <p>Túi xách da PU sang trọng, phù hợp cho mọi phong cách.</p>
+        <div class="price">Giá chỉ: 299.000đ <del>450.000đ</del></div>
+        <button>Mua ngay</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 ShopName - Tất cả quyền được bảo lưu.
+  </footer>
+
+</body>
+</html>

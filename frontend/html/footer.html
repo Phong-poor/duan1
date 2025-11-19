@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Footer FPT Shop - Gộp File</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- CSS TỔNG THỂ --- */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5; 
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Basic styling to show content above footer */
+        .main-content {
+            min-height: 300px;
+            padding: 20px;
+            text-align: center;
+            background-color: #fff;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- FOOTER STYLING --- */
+        .footer {
+            background-color: #262626; /* Nền đen xám sẫm */
+            color: #b0b0b0; /* Chữ trắng nhạt */
+            padding: 30px 0 0;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px; 
+            padding-bottom: 20px;
+            border-bottom: 1px solid #3a3a3a; 
+        }
+
+        /* --- COLUMN STYLING --- */
+        .footer-column {
+            flex: 1 1 180px; 
+            padding: 0 10px;
+            min-width: 150px; 
+        }
+
+        .footer-column h4 {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500; 
+            font-size: 14px; 
+            color: #ffffff; 
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 5px; 
+            font-size: 13px; 
+        }
+
+        .footer-column ul li a {
+            color: #b0b0b0; 
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-column ul li a:hover {
+            color: #ffffff; 
+        }
+
+        /* --- HOTLINE & HỖ TRỢ --- */
+        .footer-column .hotline {
+            color: #ff0000; /* Màu đỏ nổi bật cho số hotline */
+            font-weight: 700;
+            font-size: 15px;
+            display: block;
+            margin-bottom: 0px;
+        }
+        .footer-column .hotline-label {
+            font-size: 12px;
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 5px;
+        }
+        .hotline-section {
+            margin-bottom: 15px;
+        }
+
+        /* --- CERTIFICATIONS & LOGOS --- */
+        .certification-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .certification-group img {
+            max-height: 35px; /* Kích thước ảnh chứng nhận */
+            vertical-align: middle;
+        }
+        .payment-group img {
+            max-height: 25px; /* Kích thước logo thanh toán */
+            margin-right: 5px;
+        }
+
+        /* --- PARTNER SECTION --- */
+        .partner-section {
+            margin-bottom: 15px;
+        }
+        .partner-logo {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 8px;
+            line-height: 1.2;
+        }
+        .partner-logo img {
+            max-height: 35px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .partner-desc {
+            font-size: 11px;
+            font-weight: 400;
+            color: #888;
+            display: block;
+        }
+
+
+        /* --- COPYRIGHT STYLING --- */
+        .footer-bottom-copy {
+            background-color: #262626; 
+            color: #888;
+            font-size: 11px;
+            padding: 15px 0;
+            text-align: center;
+            max-width: 1200px;
+            width: 90%;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+        .footer-bottom-copy a {
+            color: #888;
+            text-decoration: none;
+        }
+        .footer-bottom-copy a:hover {
+            color: #ff0000;
+        }
+
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: left;
+            }
+            .footer-column {
+                flex: 1 1 100%;
+                padding: 0 10px;
+            }
+            .footer-column h4 {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <h1>Nội dung trang web ở đây</h1>
+        <p>Cuộn xuống để xem footer.</p>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-container">
+                
+                <div class="footer-column">
+                    <h4>Giới thiệu về công ty</h4>
+                    <ul>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Quy chế hoạt động</a></li>
+                        <li><a href="#">Kiểm tra hóa đơn điện tử</a></li>
+                        <li><a href="#">Tra cứu thông tin bảo hành</a></li>
+                        <li><a href="#">Câu hỏi thường gặp mua hàng</a></li>
+                    </ul>
+                    <div class="certification-group" style="margin-top: 20px;">
+                        <img src="img/bct.png" alt="Bo Cong Thuong"> 
+                    </div>
+                </div>
+
+                
+                <div class="footer-column">
+                    <h4>Tin tuyển dụng</h4>
+                    <ul>
+                        <li><a href="#">Tin khuyến mãi</a></li>
+                        <li><a href="#">Hướng dẫn mua online</a></li>
+                        <li><a href="#">Hướng dẫn mua trả góp</a></li>
+                        <li><a href="#">Chính sách trả góp</a></li>
+                    </ul>
+                    <h4 style="margin-top: 25px;">Chứng nhận:</h4>
+                    <div class="certification-group">
+                        <img src="img/IO.jpg" alt="Chứng nhận ISO">
+                    </div>
+                </div>
+
+                
+                <div class="footer-column">
+                    <h4>Hệ thống cửa hàng</h4>
+                    <ul>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Hệ thống bảo hành</a></li>
+                        <li><a href="#">Giới thiệu máy đổi trả</a></li>
+                    </ul>
+                </div>
+
+                
+                <div class="footer-column">
+                    <h4>Tư vấn mua hàng (Miễn phí)</h4>
+                    <div class="hotline-section">
+                        <span class="hotline">1800 6601</span>
+                        <span class="hotline-label">(Nhánh 1)</span>
+                    </div>
+                    
+                    <h4 style="margin-top: 0;">Hỗ trợ kỹ thuật</h4>
+                    <div class="hotline-section">
+                        <span class="hotline">1800 6601</span>
+                        <span class="hotline-label">(Nhánh 2)</span>
+                        <span class="hotline-label" style="font-size: 11px; margin-bottom: 0;">Góp ý khiếu nại (8h00-22h00)</span>
+                        <span class="hotline">1800 6616</span>
+                    </div>
+
+                    <h4 style="margin-top: 15px;">Hỗ trợ thanh toán:</h4>
+                    <div class="payment-group">
+                        <img src="img/visa.png" alt="Visa">
+                    </div>
+                </div>
+
+                
+                <div class="footer-column">
+                    <h4>Website cùng FPT Retail:</h4>
+                    <div class="partner-section">
+                        <div class="partner-logo">F.Studio <span class="partner-desc">Cửa hàng ủy quyền bởi Apple:</span></div>
+                    </div>
+                    <div class="partner-section">
+                        <div class="partner-logo">F.Care <span class="partner-desc">Trung tâm bảo hành ủy quyền của Apple:</span></div>
+                    </div>
+                    <div class="partner-section">
+                        <img src="img/logone.png" alt="FPT Polytechnic" style="max-height: 40px; margin-top: 5px;">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer-bottom-copy">
+            @ 2007 - 2023 Công Ty Cổ Phần Bán Lẻ Kỹ Thuật Số FPT/Địa chỉ: 261-263 Khánh Hội,P5,Q4, TP.Hồ Chí Minh / GPDĐKKD số 0311609355 do Sở KHDT TP.HCM cấp ngày 08/03/2012. GP số 47/GP-TTĐT do sở TTTT TP.HCM cấp ngày 02/07/2018. Điện thoại <a href="tel:02873023456">(028) 7302 3456</a>. Email: <a href="mailto:fptshop@fpt.com.vn">fptshop@fpt.com.vn</a>. Chịu trách nhiệm nội dung: Nguyễn Trịnh Nhật Linh.
+        </div>
+    </footer>
+
+</body>
+</html>

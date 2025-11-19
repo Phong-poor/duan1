@@ -1,5 +1,10 @@
 <script setup>
 import logoImage from './assets/logone.png';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const goTo = (path) => {
+  router.push(path);
+};
 </script>
 
 <template>
@@ -13,11 +18,11 @@ import logoImage from './assets/logone.png';
       </div>
 
       <nav class="nav-links">
-        <a href="#">TRANG CHỦ</a>
-        <a href="#">SẢN PHẨM</a>
-        <a href="#">TIN TỨC</a>
-        <a href="#">GIỚI THIỆU</a>
-        <a href="#">LIÊN HỆ</a>
+        <a @click.prevent="goTo('trangChu')">TRANG CHỦ</a>
+        <a @click.prevent="goTo('/sanPham')">SẢN PHẨM</a>
+        <a @click.prevent="goTo('/')">TIN TỨC</a>
+        <a @click.prevent="goTo('/gioi-thieu')">GIỚI THIỆU</a>
+        <a @click.prevent="goTo('/lien-he')">LIÊN HỆ</a>
       </nav>
 
       <div class="actions">

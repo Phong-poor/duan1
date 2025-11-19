@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Đánh Giá Sản Phẩm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            padding: 40px;
+        }
+        .review-form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Tiêu đề */
+        .review-form-container h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        /* --- PHẦN ĐÁNH GIÁ SAO (RATING) --- */
+        .rating-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fcfcfc;
+        }
+        .rating-section label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        /* CSS hệ thống sao (Ngược - Dùng Flexbox) */
+        .stars {
+            display: flex;
+            flex-direction: row-reverse; /* Đảo ngược thứ tự sao */
+            justify-content: flex-start;
+            font-size: 28px;
+            color: #ccc;
+            width: fit-content; /* Giữ khung vừa đủ các sao */
+        }
+        .stars input[type="radio"] {
+            display: none; /* Ẩn radio button mặc định */
+        }
+        .stars label {
+            cursor: pointer;
+            margin: 0 2px;
+            transition: color 0.2s, transform 0.2s;
+            color: #ccc; /* Màu sao chưa chọn */
+        }
+        .stars label:hover {
+            color: #ffc107; /* Màu hover */
+            transform: scale(1.1);
+        }
+
+        /* Khi radio được check (tạo hiệu ứng màu từ đó trở về) */
+        .stars input:checked ~ label {
+            color: #ffc107; /* Màu sao đã chọn */
+        }
+        .stars:hover label {
+            color: transparent; /* Ẩn màu khi hover */
+        }
+        .stars label:hover ~ label {
+            color: #ffc107; /* Tô màu cho các sao trước sao đang hover */
+        }
+
+
+        /* --- FORM FIELDS --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* --- INPUT UPLOAD ẢNH --- */
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s, background-color 0.3s;
+            font-size: 14px;
+            color: #777;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+            color: #007bff;
+        }
+        .upload-area i {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        #imageUpload {
+            display: none; /* Ẩn input file gốc */
+        }
+
+        /* --- NÚT SUBMIT --- */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #e53935; /* Màu đỏ nổi bật */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .submit-btn:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="review-form-container">
+        <h2>Đánh giá sản phẩm</h2>
+
+        <form action="#" method="POST" enctype="multipart/form-data">
+            
+            <div class="rating-section">
+                <label for="rating-stars">Chất lượng sản phẩm (*)</label>
+                <div class="stars" id="rating-stars">
+                    <input type="radio" id="star5" name="rating" value="5" required>
+                    <label for="star5" title="Tuyệt vời - 5 sao"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="Rất tốt - 4 sao"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="Tốt - 3 sao"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="Tạm được - 2 sao"><i class="fas fa-star"></i></label>
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="Tệ - 1 sao"><i class="fas fa-star"></i></label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="reviewTitle">Tiêu đề đánh giá (*)</label>
+                <input type="text" id="reviewTitle" name="reviewTitle" placeholder="Ví dụ: Sản phẩm rất tốt và chất lượng" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reviewContent">Nội dung đánh giá (*)</label>
+                <textarea id="reviewContent" name="reviewContent" placeholder="Chia sẻ cảm nhận chi tiết của bạn về sản phẩm..." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Thêm hình ảnh (Tùy chọn)</label>
+                <input type="file" id="imageUpload" name="reviewImages[]" accept="image/*" multiple>
+                <label for="imageUpload" class="upload-area">
+                    <i class="fas fa-camera"></i>
+                    <span>Nhấn vào đây để tải ảnh lên (Tối đa 5 ảnh)</span>
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> GỬI ĐÁNH GIÁ</button>
+
+        </form>
+    </div>
+
+</body>
+</html>

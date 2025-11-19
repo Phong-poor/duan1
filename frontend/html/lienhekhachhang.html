@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Liên Hệ Khách Hàng | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #1e1e2d;
+            --bg-card: #27293d;
+            --primary-color: #4CAF50;
+            --secondary-color: #007bff;
+            --text-light: #f8f8f8;
+            --text-muted: #9faab7;
+            --sidebar-color: #1e1e2d;
+            --shadow-dark: rgba(0, 0, 0, 0.5);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Roboto', sans-serif;
+        }
+        .layout {
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-color);
+            min-height: 100vh;
+            padding-top: 30px;
+            box-shadow: 2px 0 8px var(--shadow-dark);
+        }
+        .sidebar h4 {
+            padding: 10px 30px;
+            color: var(--text-muted);
+            font-size: 13px;
+            text-transform: uppercase;
+            margin: 20px 0 10px;
+        }
+        .sidebar a {
+            display: block;
+            padding: 14px 30px;
+            text-decoration: none;
+            color: var(--text-light);
+            border-left: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(76,175,80,0.15);
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        header {
+            background: var(--bg-card);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 6px var(--shadow-dark);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .main {
+            flex: 1;
+            padding: 40px;
+        }
+        h2 {
+            font-size: 30px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            margin-bottom: 25px;
+        }
+        .card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px var(--shadow-dark);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        th {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .btn-delete {
+            background: #ff4d4f;
+            padding: 6px 12px;
+            border-radius: 4px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#" class="logo">ADMIN PANEL</a>
+    <div>Quản trị viên: Admin</div>
+</header>
+
+<div class="layout">
+    <aside class="sidebar">
+        <h4>Menu</h4>
+        <a href="dashboard.html">📊 Dashboard</a>
+        <a href="orders.html">📦 Quản lý đơn hàng</a>
+        <a href="customers.html">👥 Khách hàng</a>
+        <a href="customer-contacts.html" class="active">✉️ Liên hệ khách hàng</a>
+        <a href="settings.html">⚙️ Cài đặt</a>
+    </aside>
+
+    <main class="main">
+        <h2>✉️ Quản Lý Liên Hệ Khách Hàng</h2>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên khách hàng</th>
+                        <th>Email</th>
+                        <th>Chủ đề</th>
+                        <th>Ngày gửi</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>LH001</td>
+                        <td>Nguyễn Văn A</td>
+                        <td>a.nguyen@example.com</td>
+                        <td>Hỏi về đơn hàng</td>
+                        <td>10/11/2025</td>
+                        <td><a href="#" class="btn-delete">Xóa</a></td>
+                    </tr>
+                    <tr>
+                        <td>LH002</td>
+                        <td>Trần Thị B</td>
+                        <td>b.tran@example.com</td>
+                        <td>Báo lỗi thanh toán</td>
+                        <td>09/11/2025</td>
+                        <td><a href="#" class="btn-delete">Xóa</a></td>
+                    </tr>
+                    <tr>
+                        <td>LH003</td>
+                        <td>Phạm Minh C</td>
+                        <td>c.minh@example.com</td>
+                        <td>Cần hỗ trợ đổi trả</td>
+                        <td>08/11/2025</td>
+                        <td><a href="#" class="btn-delete">Xóa</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

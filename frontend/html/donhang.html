@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Đơn Hàng | Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #1e1e2d;
+            --bg-card: #27293d;
+            --primary-color: #4CAF50;
+            --secondary-color: #007bff;
+            --warning-color: #ffcc00;
+            --danger-color: #ff4d4f;
+            --success-color: #4CAF50;
+            --text-light: #f8f8f8;
+            --text-muted: #9faab7;
+            --sidebar-color: #1e1e2d;
+            --shadow-dark: rgba(0,0,0,0.5);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+        }
+        header {
+            background: var(--bg-card);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 5px var(--shadow-dark);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'Montserrat';
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .dashboard-layout { display:flex; }
+
+        /* Sidebar */
+        .sidebar {
+            width:250px;
+            background:var(--sidebar-color);
+            padding-top:20px;
+            box-shadow:2px 0 10px var(--shadow-dark);
+        }
+        .sidebar h4 {
+            padding:10px 30px;
+            color:var(--text-muted);
+            text-transform:uppercase;
+            font-size:13px;
+            margin-top:25px;
+        }
+        .sidebar a {
+            display:block;
+            padding:14px 30px;
+            text-decoration:none;
+            color:var(--text-light);
+            transition:0.25s;
+            border-left:3px solid transparent;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background:rgba(76,175,80,0.15);
+            color:var(--primary-color);
+            border-left-color:var(--primary-color);
+        }
+
+        /* Main content */
+        .main-content {
+            flex:1;
+            padding:40px;
+        }
+        .main-content h2 {
+            font-size:32px;
+            font-family:'Montserrat';
+            font-weight:800;
+            margin-bottom:25px;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+            padding-bottom:10px;
+        }
+        .section-card {
+            background:var(--bg-card);
+            padding:25px;
+            border-radius:12px;
+            box-shadow:8px 8px 15px var(--shadow-dark);
+            margin-bottom:35px;
+        }
+        .section-card h3 {
+            font-size:22px;
+            font-family:'Montserrat';
+            color:var(--secondary-color);
+            margin-top:0;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+        th, td {
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: left;
+        }
+        th {
+            background:#313349;
+            text-transform: uppercase;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        td:nth-child(6), th:nth-child(6) {
+            width: 160px;
+            text-align: center;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-view { background:#6c5ce7; padding:6px 12px; border-radius:4px; color:white; text-decoration:none; }
+        .btn-edit { background:var(--secondary-color); padding:6px 12px; border-radius:4px; color:white; text-decoration:none; }
+        .btn-delete { background:var(--danger-color); padding:6px 12px; border-radius:4px; color:white; text-decoration:none; }
+
+        /* Trạng thái đơn hàng */
+        .status {
+            padding:6px 12px;
+            border-radius:6px;
+            font-weight:600;
+            display:inline-block;
+        }
+        .pending { background:var(--warning-color); color:#000; }
+        .shipping { background:#00bcd4; color:#000; }
+        .completed { background:var(--success-color); color:#fff; }
+        .cancelled { background:var(--danger-color); color:#fff; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="#" class="logo">ADMIN PANEL</a>
+    <div style="color:#ff4d4f; font-weight:600;">Admin</div>
+</header>
+
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <h4>Quản lý</h4>
+        <a href="dashboard.html">Dashboard</a>
+        <a class="active" href="orders.html">Đơn hàng</a>
+        <a href="customers.html">Khách hàng</a>
+        <a href="categories.html">Danh mục</a>
+        <a href="admin.html">Sản phẩm</a>
+
+        <h4>Hệ thống</h4>
+        <a href="settings.html">Cài đặt</a>
+        <a href="notifications.html">Thông báo</a>
+    </aside>
+
+    <main class="main-content">
+        <h2>Đơn Hàng</h2>
+
+        <div class="section-card">
+            <h3>Danh Sách Đơn Hàng</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Khách Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th>Hành Động</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>DH001</td>
+                        <td>Nguyễn Văn A</td>
+                        <td>01/11/2025</td>
+                        <td>1,250,000₫</td>
+                        <td><span class="status pending">Chờ duyệt</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a class="btn-view" href="#">Xem</a>
+                                <a class="btn-edit" href="#">Sửa</a>
+                                <a class="btn-delete" href="#">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>DH002</td>
+                        <td>Trần Thị B</td>
+                        <td>29/10/2025</td>
+                        <td>875,000₫</td>
+                        <td><span class="status shipping">Đang giao</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a class="btn-view" href="#">Xem</a>
+                                <a class="btn-edit" href="#">Sửa</a>
+                                <a class="btn-delete" href="#">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>DH003</td>
+                        <td>Phạm Quốc C</td>
+                        <td>27/10/2025</td>
+                        <td>2,100,000₫</td>
+                        <td><span class="status completed">Hoàn thành</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a class="btn-view" href="#">Xem</a>
+                                <a class="btn-edit" href="#">Sửa</a>
+                                <a class="btn-delete" href="#">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>DH004</td>
+                        <td>Đỗ Minh D</td>
+                        <td>25/10/2025</td>
+                        <td>420,000₫</td>
+                        <td><span class="status cancelled">Đã hủy</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a class="btn-view" href="#">Xem</a>
+                                <a class="btn-edit" href="#">Sửa</a>
+                                <a class="btn-delete" href="#">Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </main>
+
+</div>
+
+</body>
+</html>
