@@ -142,7 +142,6 @@
     <Footer/>
   </div>
 </template>
-
 <script setup>
 import { computed, ref, watchEffect }from 'vue';
 import Header from'../../header.vue';

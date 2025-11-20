@@ -120,7 +120,6 @@ import Footer from'../../footer.vue';
   max-width: 1300px;
   margin: 0 auto;
 }
-
 .profile-email {
   font-size: 14px;
   color: #777;

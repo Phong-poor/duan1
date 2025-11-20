@@ -646,7 +646,6 @@ onMounted(() => {
   padding: 0 5%;
   box-sizing: border-box;
 }
-
 .slide::before {
   content: '';
   position: absolute;
