@@ -275,7 +275,7 @@ onMounted(() => {
             <p>2,890,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <a @click.prevent="goTo('chiTiet')"class="action-btn secondary">Chi tiết</a>
             </div>
           </div>
 

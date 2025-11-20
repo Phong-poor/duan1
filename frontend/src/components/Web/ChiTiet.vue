@@ -152,7 +152,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, ref } from'vue';
 import Header from '../../header.vue';
 import Footer from '../../footer.vue';
 

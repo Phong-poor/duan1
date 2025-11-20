@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <h2 class="section-title">👟 TẤT CẢ GIÀY NIKE (100+)</h2>
+      <h2 class="section-title">TẤT CẢ GIÀY NIKE (100+)</h2>
 
       <section class="product-grid">
         <div class="product-card">

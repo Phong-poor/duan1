@@ -139,7 +139,7 @@
         </section>
       </div>
     </main>
-    <Footer />
+    <Footer/>
   </div>
 </template>
 
