@@ -9,13 +9,13 @@ import Dashboard from '../components/Admin/Dashboard.vue';
 import ThanhtoanGiohang from '../components/web/Thanhtoangiohang.vue';
 
 const routes = [
-    { path: '/', name: 'Thanhtoan', component: ThanhtoanGiohang },
-    //{ path: '/', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
-    //{ path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
-    //{ path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu, meta: { isAuth: false } },
-    //{ path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
-    //{ path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
-    //{ path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
+    { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
+    { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
+    { path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu, meta: { isAuth: false } },
+    { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
+    { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
+    { path: '/', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
+
 ]
 
 const router = createRouter({

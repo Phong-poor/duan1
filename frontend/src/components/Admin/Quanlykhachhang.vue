@@ -6,11 +6,11 @@
       <img :src="logoImage" alt="Logo" class="logo-img" />
 
       <ul class="sidebar-menu">
-        <router-link to="/Dashboard" class="menu-item" active-class="active">
+        <router-link to="/" class="menu-item" active-class="active">
           <i class="fa-solid fa-chart-line"></i> Dashboard
         </router-link>
 
-        <router-link to="/" class="menu-item" active-class="active">
+        <router-link to="/Quanlysanpham" class="menu-item" active-class="active">
           <i class="fa-solid fa-box"></i> Sản phẩm
         </router-link>
 
