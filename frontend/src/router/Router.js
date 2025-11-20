@@ -6,6 +6,8 @@ import Quanlythuonghieu from '../components/Admin/Quanlythuonghieu.vue';
 import Quanlykhachhang from '../components/Admin/Quanlykhachhang.vue';
 import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
+import ThanhtoanGiohang from '../components/web/Thanhtoangiohang.vue';
+
 const routes = [
     { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
     { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
@@ -13,6 +15,7 @@ const routes = [
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
     { path: '/', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
+
 ]
 
 const router = createRouter({
