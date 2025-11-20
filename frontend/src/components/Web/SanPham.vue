@@ -118,9 +118,8 @@ const goTo = (path) => {
   router.push(path);
 };
 
-import Header from '../../header.vue';
+import Header from'../../header.vue';
 import Footer from '../../footer.vue';
-
 import bannerSlide1 from '@/assets/banner-slide-1.png';
 import bannerSlide2 from '@/assets/banner-slide-2.jpg';
 import bannerSlide3 from '@/assets/banner-slide-3.jpg';

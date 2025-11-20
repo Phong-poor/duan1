@@ -601,11 +601,9 @@ onMounted(() => {
   max-width: 1300px;
   margin: 0 auto;
 }
-
 .main-content {
   padding-top: 80px; /* Tạo khoảng trống cho header fixed */
 }
-
 .section-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 24px;

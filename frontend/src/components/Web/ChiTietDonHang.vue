@@ -146,8 +146,7 @@
 <script setup>
 import { computed, ref, watchEffect }from 'vue';
 import Header from'../../header.vue';
-import Footer from '../../footer.vue';
-
+import Footer from'../../footer.vue';
 const allOrders = [
   {
     id: 'KH00245',

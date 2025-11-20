@@ -152,10 +152,9 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, ref } from'vue';
+import { onBeforeUnmount,ref } from'vue';
 import Header from'../../header.vue';
 import Footer from '../../footer.vue';
-
 import heroImage from '@/assets/bannergiay.jpg';
 import thumb1 from '@/assets/images (4).jpg';
 import thumb2 from '@/assets/images (2).jpg';

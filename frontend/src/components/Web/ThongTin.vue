@@ -107,7 +107,6 @@
 import Header from'../../header.vue';
 import Footer from'../../footer.vue';
 </script>
-
 <style scoped>
 .account-page {
   font-family: 'Roboto', sans-serif;
@@ -116,7 +115,6 @@ import Footer from'../../footer.vue';
   min-height: 100vh;
   padding: 120px 0 60px; /* chừa khoảng header global */
 }
-
 .account-container {
   width: 90%;
   max-width: 1300px;
