@@ -113,7 +113,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-const router = useRouter();
+const router=useRouter();
 const goTo = (path) => {
   router.push(path);
 };

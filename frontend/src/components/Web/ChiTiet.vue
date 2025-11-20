@@ -153,7 +153,7 @@
 
 <script setup>
 import { onBeforeUnmount, ref } from'vue';
-import Header from '../../header.vue';
+import Header from'../../header.vue';
 import Footer from '../../footer.vue';
 
 import heroImage from '@/assets/bannergiay.jpg';

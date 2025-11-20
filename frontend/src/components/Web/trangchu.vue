@@ -542,7 +542,6 @@ onMounted(() => {
             <img :src="imgNews3" alt="Giày phối đồ" />
             <span class="tag">Mẹo Shopping</span>
           </div>
-
           <div class="news-content">
             <h3>Top 5 cách phối đồ với giày thể thao</h3>
             <a href="baiiviet.html" class="more">XEM CHI TIẾT ></a>
