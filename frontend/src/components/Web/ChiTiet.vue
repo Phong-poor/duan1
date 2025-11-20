@@ -143,7 +143,7 @@
     </main>
 
     <transition name="popup">
-      <div v-if="popupVisible" class="popup-toast">
+      <div v-if="popupVisible"class="popup-toast">
         {{ popupMessage }}
       </div>
     </transition>
