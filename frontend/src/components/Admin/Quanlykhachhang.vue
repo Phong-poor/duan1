@@ -22,6 +22,14 @@
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
         </router-link>
 
+        <router-link to="/Quanlymausac" class="menu-item" active-class="active">
+          <i class="fa-solid fa-palette"></i> Màu sắc
+        </router-link>
+
+        <router-link to="/Quanlysize" class="menu-item" active-class="active">
+          <i class="fa-solid fa-maximize"></i> Size
+        </router-link>
+
         <router-link to="Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>

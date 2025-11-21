@@ -16,6 +16,13 @@
         <router-link to="/Quanlythuonghieu" class="menu-item" active-class="active">
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
         </router-link>
+        <router-link to="/Quanlymausac" class="menu-item" active-class="active">
+          <i class="fa-solid fa-palette"></i> Màu sắc
+        </router-link>
+
+        <router-link to="/Quanlysize" class="menu-item" active-class="active">
+          <i class="fa-solid fa-maximize"></i> Size
+        </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
