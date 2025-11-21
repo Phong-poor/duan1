@@ -85,13 +85,29 @@ if (!empty($_FILES["extraImages"])) {
 /* -----------------------------------------
    INSERT BIẾN THỂ
 ------------------------------------------*/
-foreach ($variants as $var) {
+foreach ($variants as $i => $var) {
+
+    // Upload ảnh biến thể
+    $varImage = null;
+
+    if (!empty($_FILES["variantImages"]["name"][$i])) {
+        $fileName = time() . "_variant_" . $i . "_" . $_FILES["variantImages"]["name"][$i];
+        $savePath = "../../uploads/Product/" . $fileName;
+
+        if (move_uploaded_file($_FILES["variantImages"]["tmp_name"][$i], $savePath)) {
+            $varImage = "uploads/Product/" . $fileName;
+        }
+    }
+
+    // Lưu biến thể vào DB
     $stmt = $pdo->prepare("
-        INSERT INTO bienthesanpham (id_sanpham, id_mausac, id_size, soLuong)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO bienthesanpham (id_sanpham, id_mausac, id_size, soLuong, anh_bienthe)
+        VALUES (?, ?, ?, ?, ?)
     ");
-    $stmt->execute([$idSP, $var["color"], $var["size"], $var["quantity"]]);
+
+    $stmt->execute([$idSP, $var["color"], $var["size"], $var["quantity"], $varImage]);
 }
+
 
 /* -----------------------------------------
    TRẢ VỀ JSON CHO FRONTEND

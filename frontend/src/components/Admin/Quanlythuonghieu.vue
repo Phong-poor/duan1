@@ -20,6 +20,14 @@
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
         </router-link>
 
+        <router-link to="/Quanlymausac" class="menu-item" active-class="active">
+          <i class="fa-solid fa-palette"></i> Màu sắc
+        </router-link>
+
+        <router-link to="/Quanlysize" class="menu-item" active-class="active">
+          <i class="fa-solid fa-maximize"></i>   Size
+        </router-link>
+
         <router-link to="Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
@@ -51,20 +59,17 @@
           <thead class="table-secondary">
             <tr>
               <th>Mã TH</th>
-              <th>Logo</th>
               <th>Tên thương hiệu</th>
-              <th>Quốc gia</th>
               <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="br in paginatedBrands" :key="br.id">
-              <td>{{ br.id }}</td>
-              <td>{{ br.name }}</td>
-              <td>{{ br.country }}</td>
+            <tr v-for="br in paginatedBrands" :key="br.id_thuonghieu">
+              <td>{{ br.maTH }}</td>
+              <td>{{ br.tenTH }}</td>
               <td>
-                <button class="btn btn-warning btn-sm" @click="scrollToForm">Sửa</button>
-                <button class="btn btn-danger btn-sm ms-2">Xóa</button>
+                <button class="btn btn-warning btn-sm" @click="editBrand(br)">Sửa</button>
+                <button class="btn btn-danger btn-sm ms-2" @click="deleteBrand(br.id_thuonghieu)">Xóa</button>
               </td>
             </tr>
           </tbody>
@@ -79,19 +84,17 @@
 
         <!-- Brand Form -->
         <div class="card p-4 mt-4" id="add-form">
-          <h4 class="fw-bold mb-3">Thêm / Chỉnh sửa thương hiệu</h4>
+          <h4 class="fw-bold mb-3">{{ isEdit ? "Cập nhật thương hiệu" : "Thêm thương hiệu" }}</h4>
 
           <div class="mb-3">
             <label>Tên thương hiệu</label>
-            <input type="text" class="form-control" />
+            <input v-model="form.tenTH" type="text" class="form-control" placeholder="Nhập tên thương hiệu..." />
+            <p v-if="errors.tenTH" class="text-danger mt-1">{{ errors.tenTH }}</p>
           </div>
 
-          <div class="mb-3">
-            <label>Quốc gia</label>
-            <input type="text" class="form-control" />
-          </div>
-
-          <button class="btn btn-primary">Lưu thương hiệu</button>
+          <button class="btn btn-success" @click="saveBrand">
+            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+          </button>
         </div>
 
       </div>
@@ -104,24 +107,84 @@ import { ref, computed } from "vue";
 import logoImage from "../../assets/logo.png";
 import HeaderAdmin from "../../Header-admin.vue";
 
+/* --- STATE --- */
+const brands = ref([]);
 const search = ref("");
-const scrollToForm = () => {
-  const form = document.getElementById("add-form");
-  if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
-};
-
-// Demo brands data
-const brands = ref([
-  { id: 1, name: "Apple", country: "USA" },
-  { id: 2, name: "Samsung", country: "Korea" },
-]);
-
 const page = ref(1);
 const perPage = 5;
 
+const form = ref({
+  id_thuonghieu: null,
+  tenTH: ""
+});
+
+// Lỗi form
+const errors = ref({});
+const isEdit = ref(false);
+
+/* --- LOAD BRAND --- */
+const loadBrands = async () => {
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetBrand.php");
+    brands.value = await res.json();
+  } catch (e) {
+    console.log("Lỗi load thương hiệu", e);
+  }
+};
+
+/* --- SAVE BRAND (ADD / UPDATE) --- */
+const saveBrand = async () => {
+  errors.value = {};
+
+  if (!form.value.tenTH.trim()) {
+    errors.value.tenTH = "Tên thương hiệu không được để trống!";
+    return;
+  }
+
+  const url = isEdit.value
+    ? "http://localhost/duan1/backend/api/Admin/UpdateBrand.php"
+    : "http://localhost/duan1/backend/api/Admin/AddBrand.php";
+
+  await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form.value)
+  });
+
+  resetForm();
+  loadBrands();
+};
+
+/* --- DELETE BRAND --- */
+const deleteBrand = async (id) => {
+  if (!confirm("Bạn có chắc muốn xóa không?")) return;
+
+  await fetch(`http://localhost/duan1/backend/api/Admin/DeleteBrand.php?id=${id}`);
+
+  loadBrands();
+};
+
+/* --- EDIT BRAND --- */
+const editBrand = (br) => {
+  form.value = {
+    id_thuonghieu: br.id_thuonghieu,
+    tenTH: br.tenTH
+  };
+  isEdit.value = true;
+  scrollToForm();
+};
+
+/* --- RESET --- */
+const resetForm = () => {
+  form.value = { id_thuonghieu: null, tenTH: "" };
+  errors.value = {};
+  isEdit.value = false;
+};
+
+/* --- PAGINATION --- */
 const filteredBrands = computed(() =>
   brands.value.filter((b) =>
-    b.name.toLowerCase().includes(search.value.toLowerCase())
+    b.tenTH.toLowerCase().includes(search.value.toLowerCase())
   )
 );
 
@@ -133,7 +196,17 @@ const paginatedBrands = computed(() => {
   const start = (page.value - 1) * perPage;
   return filteredBrands.value.slice(start, start + perPage);
 });
+
+/* --- SCROLL FORM --- */
+const scrollToForm = () => {
+  const form = document.getElementById("add-form");
+  if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
+/* INIT */
+loadBrands();
 </script>
+
 
 <style scoped>
 .logo-img {

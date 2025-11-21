@@ -16,6 +16,12 @@
         <router-link to="/Quanlythuonghieu" class="menu-item" active-class="active">
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
         </router-link>
+        <router-link to="/Quanlymausac" class="menu-item" active-class="active">
+          <i class="fa-solid fa-palette"></i> Màu sắc
+        </router-link>
+        <router-link to="/Quanlysize" class="menu-item" active-class="active">
+          <i class="fa-solid fa-maximize"></i> Size
+        </router-link>
         <router-link to="Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
@@ -35,7 +41,9 @@
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h3 class="fw-bold">Quản lý sản phẩm</h3>
-          <button class="btn btn-primary me-2 back" @click="scrollToForm">Thêm sản phẩm</button>
+          <button class="btn btn-primary me-2 back" @click="scrollToForm">
+            {{ isEditing ? 'Sửa sản phẩm' : 'Thêm sản phẩm' }}
+          </button>
         </div>
 
         <!-- Search -->
@@ -57,21 +65,35 @@
               <th>Thương hiệu</th>
               <th>Giá</th>
               <th>Giảm giá</th>
+              <th>Bắt đầu</th>
+              <th>Kết thúc</th>
               <th>Hành động</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="sp in paginatedProducts" :key="sp.id">
-              <td>{{ sp.id }}</td>
-              <td><img :src="sp.image" class="thumb" /></td>
+              <td>{{ sp.maSP }}</td>
+              <td>
+                <img :src="sp.image" class="thumb" v-if="sp.image" />
+              </td>
               <td>{{ sp.name }}</td>
               <td>{{ sp.category }}</td>
               <td>{{ sp.brand }}</td>
-              <td>{{ sp.price }} đ</td>
-              <td>{{ sp.discount ?? 0 }}%</td>
+              <td>{{ formatCurrency(sp.price) }}</td>
               <td>
-                <button class="btn btn-warning btn-sm" @click="scrollToForm">Sửa</button>
-                <button class="btn btn-danger btn-sm ms-2">Xóa</button>
+                <span v-if="sp.giamgiaSP && sp.giamgiaSP > 0">
+                  {{ formatCurrency(sp.giamgiaSP) }}
+                </span>
+                <span v-else>
+                  Không giảm
+                </span>
+              </td>
+              <td>{{ sp.giamgia_start || '' }}</td>
+              <td>{{ sp.giamgia_end || '' }}</td>
+              <td class="action-cell">
+                <button class="btn btn-warning btn-sm" @click="startEdit(sp)">Sửa</button>
+                <button class="btn btn-danger btn-sm ms-2" @click="deleteProduct(sp.id)">Xóa</button>
+                <button class="btn btn-info btn-sm ms-2" @click="openDiscountPopup(sp)">Giảm giá</button>
               </td>
             </tr>
           </tbody>
@@ -83,98 +105,106 @@
           <span>Trang {{ page }} / {{ totalPages }}</span>
           <button class="btn btn-secondary btn-sm" :disabled="page === totalPages" @click="page++">Sau</button>
         </div>
+        <!-- POPUP GIẢM GIÁ -->
+        <div v-if="showDiscount" class="popup-overlay">
+          <div class="popup-box">
+            <h5 class="fw-bold mb-3">Giảm giá sản phẩm</h5>
 
-        <!-- Add Product Form -->
+            <div class="mb-3">
+              <label>% giảm</label>
+              <input v-model.number="discountForm.percent" type="number" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+              <label>Ngày bắt đầu</label>
+              <input v-model="discountForm.start" type="datetime-local" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+              <label>Ngày kết thúc</label>
+              <input v-model="discountForm.end" type="datetime-local" class="form-control" />
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button class="btn btn-secondary" @click="showDiscount=false">Hủy</button>
+              <button class="btn btn-primary" @click="applyDiscount">Lưu</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add / Edit Product Form -->
         <div class="card p-4 mt-4" id="add-form">
-          <h4 class="fw-bold mb-3">Thêm sản phẩm</h4>
+          <h4 class="fw-bold mb-3">
+            {{ isEditing ? 'Sửa sản phẩm' : 'Thêm sản phẩm' }}
+          </h4>
 
           <!-- Ảnh chính -->
           <div class="mb-3">
-            <label class="form-label">Hình ảnh chính</label>
-            <input
-              type="file"
-              class="form-control"
-              :class="{ 'is-invalid': errors.mainImage }"
-              @change="onMainImageChange"
-            />
-            <div v-if="errors.mainImage" class="text-danger small mt-1">
-              {{ errors.mainImage }}
+            <label class="form-label">Ảnh chính</label>
+
+            <!-- Chỉ cho chọn file khi THÊM -->
+            <div v-if="!isEditing">
+              <input type="file" class="form-control" @change="onMainImageChange" />
             </div>
+
+            <img
+              v-if="mainImagePreview"
+              :src="mainImagePreview"
+              class="preview-img mt-2"
+            />
           </div>
 
-          <!-- Tên sản phẩm -->
+          <!-- Tên SP -->
           <div class="mb-3">
             <label class="form-label">Tên sản phẩm</label>
-            <input
-              v-model="productForm.name"
-              type="text"
-              class="form-control"
-              :class="{ 'is-invalid': errors.name }"
-            />
-            <div v-if="errors.name" class="text-danger small mt-1">
-              {{ errors.name }}
-            </div>
+            <input v-model="productForm.name" type="text" class="form-control" />
           </div>
 
           <!-- Danh mục -->
           <div class="mb-3">
             <label class="form-label">Danh mục</label>
-            <select
-              v-model="productForm.category"
-              class="form-select"
-              :class="{ 'is-invalid': errors.category }"
-            >
+            <select v-model="productForm.category" class="form-select">
               <option disabled value="">-- Chọn danh mục --</option>
-              <option v-for="dm in categories" :key="dm.id" :value="dm.id">
-                {{ dm.ten }}
+              <option v-for="dm in categories" :key="dm.id_danhmuc" :value="dm.id_danhmuc">
+                {{ dm.tenDM }}
               </option>
             </select>
-            <div v-if="errors.category" class="text-danger small mt-1">
-              {{ errors.category }}
-            </div>
           </div>
 
           <!-- Thương hiệu -->
           <div class="mb-3">
             <label class="form-label">Thương hiệu</label>
             <select v-model="productForm.thuonghieu" class="form-select">
-                <option disabled value="">-- Chọn thương hiệu --</option>
-                <option v-for="th in brands" :key="th.id_thuonghieu" :value="th.id_thuonghieu">
-                    {{ th.tenTH }}
-                </option>
+              <option disabled value="">-- Chọn thương hiệu --</option>
+              <option v-for="th in brands" :key="th.id_thuonghieu" :value="th.id_thuonghieu">
+                {{ th.tenTH }}
+              </option>
             </select>
-            <div v-if="errors.thuonghieu" class="text-danger small mt-1">
-              {{ errors.thuonghieu }}
-            </div>
           </div>
 
           <!-- Giá -->
           <div class="mb-3">
             <label class="form-label">Giá</label>
-            <input
-              v-model.number="productForm.price"
-              type="number"
-              class="form-control"
-              :class="{ 'is-invalid': errors.price }"
-            />
-            <div v-if="errors.price" class="text-danger small mt-1">
-              {{ errors.price }}
-            </div>
+            <input v-model.number="productForm.price" type="number" class="form-control" />
           </div>
 
           <!-- Ảnh phụ -->
           <div class="mb-3">
-            <label class="form-label">Ảnh phụ (nhiều ảnh, không bắt buộc)</label>
-            <input type="file" multiple class="form-control" @change="onExtraImagesChange" />
+            <label class="form-label">Ảnh phụ</label>
+            <input
+              type="file"
+              class="form-control"
+              multiple
+              @change="onExtraImagesChange"
+            />
 
-            <!-- Preview ảnh phụ -->
             <div class="d-flex flex-wrap mt-3 gap-2">
               <div
-                v-for="(img, index) in extraImagesPreview"
+                v-for="(img, index) in productForm.extraImageUrls"
                 :key="index"
                 class="position-relative"
               >
-                <img :src="img" class="preview-img" />
+                <img :src="img.preview" class="preview-img" />
                 <button
                   class="btn btn-danger btn-sm delete-img-btn"
                   type="button"
@@ -187,8 +217,8 @@
           </div>
 
           <!-- BIẾN THỂ -->
-          <div class="variant-box border p-3 mb-3">
-            <h5 class="fw-semibold">Biến thể (màu + size + số lượng)</h5>
+          <div class="variant-box border p-3">
+            <h5 class="fw-semibold">Biến thể (màu + size + số lượng + ảnh)</h5>
 
             <div
               v-for="(v, index) in variants"
@@ -196,44 +226,51 @@
               class="border p-3 rounded mt-2"
             >
               <div class="row g-2">
-                <div class="col-md-4">
-                  <label class="form-label">Màu sắc</label>
-                  <select
-                    v-model="v.color"
-                    class="form-select"
-                    :class="{ 'is-invalid': errors['variant_' + index] }"
-                  >
+
+                <!-- Màu -->
+                <div class="col-md-3">
+                  <label>Màu sắc</label>
+                  <select v-model="v.color" class="form-select">
                     <option disabled value="">-- Chọn màu --</option>
-                    <option v-for="c in colors" :key="c.id" :value="c.id">
-                      {{ c.ten }}
+                    <option v-for="c in colors" :key="c.id_mausac" :value="c.id_mausac">
+                      {{ c.mausac }}
                     </option>
                   </select>
                 </div>
 
-                <div class="col-md-4">
-                  <label class="form-label">Size</label>
-                  <select
-                    v-model="v.size"
-                    class="form-select"
-                    :class="{ 'is-invalid': errors['variant_' + index] }"
-                  >
+                <!-- Size -->
+                <div class="col-md-3">
+                  <label>Size</label>
+                  <select v-model="v.size" class="form-select">
                     <option disabled value="">-- Chọn size --</option>
-                    <option v-for="s in sizes" :key="s.id" :value="s.id">
+                    <option v-for="s in sizes" :key="s.id_size" :value="s.id_size">
                       {{ s.size }}
                     </option>
                   </select>
                 </div>
 
+                <!-- SL -->
+                <div class="col-md-2">
+                  <label>Số lượng</label>
+                  <input v-model.number="v.quantity" type="number" class="form-control" />
+                </div>
+
+                <!-- Ảnh biến thể -->
                 <div class="col-md-3">
-                  <label class="form-label">Số lượng</label>
+                  <label>Ảnh biến thể</label>
                   <input
-                    v-model.number="v.quantity"
-                    type="number"
+                    type="file"
                     class="form-control"
-                    :class="{ 'is-invalid': errors['variant_' + index] }"
+                    @change="onVariantImageChange($event, index)"
+                  />
+                  <img
+                    v-if="v.preview || v.imageUrl"
+                    :src="v.preview || (backendBase + v.imageUrl)"
+                    class="preview-img mt-2"
                   />
                 </div>
 
+                <!-- Xóa -->
                 <div class="col-md-1 d-flex align-items-end">
                   <button
                     class="btn btn-danger btn-sm"
@@ -243,21 +280,21 @@
                     ✖
                   </button>
                 </div>
-              </div>
 
-              <!-- lỗi cho từng biến thể -->
-              <div v-if="errors['variant_' + index]" class="text-danger small mt-1">
-                {{ errors['variant_' + index] }}
               </div>
             </div>
 
-            <button class="btn btn-success btn-sm mt-2" type="button" @click="addVariant">
-              ➕ Thêm biến thể
+            <button
+              class="btn btn-success btn-sm mt-3"
+              type="button"
+              @click="addVariant"
+            >
+              + Thêm biến thể
             </button>
           </div>
 
-          <button class="btn btn-primary" type="button" @click="saveProduct">
-            Lưu sản phẩm
+          <button class="btn btn-primary mt-3" type="button" @click="submitProduct">
+            {{ isEditing ? 'Lưu thay đổi' : 'Lưu sản phẩm' }}
           </button>
         </div>
       </div>
@@ -270,88 +307,270 @@ import { ref, computed } from "vue";
 import logoImage from "../../assets/logo.png";
 import HeaderAdmin from "../../Header-admin.vue";
 
-/* ------------ STATE ------------ */
+/* --------- CONST --------- */
+const backendBase = "http://localhost/duan1/backend/";
 
+/* --------- STATE --------- */
 const search = ref("");
 
-// danh mục & thương hiệu từ API
 const categories = ref([]);
 const brands = ref([]);
-
-// danh sách sản phẩm (hiển thị trên bảng)
+const colors = ref([]);
+const sizes = ref([]);
 const products = ref([]);
 
-// form thêm sản phẩm
+const isEditing = ref(false);
+const editingId = ref(null);
+
+/* ảnh chính: path lưu DB + preview hiển thị */
 const productForm = ref({
   name: "",
   category: "",
   thuonghieu: "",
   price: "",
+  imageUrl: "",          // đường dẫn lưu DB: "uploads/Product/xxx.jpg"
+  extraImageUrls: []     // [{ preview, real }]
 });
+const mainImagePreview = ref("");        // src hiển thị ảnh chính
 
-// ảnh
-const mainImage = ref(null);
-const extraImages = ref([]);
-const extraImagesPreview = ref([]);
-
-// biến thể
-const variants = ref([{ color: "", size: "", quantity: 0 }]);
-const errors = ref({});
-// màu & size (tạm thời static, sau này có API thì đổi)
-const colors = ref([
-  { id: 1, ten: "Đỏ" },
-  { id: 2, ten: "Đen" },
-  { id: 3, ten: "Xanh" },
+/* biến thể: thêm field preview để show */
+const variants = ref([
+  { color: "", size: "", quantity: 0, imageUrl: "", preview: "" }
 ]);
+/* ---- Format datetime-local từ DB ---- */
+const formatDateForInput = (dateString) => {
+  if (!dateString) return "";
 
-const sizes = ref([
-  { id: 1, size: "36" },
-  { id: 2, size: "37" },
-  { id: 3, size: "38" },
-  { id: 4, size: "39" },
-  { id: 5, size: "40" },
-  { id: 6, size: "41" },
-  { id: 7, size: "42" },
-]);
+  const d = new Date(dateString);
+  if (isNaN(d.getTime())) return "";
 
-/* ------------ LOAD STATIC OPTIONS (DM + TH) ------------ */
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hour = String(d.getHours()).padStart(2, "0");
+  const minute = String(d.getMinutes()).padStart(2, "0");
 
-const loadStaticOptions = async () => {
-  try {
-    const dm = await fetch("http://localhost/duan1/backend/api/Admin/GetCategory.php");
-    categories.value = await dm.json();
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+};
+/* ----- GIẢM GIÁ ----- */
+const showDiscount = ref(false);
 
-    const th = await fetch("http://localhost/duan1/backend/api/Admin/GetThuongHieu.php");
-    brands.value = await th.json();
-  } catch (err) {
-    console.error("Lỗi load dữ liệu danh mục / thương hiệu:", err);
+const discountForm = ref({
+  id_sanpham: null,
+  originalPrice: 0,
+  percent: 0,
+  start: "",
+  end: ""
+});
+const openDiscountPopup = (sp) => {
+  showDiscount.value = true;
+
+  discountForm.value = {
+    id_sanpham: sp.id,
+    originalPrice: sp.price,
+    percent: sp.giamgiaSP 
+      ? Math.round(((sp.price - sp.giamgiaSP) / sp.price) * 100)
+      : 0,
+    start: formatDateForInput(sp.giamgia_start),
+    end: formatDateForInput(sp.giamgia_end)
+  };
+};
+
+const applyDiscount = async () => {
+  const payload = {
+    id_sanpham: discountForm.value.id_sanpham,
+    percent: discountForm.value.percent,
+    giaSP: discountForm.value.originalPrice,
+    giamgia_start: discountForm.value.start,
+    giamgia_end: discountForm.value.end
+  };
+
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/ApplyDiscount.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const data = await res.json();
+
+  if (data.status === "success") {
+    alert("Cập nhật giảm giá thành công!");
+    showDiscount.value = false;
+    loadProducts();
   }
 };
 
-/* ------------ LOAD PRODUCT LIST (product.json) ------------ */
 
+/* --------- LOAD OPTIONS --------- */
+const loadOptions = async () => {
+  const [dm, th, ms, sz] = await Promise.all([
+    fetch("http://localhost/duan1/backend/api/Admin/GetCategory.php"),
+    fetch("http://localhost/duan1/backend/api/Admin/GetBrand.php"),
+    fetch("http://localhost/duan1/backend/api/Admin/GetColor.php"),
+    fetch("http://localhost/duan1/backend/api/Admin/GetSize.php")
+  ]);
+
+  categories.value = await dm.json();
+  brands.value = await th.json();
+  colors.value = await ms.json();
+  sizes.value = await sz.json();
+};
+
+/* ----- ẢNH CHÍNH (chỉ dùng khi THÊM) ----- */
+const onMainImageChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  productForm.value.imageUrl = "uploads/Product/" + file.name;      // lưu DB
+  mainImagePreview.value = URL.createObjectURL(file);               // hiển thị
+};
+
+/* ----- ẢNH PHỤ ----- */
+const onExtraImagesChange = (e) => {
+  const files = Array.from(e.target.files);
+
+  files.forEach(file => {
+    productForm.value.extraImageUrls.push({
+      preview: URL.createObjectURL(file),           // hiển thị
+      real: "uploads/Product/" + file.name          // lưu DB
+    });
+  });
+
+  e.target.value = "";
+};
+
+const removeExtraImage = (index) => {
+  productForm.value.extraImageUrls.splice(index, 1);
+};
+
+/* ----- ẢNH BIẾN THỂ ----- */
+const onVariantImageChange = (e, index) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  variants.value[index].imageUrl = "uploads/Product/" + file.name;       // DB
+  variants.value[index].preview  = URL.createObjectURL(file);            // hiển thị
+};
+
+/* ----- THÊM / XOÁ BIẾN THỂ ----- */
+const addVariant = () => {
+  variants.value.push({
+    color: "",
+    size: "",
+    quantity: 0,
+    imageUrl: "",
+    preview: ""
+  });
+};
+
+const removeVariant = (index) => {
+  variants.value.splice(index, 1);
+};
+
+/* --------- LOAD PRODUCTS (list) --------- */
 const loadProducts = async () => {
+  const res = await fetch(
+    "http://localhost/duan1/backend/api/Admin/GetProducts.php"
+  );
+  const data = await res.json();
+
+  products.value = (data.products || []).map((p) => ({
+    id: p.id,
+    maSP: p.maSP,
+    name: p.tenSP,
+    image: p.hinhAnhGoc?.startsWith("http")
+      ? p.hinhAnhGoc
+      : (p.hinhAnhGoc ? backendBase + p.hinhAnhGoc : ""),
+    category: p.category,
+    brand: p.brand,
+    price: p.giaSP,
+    giamgiaSP: p.giamgiaSP,
+    giamgia_start: p.giamgia_start,
+    giamgia_end: p.giamgia_end
+  }));
+};
+
+/* --------- LOAD PRODUCT DETAIL (edit) --------- */
+const startEdit = async (sp) => {
+  isEditing.value = true;
+  editingId.value = sp.id;
+  scrollToForm();
+
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetProducts.php");
+    const res = await fetch(
+      "http://localhost/duan1/backend/api/Admin/GetProductDetail.php?id=" + sp.id
+    );
     const data = await res.json();
 
-    products.value = data.products.map(p => ({
-      id: p.id,
-      name: p.tenSP,
-      image: p.hinhAnhGoc,
-      category: p.category,
-      brand: p.brand,
-      price: p.giaSP,
-      discount: 0
+    if (data.status !== "success") {
+      alert(data.message || "Không load được chi tiết sản phẩm");
+      return;
+    }
+
+    const p = data.product;
+
+    // Ảnh chính: lưu path DB + set preview từ backendBase
+    productForm.value.imageUrl = p.hinhAnhGoc || "";
+    mainImagePreview.value = p.hinhAnhGoc
+      ? (p.hinhAnhGoc.startsWith("http")
+          ? p.hinhAnhGoc
+          : backendBase + p.hinhAnhGoc)
+      : "";
+
+    // Ảnh phụ: chuẩn hóa về [{preview, real}]
+    productForm.value.extraImageUrls = (data.extraImages || []).map(img => ({
+      preview: backendBase + img.url,      // hiển thị
+      real: img.url                        // lưu DB
     }));
+
+    // Thông tin cơ bản
+    productForm.value.name       = p.tenSP;
+    productForm.value.category   = p.id_danhmuc;
+    productForm.value.thuonghieu = p.id_thuonghieu;
+    productForm.value.price      = p.giaSP;
+
+    // Biến thể
+    variants.value = (data.variants || []).map((v) => ({
+      color: v.color,
+      size: v.size,
+      quantity: v.quantity,
+      imageUrl: v.imageUrl || "",
+      preview: v.imageUrl ? (backendBase + v.imageUrl) : ""
+    }));
+
+    if (variants.value.length === 0) {
+      variants.value.push({
+        color: "",
+        size: "",
+        quantity: 0,
+        imageUrl: "",
+        preview: ""
+      });
+    }
+
   } catch (err) {
-    console.error("Lỗi load sản phẩm:", err);
+    console.error(err);
+    alert("Lỗi load chi tiết sản phẩm");
   }
 };
+/* --------- XÓA SẢN PHẨM --------- */
+const deleteProduct = async (id) => {
+  if (!confirm("Bạn có chắc muốn xóa sản phẩm này không?")) return;
 
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/DeleteProduct.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id_sanpham: id })
+  });
 
-/* ------------ PAGINATION ------------ */
+  const data = await res.json();
 
+  if (data.status === "success") {
+    alert("Xóa thành công!");
+    loadProducts();
+  } else {
+    alert("Lỗi: " + data.message);
+  }
+};
+/* PAGINATION */
 const page = ref(1);
 const perPage = 5;
 
@@ -370,139 +589,77 @@ const paginatedProducts = computed(() => {
   return filteredProducts.value.slice(start, start + perPage);
 });
 
-/* ------------ IMAGE HANDLER ------------ */
+/* --------- SUBMIT PRODUCT (Add + Edit) --------- */
+const submitProduct = async () => {
+  const payload = {
+    tenSP: productForm.value.name,
+    giaSP: productForm.value.price,
+    id_danhmuc: productForm.value.category,
+    id_thuonghieu: productForm.value.thuonghieu,
+    imageUrl: productForm.value.imageUrl,
+    // gửi về backend chỉ path thật, không gửi preview
+    extraImages: productForm.value.extraImageUrls.map(i => i.real),
+    variants: variants.value.map(v => ({
+      color: v.color,
+      size: v.size,
+      quantity: v.quantity,
+      imageUrl: v.imageUrl
+    }))
+  };
 
-const onMainImageChange = (e) => {
-  mainImage.value = e.target.files[0] || null;
-};
+  const url = isEditing.value
+    ? "http://localhost/duan1/backend/api/Admin/UpdateProduct.php"
+    : "http://localhost/duan1/backend/api/Admin/AddProduct.php";
 
-const onExtraImagesChange = (e) => {
-  const files = Array.from(e.target.files);
-  files.forEach((file) => {
-    extraImages.value.push(file);
-    const previewURL = URL.createObjectURL(file);
-    extraImagesPreview.value.push(previewURL);
-  });
-};
-
-const removeExtraImage = (index) => {
-  extraImages.value.splice(index, 1);
-  extraImagesPreview.value.splice(index, 1);
-};
-
-/* ------------ VARIANT HANDLER ------------ */
-
-const addVariant = () => {
-  variants.value.push({ color: "", size: "", quantity: 0 });
-};
-
-const removeVariant = (index) => {
-  variants.value.splice(index, 1);
-};
-/* ------------ VALIDATE FORM ------------ */
-
-const validateForm = () => {
-  errors.value = {};
-
-  if (!productForm.value.name.trim()) {
-    errors.value.name = "Tên sản phẩm không được để trống";
+  if (isEditing.value) {
+    payload.id_sanpham = editingId.value;
   }
 
-  if (!productForm.value.category) {
-    errors.value.category = "Vui lòng chọn danh mục";
-  }
-
-  if (!productForm.value.thuonghieu) {
-    errors.value.thuonghieu = "Vui lòng chọn thương hiệu";
-  }
-
-  if (!productForm.value.price || productForm.value.price <= 0) {
-    errors.value.price = "Giá sản phẩm phải lớn hơn 0";
-  }
-
-  if (!mainImage.value) {
-    errors.value.mainImage = "Vui lòng chọn ảnh chính";
-  }
-
-  // VALIDATE BIẾN THỂ
-  variants.value.forEach((v, index) => {
-    if (!v.color || !v.size || !v.quantity || v.quantity <= 0) {
-      errors.value[`variant_${index}`] = "Biến thể phải đầy đủ màu - size - số lượng";
-    }
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
   });
 
-  return Object.keys(errors.value).length === 0;
-};
-/* ------------ SAVE PRODUCT (CALL API) ------------ */
+  const data = await res.json();
 
-const saveProduct = async () => {
-  try {
-    const fd = new FormData();
-
-    fd.append("tenSP", productForm.value.name);
-    fd.append("maSP", "SP_" + Date.now());
-    fd.append("giaSP", productForm.value.price || 0);
-    fd.append("mota", "");
-    fd.append("id_danhmuc", productForm.value.category);
-    fd.append("id_thuonghieu", productForm.value.thuonghieu);
-
-    if (mainImage.value) {
-      fd.append("mainImage", mainImage.value);
-    }
-
-    extraImages.value.forEach((img) => {
-      fd.append("extraImages[]", img);
-    });
-
-    fd.append("variants", JSON.stringify(variants.value));
-
-    const res = await fetch(
-      "http://localhost/duan1/backend/api/Admin/ProductController.php",
-      {
-        method: "POST",
-        body: fd,
-      }
-    );
-
-    const data = await res.json();
-    if (data.status === "success") {
-      alert("Thêm sản phẩm thành công!");
-      await loadProducts();
-      resetForm();
-    } else {
-      alert("Lỗi thêm sản phẩm: " + (data.message || ""));
-    }
-  } catch (err) {
-    console.error("Lỗi saveProduct:", err);
-    alert("Có lỗi khi thêm sản phẩm, kiểm tra console.");
+  if (data.status === "success") {
+    alert(isEditing.value ? "Cập nhật sản phẩm thành công!" : "Thêm sản phẩm thành công!");
+    resetForm();
+    loadProducts();
+  } else {
+    alert("Lỗi: " + (data.message || ""));
   }
 };
 
-/* ------------ RESET FORM ------------ */
-
+/* RESET */
 const resetForm = () => {
   productForm.value = {
     name: "",
     category: "",
     thuonghieu: "",
     price: "",
+    imageUrl: "",
+    extraImageUrls: []
   };
-  mainImage.value = null;
-  extraImages.value = [];
-  extraImagesPreview.value = [];
-  variants.value = [{ color: "", size: "", quantity: 0 }];
+  mainImagePreview.value = "";
+  variants.value = [{ color: "", size: "", quantity: 0, imageUrl: "", preview: "" }];
+  isEditing.value = false;
+  editingId.value = null;
 };
-
-/* ------------ SCROLL ------------ */
 
 const scrollToForm = () => {
-  const form = document.getElementById("add-form");
-  if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("add-form")?.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 };
 
-/* ------------ INIT ------------ */
+const formatCurrency = (val) =>
+  new Intl.NumberFormat("vi-VN").format(val || 0) + " đ";
 
-loadStaticOptions();
+/* INIT */
+loadOptions();
 loadProducts();
 </script>
 
@@ -522,13 +679,6 @@ loadProducts();
   top: 0;
   bottom: 0;
   overflow-y: auto;
-}
-
-.brand-title {
-  font-size: 18px;
-  margin-top: 10px;
-  font-weight: 600;
-  color: #ffffffd9;
 }
 
 .sidebar-menu {
@@ -569,11 +719,6 @@ loadProducts();
   height: auto;
 }
 
-.hover-item:hover {
-  background: #444;
-  cursor: pointer;
-}
-
 .thumb {
   width: 60px;
   height: 60px;
@@ -597,10 +742,6 @@ header.admin-header {
   border-radius: 6px;
 }
 
-.variant-box h5 {
-  margin-bottom: 10px;
-}
-
 .preview-img {
   width: 80px;
   height: 80px;
@@ -616,5 +757,40 @@ header.admin-header {
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 12px;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.popup-box {
+  background: white;
+  padding: 25px;
+  width: 400px;
+  border-radius: 8px;
+}
+table th {
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+}
+.action-cell {
+  white-space: nowrap;
+}
+.action-cell button {
+  display: inline-block;
+  vertical-align: middle;
+}
+table td:not(.no-resize) {
+  font-size: 13px;
+  vertical-align: middle;
 }
 </style>
