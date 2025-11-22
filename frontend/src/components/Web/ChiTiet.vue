@@ -148,6 +148,8 @@
       </div>
     </transition>
   </div>
+  <FooterWeb/>
+</template>
 <script setup>
 import { onBeforeUnmount, ref } from 'vue';
 import HeaderWeb from '../../Header-web.vue';

@@ -16,7 +16,7 @@ import ThongTin from '../components/Web/ThongTin.vue';
 import Gioithieu from '../components/Web/Gioithieu.vue';
 import Dangnhap from '../components/Auth/Dangnhap.vue'; 
 import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
-import tintuc from '../components/Web/tintuc.vue';
+// import tintuc from '../components/Web/tintuc.vue';
 import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
 
 
@@ -25,6 +25,8 @@ const routes = [
     { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
     { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
     { path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu, meta: { isAuth: false } },
+    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
+    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
     { path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
@@ -35,7 +37,7 @@ const routes = [
     { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
     { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
-    { path: '/tintuc', name: 'tintuc', component: tintuc, meta: { isAuth: false } },  
+    // { path: '/tintuc', name: 'tintuc', component: tintuc, meta: { isAuth: false } },  
     { path: '/Thanhtoangiohang', name: 'Thanhtoangiohang', component: Thanhtoangiohang, meta: { isAuth: false } }, 
 
 ]
