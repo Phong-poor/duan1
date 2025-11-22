@@ -1,5 +1,16 @@
 <script setup>
+import { ref } from "vue";
 import logoImage from './assets/logone.png';
+const dropdownOpen = ref(false);
+
+const toggleDropdown = () => {
+  dropdownOpen.value = !dropdownOpen.value;
+};
+
+const logout = () => {
+  localStorage.removeItem("currentUser");
+  window.location.href = "/"; // chuyển về trang chủ hoặc login
+};
 </script>
 
 <template>
@@ -13,11 +24,21 @@ import logoImage from './assets/logone.png';
       </div>
 
       <nav class="nav-links">
-        <a href="#">TRANG CHỦ</a>
-        <a href="#">SẢN PHẨM</a>
-        <a href="#">TIN TỨC</a>
-        <a href="#">GIỚI THIỆU</a>
-        <a href="#">LIÊN HỆ</a>
+        <router-link to="/" class="menu-item" active-class="active">
+                 Trang chủ
+            </router-link>
+        <router-link to="/Sanpham" class="menu-item" active-class="active">
+                 Sản phẩm
+            </router-link>
+        <router-link to="/tintuc" class="menu-item" active-class="active">
+                 Tin tức
+            </router-link>
+        <router-link to="/Gioithieu" class="menu-item" active-class="active">
+                 Giới thiệu
+            </router-link>
+        <router-link to="/Sanpham" class="menu-item" active-class="active">
+                 Liên hệ
+            </router-link>
       </nav>
 
       <div class="actions">
@@ -27,8 +48,20 @@ import logoImage from './assets/logone.png';
         </div>
         <div class="icons">
           <a href="#" class="icon-heart"><i class="fas fa-heart"></i></a>
-          <a href="#" class="icon-shopping-cart"><i class="fas fa-shopping-cart"></i></a>
-          <a href="#" class="icon-user"><i class="fas fa-user"></i></a>
+          <a href="#" class="icon-shopping-cart"></a>
+          <router-link to="/Thanhtoangiohang" class="icon-shopping-cart"><i class="fas fa-shopping-cart"></i></router-link>
+          <div class="user-dropdown-wrapper">
+            <a href="#" class="icon-user" @click.prevent="toggleDropdown">
+              <i class="fas fa-user"></i>
+            </a>
+
+            <div v-if="dropdownOpen" class="user-dropdown">
+              <router-link to="/Thongtin" class="item">Thông tin người dùng</router-link>
+              <router-link to="/Dashboard" class="item">Quản lý trang web</router-link>
+              <router-link to="/Dangnhap" class="item">Đăng xuất</router-link>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -180,5 +213,40 @@ import logoImage from './assets/logone.png';
     width: 100%;
     margin-bottom: 10px;
   }
+}
+.user-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-user i {
+  font-size: 20px;
+  color: #333;
+  cursor: pointer;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #fff;
+  border-radius: 6px;
+  width: 200px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 8px 0;
+  z-index: 999;
+}
+
+.user-dropdown .item {
+  display: block;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.user-dropdown .item:hover {
+  background: #f2f2f2;
 }
 </style>
