@@ -5,6 +5,8 @@ import Quanlydanhmuc from '../components/Admin/Quanlydanhmuc.vue';
 import Quanlythuonghieu from '../components/Admin/Quanlythuonghieu.vue';
 import Quanlykhachhang from '../components/Admin/Quanlykhachhang.vue';
 import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
+import Quanlymausac from '../components/Admin/Quanlymausac.vue';
+import Quanlysize from '../components/Admin/Quanlysize.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
 import TrangChu from '../components/Web/TrangChu.vue';
 import Sanpham from '../components/Web/Sanpham.vue';

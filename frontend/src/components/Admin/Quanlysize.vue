@@ -2,8 +2,7 @@
   <div class="app-wrapper d-flex">
     <!-- Sidebar -->
     <aside class="sidebar bg-dark text-white p-3">
-      <img :src="logoImage" alt="Logo" class="logo-img" />
-
+      <img :src="logoImage" alt="Logo" class="logo-img">
       <ul class="sidebar-menu">
         <router-link to="/" class="menu-item" active-class="active">
           <i class="fa-solid fa-chart-line"></i> Dashboard
@@ -20,16 +19,15 @@
         <router-link to="/Quanlythuonghieu" class="menu-item" active-class="active">
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
         </router-link>
-
         <router-link to="/Quanlymausac" class="menu-item" active-class="active">
           <i class="fa-solid fa-palette"></i> Màu sắc
         </router-link>
 
         <router-link to="/Quanlysize" class="menu-item" active-class="active">
-          <i class="fa-solid fa-maximize"></i>Size
+          <i class="fa-solid fa-maximize"></i> Size
         </router-link>
 
-        <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
+        <router-link to="Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
 
@@ -46,49 +44,31 @@
       </header>
 
       <div class="content-section p-4">
-        <!-- Header -->
+        <!-- Page Header -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="fw-bold">Quản lý đơn hàng</h3>
+          <h3 class="fw-bold">Quản lý thương hiệu</h3>
+          <button class="btn btn-primary" @click="scrollToForm">Thêm thương hiệu</button>
         </div>
 
         <!-- Search -->
-        <input v-model="search" type="text" class="form-control mb-3" placeholder="🔍 Tìm theo tên hoặc email..." />
+        <input v-model="search" type="text" class="form-control mb-3" placeholder="🔍 Tìm thương hiệu..." />
 
-        <!-- Orders Table -->
+        <!-- Brand Table -->
         <table class="table table-bordered text-center">
           <thead class="table-secondary">
             <tr>
-              <th>ID</th>
-              <th>Khách hàng</th>
-              <th>Email</th>
-              <th>SĐT</th>
-              <th>Thanh toán</th>
-              <th>Tổng</th>
-              <th>Trạng thái</th>
+              <th>Mã TH</th>
+              <th>Size</th>
               <th>Hành động</th>
             </tr>
           </thead>
-
           <tbody>
-            <tr v-for="o in paginatedOrders" :key="o.id">
-              <td>{{ o.id }}</td>
-              <td>{{ o.name }}</td>
-              <td>{{ o.email }}</td>
-              <td>{{ o.phone }}</td>
-              <td>{{ o.payment }}</td>
-              <td>{{ formatPrice(o.total) }}</td>
+            <tr v-for="sz in paginatedSizes" :key="sz.id_size">
+              <td>{{ sz.id_size }}</td>
+              <td>{{ sz.size }}</td>
               <td>
-                <span class="badge"
-                  :class="{
-                    'bg-warning': o.status === 'Chờ xác nhận',
-                    'bg-primary': o.status === 'Đã xác nhận',
-                    'bg-info': o.status === 'Đang giao hàng',
-                    'bg-success': o.status === 'Thành công'
-                  }"
-                >{{ o.status }}</span>
-              </td>
-              <td>
-                <button class="btn btn-info btn-sm" @click="viewDetails(o)">Xem</button>
+                <button class="btn btn-warning btn-sm" @click="editSize(sz)">Sửa</button>
+                <button class="btn btn-danger btn-sm ms-2" @click="deleteSize(sz.id_size)">Xóa</button>
               </td>
             </tr>
           </tbody>
@@ -101,33 +81,28 @@
           <button class="btn btn-secondary btn-sm" :disabled="page === totalPages" @click="page++">Sau</button>
         </div>
 
-        <!-- Order Detail -->
-        <div v-if="selectedOrder" class="card p-4 mt-4">
-          <h4 class="fw-bold mb-3">Chi tiết đơn hàng #{{ selectedOrder.id }}</h4>
+        <!-- Brand Form -->
+        <div class="card p-4 mt-4" id="add-form">
+          <h4 class="fw-bold mb-3">
+            {{ isEdit ? "Cập nhật size" : "Thêm size" }}
+          </h4>
 
-          <table class="table table-bordered text-center">
-            <thead class="table-light">
-              <tr>
-                <th>ID SP</th>
-                <th>Tên sản phẩm</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Tổng</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in selectedOrder.items" :key="item.id">
-                <td>{{ item.id }}</td>
-                <td>{{ item.name }}</td>
-                <td>{{ formatPrice(item.price) }}</td>
-                <td>{{ item.qty }}</td>
-                <td>{{ formatPrice(item.price * item.qty) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="mb-3">
+            <label class="fw-semibold">Size</label>
+            <input
+              v-model="form.size"
+              type="number"
+              class="form-control"
+              placeholder="Nhập size..."
+            />
+            <p v-if="errors.size" class="text-danger mt-1">{{ errors.size }}</p>
+          </div>
 
-          <h5 class="text-end fw-bold mt-3">Tổng đơn hàng: {{ formatPrice(selectedOrder.total) }}</h5>
+          <button class="btn btn-success" @click="saveSize">
+            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+          </button>
         </div>
+
       </div>
     </div>
   </div>
@@ -135,70 +110,104 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import HeaderAdmin from "../../Header-admin.vue";
 import logoImage from "../../assets/logo.png";
+import HeaderAdmin from "../../Header-admin.vue";
 
-// Search keyword
+/* STATE */
+const sizes = ref([]);
 const search = ref("");
-
-// Fake Orders
-const orders = ref([
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    email: "a@gmail.com",
-    phone: "0909123456",
-    payment: "COD",
-    status: "Chờ xác nhận",
-    total: 25990000,
-    items: [
-      { id: 1, name: "iPhone 15", price: 25990000, qty: 1 }
-    ]
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    email: "b@gmail.com",
-    phone: "0988111222",
-    payment: "Chuyển khoản",
-    status: "Đang giao hàng",
-    total: 44500000,
-    items: [
-      { id: 2, name: "Samsung S24", price: 22500000, qty: 1 },
-      { id: 3, name: "AirPods Pro", price: 22000000, qty: 1 }
-    ]
-  }
-]);
-
 const page = ref(1);
 const perPage = 5;
 
-// Filter
-const filteredOrders = computed(() =>
-  orders.value.filter(
-    (o) =>
-      o.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      o.email.toLowerCase().includes(search.value.toLowerCase())
+const form = ref({
+  id_size: null,
+  size: ""
+});
+const errors = ref({});
+const isEdit = ref(false);
+
+/* LOAD SIZE */
+const loadSizes = async () => {
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetSize.php");
+    sizes.value = await res.json();
+  } 
+  catch (e) {
+    console.error("Lỗi load size:", e);
+  }
+};
+
+/* SAVE (ADD/UPDATE) */
+const saveSize = async () => {
+  errors.value = {};
+
+  if (!form.value.size) {
+    errors.value.size = "Size không được để trống!";
+    return;
+  }
+
+  const url = isEdit.value
+    ? "http://localhost/duan1/backend/api/Admin/UpdateSize.php"
+    : "http://localhost/duan1/backend/api/Admin/AddSize.php";
+
+  await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(form.value)
+  });
+
+  resetForm();
+  loadSizes();
+};
+
+/* DELETE */
+const deleteSize = async (id) => {
+  if (!confirm("Bạn có chắc chắn muốn xóa không?")) return;
+  await fetch(`http://localhost/duan1/backend/api/Admin/DeleteSize.php?id=${id}`);
+  loadSizes();
+};
+
+/* EDIT */
+const editSize = (sz) => {
+  form.value = {
+    id_size: sz.id_size,
+    size: sz.size
+  };
+  isEdit.value = true;
+  scrollToForm();
+};
+
+/* RESET */
+const resetForm = () => {
+  form.value = { id_size: null, size: "" };
+  errors.value = {};
+  isEdit.value = false;
+};
+
+/* SEARCH + PAGINATION */
+const filteredSizes = computed(() =>
+  sizes.value.filter((s) =>
+    s.size.toString().includes(search.value)
   )
 );
 
-// Pagination
-const totalPages = computed(() => Math.ceil(filteredOrders.value.length / perPage));
+const totalPages = computed(() =>
+  Math.ceil(filteredSizes.value.length / perPage) || 1
+);
 
-const paginatedOrders = computed(() => {
+const paginatedSizes = computed(() => {
   const start = (page.value - 1) * perPage;
-  return filteredOrders.value.slice(start, start + perPage);
+  return filteredSizes.value.slice(start, start + perPage);
 });
 
-// Selected order for detail view
-const selectedOrder = ref(null);
-
-const viewDetails = (order) => {
-  selectedOrder.value = order;
+/* SCROLL */
+const scrollToForm = () => {
+  const formDom = document.getElementById("add-form");
+  if (formDom) formDom.scrollIntoView({ behavior: "smooth" });
 };
 
-const formatPrice = (num) =>
-  num.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+/* INIT */
+loadSizes();
 </script>
 
 <style scoped>

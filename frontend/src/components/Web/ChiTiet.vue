@@ -148,10 +148,6 @@
       </div>
     </transition>
   </div>
-  <FooterWeb/>
-</template>
-
-
 <script setup>
 import { onBeforeUnmount, ref } from 'vue';
 import HeaderWeb from '../../Header-web.vue';
@@ -167,7 +163,6 @@ import related3 from '../../assets/images (4).jpg';
 import related4 from '../../assets/cv-2110.jpg';
 import related5 from '../../assets/images.jpg';
 import related6 from '../../assets/bannergiay2.jpg';
-
 const thumbnails = [
   { id: 0, src: heroImage, alt: 'Nike Air Max Hero' },
   { id: 1, src: thumb1, alt: 'View 1' },

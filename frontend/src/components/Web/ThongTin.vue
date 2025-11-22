@@ -72,7 +72,6 @@
                   <td class="action-cell">
                     <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
                     <a href="#" class="action-btn-custom cancel-btn">Trả hàng</a>
-                    
                   </td>
                 </tr>
                 <tr>
@@ -122,7 +121,6 @@ import footerWeb from '../../footer-web.vue';
   max-width: 1300px;
   margin: 0 auto;
 }
-
 .profile-email {
   font-size: 14px;
   color: #777;

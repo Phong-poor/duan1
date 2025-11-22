@@ -4,10 +4,10 @@
     <aside class="sidebar bg-dark text-white p-3">
       <img :src="logoImage" alt="Logo" class="logo-img" />
       <ul class="sidebar-menu">
-        <router-link to="/Dashboard" class="menu-item" active-class="active">
+        <router-link to="/" class="menu-item" active-class="active">
           <i class="fa-solid fa-chart-line"></i> Dashboard
         </router-link>
-        <router-link to="/" class="menu-item" active-class="active">
+        <router-link to="/Quanlysanpham" class="menu-item" active-class="active">
           <i class="fa-solid fa-box"></i> Sản phẩm
         </router-link>
         <router-link to="/Quanlydanhmuc" class="menu-item" active-class="active">
@@ -15,6 +15,13 @@
         </router-link>
         <router-link to="/Quanlythuonghieu" class="menu-item" active-class="active">
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
+        </router-link>
+        <router-link to="/Quanlymausac" class="menu-item" active-class="active">
+          <i class="fa-solid fa-palette"></i> Màu sắc
+        </router-link>
+
+        <router-link to="/Quanlysize" class="menu-item" active-class="active">
+          <i class="fa-solid fa-maximize"></i> Size
         </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
