@@ -1,5 +1,5 @@
 <template>
-  <Header/>
+  <HeaderWeb/>
   <div class="product-detail-wrapper">
     <main class="container product-detail-page">
       <div class="product-content">
@@ -148,23 +148,23 @@
       </div>
     </transition>
   </div>
-  <Footer/>
+  <footerWeb/>
 </template>
 <script setup>
 import { onBeforeUnmount,ref } from'vue';
-import Header from'../../header.vue';
-import Footer from '../../footer.vue';
-import heroImage from '@/assets/bannergiay.jpg';
-import thumb1 from '@/assets/images (4).jpg';
-import thumb2 from '@/assets/images (2).jpg';
-import thumb3 from '@/assets/images (5).jpg';
-import thumb4 from '@/assets/images (1).jpg';
-import related1 from '@/assets/images (2).jpg';
-import related2 from '@/assets/images (3).jpg';
-import related3 from '@/assets/images (4).jpg';
-import related4 from '@/assets/cv-2110.jpg';
-import related5 from '@/assets/images.jpg';
-import related6 from '@/assets/bannergiay2.jpg';
+import HeaderWeb from '../../Header-web.vue';
+import footerWeb from '../../footer-web.vue';
+// import heroImage from '@/assets/bannergiay.jpg';
+// import thumb1 from '@/assets/images (4).jpg';
+// import thumb2 from '@/assets/images (2).jpg';
+// import thumb3 from '@/assets/images (5).jpg';
+// import thumb4 from '@/assets/images (1).jpg';
+// import related1 from '@/assets/images (2).jpg';
+// import related2 from '@/assets/images (3).jpg';
+// import related3 from '@/assets/images (4).jpg';
+// import related4 from '@/assets/cv-2110.jpg';
+// import related5 from '@/assets/images.jpg';
+// import related6 from '@/assets/bannergiay2.jpg';
 const thumbnails = [
   { id: 0, src: heroImage, alt: 'Nike Air Max Hero' },
   { id: 1, src: thumb1, alt: 'View 1' },

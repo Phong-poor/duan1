@@ -106,7 +106,7 @@
         </div>
       </section>
     </main>
-    <Footer />
+    <footerWeb />
   </div>
 </template>
 
@@ -117,13 +117,13 @@ const router=useRouter();
 const goTo = (path) => {
   router.push(path);
 };
-import Header from'../../header.vue';
-import Footer from '../../footer.vue';
-import bannerSlide1 from '@/assets/banner-slide-1.png';
-import bannerSlide2 from '@/assets/banner-slide-2.jpg';
-import bannerSlide3 from '@/assets/banner-slide-3.jpg';
-import productImg1 from '@/assets/images (2).jpg';
-import productImg2 from '@/assets/images (3).jpg';
+import HeaderWeb from '../../Header-web.vue';
+import footerWeb from '../../footer-web.vue';
+// import bannerSlide1 from '@/assets/banner-slide-1.png';
+// import bannerSlide2 from '@/assets/banner-slide-2.jpg';
+// import bannerSlide3 from '@/assets/banner-slide-3.jpg';
+// import productImg1 from '@/assets/images (2).jpg';
+// import productImg2 from '@/assets/images (3).jpg';
 
 const slideContainer = ref(null);
 let slideTimer;

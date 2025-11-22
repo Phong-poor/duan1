@@ -1,5 +1,5 @@
 <template>
-  <Header/> 
+  <HeaderWeb/> 
   <div class="account-page">
     <main class="account-container">
       <div class="profile-container">
@@ -101,11 +101,12 @@
       </div>
     </main>
   </div>
-  <Footer/>
+  <footerWeb/>
 </template>
 <script setup>
-import Header from'../../header.vue';
-import Footer from'../../footer.vue';
+
+import HeaderWeb from '../../Header-web.vue';
+import footerWeb from '../../footer-web.vue';
 </script>
 <style scoped>
 .account-page {
