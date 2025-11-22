@@ -2,26 +2,23 @@
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
-const goTo = (path) => {
-  router.push(path);
-};
 import HeaderWeb from '../../Header-web.vue';
 import footerWeb from '../../footer-web.vue';
-// import banner1 from '@/assets/banner-slide-1.png';
-// import banner2 from '@/assets/banner-slide-2.jpg';
-// import banner3 from '@/assets/banner-slide-3.jpg';
-// import imgSale1 from '@/assets/images (1).jpg';
-// import imgSale2 from '@/assets/images (2).jpg';
-// import imgSale3 from '@/assets/images (3).jpg';
-// import imgSale4 from '@/assets/images (4).jpg';
-// import imgSale5 from '@/assets/images (5).jpg';
-// import bannerGiay from '@/assets/bannergiay.jpg';
-// import imgNews1 from '@/assets/images (3).jpg';
-// import imgNews2 from '@/assets/images (4).jpg';
-// import imgNews3 from '@/assets/images (2).jpg';
-// import imgCv2110 from '@/assets/cv-2110.jpg';
-// import imgCanhan3 from '@/assets/canhan3.jpg';
-// import imgCanhan1 from '@/assets/canhan1.jpg';
+import banner1 from '../../assets/banner-slide-1.png';
+import banner2 from '../../assets/banner-slide-2.jpg';
+import banner3 from '../../assets/banner-slide-3.jpg';
+import imgSale1 from '../../assets/images (1).jpg';
+import imgSale2 from '../../assets/images (2).jpg';
+import imgSale3 from '../../assets/images (3).jpg';
+import imgSale4 from '../../assets/images (4).jpg';
+import imgSale5 from '../../assets/images (5).jpg';
+import bannerGiay from '../../assets/bannergiay.jpg';
+import imgNews1 from '../../assets/images (3).jpg';
+import imgNews2 from '../../assets/images (4).jpg';
+import imgNews3 from '../../assets/images (2).jpg';
+import imgCv2110 from '../../assets/cv-2110.jpg';
+import imgCanhan3 from '../../assets/canhan3.jpg';
+import imgCanhan1 from '../../assets/canhan1.jpg';
 
 onMounted(() => {
   // 1. CAROUSEL BANNER LỚN
@@ -62,42 +59,38 @@ onMounted(() => {
     slideInterval = setInterval(goToNextSlide, 5000);
   });
 
-  // 2. FLASH SALE TIMER
-  function updateFlashSaleTimer() {
-    const endTime = new Date();
-    endTime.setHours(endTime.getHours() + 4);
+  // 2. FLASH SALE TIMER (CÓ THÊM NGÀY)
+function updateFlashSaleTimer() {
+  // Ví dụ: flash sale kết thúc sau 4 ngày + 4 giờ
+  const endTime = new Date();
+  endTime.setDate(endTime.getDate() + 4);
+  endTime.setHours(endTime.getHours() + 4);
 
-    const timerFunction = setInterval(() => {
-      const now = new Date().getTime();
-      const distance = endTime.getTime() - now;
+  const timerFunction = setInterval(() => {
+    const now = new Date().getTime();
+    const distance = endTime.getTime() - now;
 
-      if (distance < 0) {
-        clearInterval(timerFunction);
-        const hBox = document.getElementById('hoursBox');
-        const mBox = document.getElementById('minutesBox');
-        const sBox = document.getElementById('secondsBox');
-        if (hBox && mBox && sBox) {
-          hBox.textContent = '00';
-          mBox.textContent = '00';
-          sBox.textContent = '00';
-        }
-        return;
-      }
+    if (distance < 0) {
+      clearInterval(timerFunction);
+      ['dayBox', 'hoursBox', 'minutesBox', 'secondsBox'].forEach(id => {
+        const box = document.getElementById(id);
+        if (box) box.textContent = '00';
+      });
+      return;
+    }
 
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      const hBox = document.getElementById('hoursBox');
-      const mBox = document.getElementById('minutesBox');
-      const sBox = document.getElementById('secondsBox');
-      if (hBox && mBox && sBox) {
-        hBox.textContent = String(hours).padStart(2, '0');
-        mBox.textContent = String(minutes).padStart(2, '0');
-        sBox.textContent = String(seconds).padStart(2, '0');
-      }
-    }, 1000);
-  }
+    document.getElementById('dayBox').textContent = String(days).padStart(2, '0');
+    document.getElementById('hoursBox').textContent = String(hours).padStart(2, '0');
+    document.getElementById('minutesBox').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('secondsBox').textContent = String(seconds).padStart(2, '0');
+  }, 1000);
+}
+
 
   updateFlashSaleTimer();
 
@@ -196,12 +189,20 @@ onMounted(() => {
         <div class="timer-container-new">
           <p>Chỉ còn lại:</p>
           <div class="sale-timer">
-            <div class="timer-box" id="hoursBox">00</div>
-            <span class="timer-separator">:</span>
-            <div class="timer-box" id="minutesBox">00</div>
-            <span class="timer-separator">:</span>
-            <div class="timer-box" id="secondsBox">00</div>
-          </div>
+
+              <div class="timer-box" id="dayBox">00</div>
+           
+                <span class="timer-separator">:</span>
+
+                <div class="timer-box" id="hoursBox">00</div>
+                  <span class="timer-separator">:</span>
+
+                <div class="timer-box" id="minutesBox">00</div>
+                  <span class="timer-separator">:</span>
+
+                <div class="timer-box" id="secondsBox">00</div>
+            </div>
+
         </div>
 
         <div class="sale-product-grid">
@@ -275,7 +276,7 @@ onMounted(() => {
             <p>2,890,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')"class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -286,7 +287,7 @@ onMounted(() => {
             <p>3,990,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -297,7 +298,7 @@ onMounted(() => {
             <p>4,500,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -308,7 +309,7 @@ onMounted(() => {
             <p>1,500,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -319,7 +320,7 @@ onMounted(() => {
             <p>1,690,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -330,7 +331,7 @@ onMounted(() => {
             <p>2,990,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -341,7 +342,7 @@ onMounted(() => {
             <p>3,700,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -352,7 +353,7 @@ onMounted(() => {
             <p>8,500,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -363,7 +364,7 @@ onMounted(() => {
             <p>3,700,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -374,7 +375,7 @@ onMounted(() => {
             <p>2,190,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
         </div>
@@ -395,7 +396,7 @@ onMounted(() => {
             <p>5,500,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -406,7 +407,7 @@ onMounted(() => {
             <p>2,350,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -417,7 +418,7 @@ onMounted(() => {
             <p>1,990,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -428,7 +429,7 @@ onMounted(() => {
             <p>2,590,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -439,7 +440,7 @@ onMounted(() => {
             <p>1,800,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -450,7 +451,7 @@ onMounted(() => {
             <p>1,490,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -461,7 +462,7 @@ onMounted(() => {
             <p>3,190,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
 
@@ -472,7 +473,7 @@ onMounted(() => {
             <p>2,400,000 VNĐ</p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
         </div>
@@ -594,6 +595,7 @@ onMounted(() => {
   </main>
   <footerWeb/>
 </template>
+
 <style scoped>
 /* --- CSS TỔNG THỂ --- */
 .container {
@@ -616,12 +618,14 @@ onMounted(() => {
 
 /* --- SLIDE BANNER LỚN --- */
 .hero-carousel {
-  width: 100%;
+  width: 100vw;            /* thêm */
+  margin-left: 50%;        /* thêm */
+  transform: translateX(-50%);
   overflow: hidden;
   position: relative;
   margin-bottom: 40px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
+  border-radius: 0; /* xoá bo góc banner nếu muốn giống web mẫu */
 }
 
 .slide-container {
@@ -632,7 +636,7 @@ onMounted(() => {
 
 .slide {
   width: calc(100% / 3);
-  height: 300px;
+  height: 60vh;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -646,6 +650,7 @@ onMounted(() => {
   padding: 0 5%;
   box-sizing: border-box;
 }
+
 .slide::before {
   content: '';
   position: absolute;
@@ -1193,6 +1198,195 @@ onMounted(() => {
 .more:hover {
   text-decoration: underline;
 }
+
+/* ============================= */
+/*        RESPONSIVE TABLET      */
+/* ============================= */
+@media (max-width: 1024px) {
+
+  /* Banner */
+  .slide {
+    height: 45vh;
+    padding: 0 3%;
+  }
+
+  .slide h1 {
+    font-size: 32px;
+  }
+
+  .slide p {
+    font-size: 18px;
+  }
+
+  .sale-product-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .product-card-slide,
+  .product-card {
+    flex: 0 0 calc((100% - (3 * 20px)) / 4);
+    min-width: calc((100% - (3 * 20px)) / 4);
+  }
+
+  .review-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .content-box {
+    flex-direction: column;
+  }
+
+  .left, .right {
+    width: 100%;
+  }
+
+  .right img {
+    height: 300px;
+  }
+
+  .news-container {
+    flex-wrap: wrap;
+  }
+}
+
+/* ============================= */
+/*        RESPONSIVE MOBILE      */
+/* ============================= */
+@media (max-width: 768px) {
+
+  .container {
+    width: 100%;
+  }
+
+  /* Banner chính */
+  .hero-carousel {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+  }
+
+  .slide {
+    height: 40vh;
+    align-items: center;
+    text-align: center;
+  }
+
+  .slide h1 {
+    font-size: 26px;
+  }
+
+  .slide p {
+    font-size: 16px;
+  }
+
+  .slide-cta {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+
+  /* Flash sale */
+  .sale-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .sale-product-card img {
+    height: 150px;
+  }
+
+  /* Carousel product */
+  .product-carousel-wrap {
+    padding: 0 10px;
+  }
+
+  .product-card-slide,
+  .product-card {
+    flex: 0 0 60%;
+    min-width: 60%;
+  }
+
+  .carousel-nav-btn {
+    display: none;
+  }
+
+  /* Testimonials */
+  .review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Xshop section */
+  .content-box {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .right img {
+    width: 100%;
+    height: 220px;
+  }
+
+  /* News */
+  .news-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* ============================= */
+/*      MOBILE SIÊU NHỎ         */
+/* ============================= */
+@media (max-width: 480px) {
+
+  .slide {
+    height: 35vh;
+  }
+
+  .slide h1 {
+    font-size: 22px;
+  }
+
+  .slide p {
+    font-size: 14px;
+  }
+
+  .sale-header h2 {
+    font-size: 20px;
+  }
+
+  .timer-box {
+    font-size: 20px;
+    padding: 5px 10px;
+  }
+
+  .sale-product-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card-slide,
+  .product-card {
+    flex: 0 0 80%;
+    min-width: 80%;
+  }
+
+  .news-card {
+    width: 90%;
+  }
+
+  .news-title {
+    font-size: 26px;
+  }
+
+  .xshop-section {
+    padding: 20px 0;
+  }
+
+  .stat h1 {
+    font-size: 26px;
+  }
+
+  .review-card {
+    padding: 20px;
+  }
+}
+
 </style>
-
-
