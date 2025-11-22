@@ -1,4 +1,5 @@
 <template>
+  <HeaderWeb  />
   <div class="bg-light">
 
     <!-- GIỎ HÀNG -->
@@ -171,12 +172,16 @@
     </div>
 
   </div>
+  <footerWeb />
 </template>
 
-<script>
-export default {
-  name: "ThanhtoanGiohang"
-};
+<script setup>
+import HeaderWeb from '../../Header-web.vue';
+import footerWeb from '../../footer-web.vue';
 </script>
 
-<style scoped></style>
+<style scoped>
+.bg-light{
+  margin-top: 50px;
+}
+</style>

@@ -5,23 +5,23 @@ const router = useRouter();
 const goTo = (path) => {
   router.push(path);
 };
-import Header from '../../header.vue';
-import Footer from '../../footer.vue';
-import banner1 from '@/assets/banner-slide-1.png';
-import banner2 from '@/assets/banner-slide-2.jpg';
-import banner3 from '@/assets/banner-slide-3.jpg';
-import imgSale1 from '@/assets/images (1).jpg';
-import imgSale2 from '@/assets/images (2).jpg';
-import imgSale3 from '@/assets/images (3).jpg';
-import imgSale4 from '@/assets/images (4).jpg';
-import imgSale5 from '@/assets/images (5).jpg';
-import bannerGiay from '@/assets/bannergiay.jpg';
-import imgNews1 from '@/assets/images (3).jpg';
-import imgNews2 from '@/assets/images (4).jpg';
-import imgNews3 from '@/assets/images (2).jpg';
-import imgCv2110 from '@/assets/cv-2110.jpg';
-import imgCanhan3 from '@/assets/canhan3.jpg';
-import imgCanhan1 from '@/assets/canhan1.jpg';
+import HeaderWeb from '../../Header-web.vue';
+import footerWeb from '../../footer-web.vue';
+// import banner1 from '@/assets/banner-slide-1.png';
+// import banner2 from '@/assets/banner-slide-2.jpg';
+// import banner3 from '@/assets/banner-slide-3.jpg';
+// import imgSale1 from '@/assets/images (1).jpg';
+// import imgSale2 from '@/assets/images (2).jpg';
+// import imgSale3 from '@/assets/images (3).jpg';
+// import imgSale4 from '@/assets/images (4).jpg';
+// import imgSale5 from '@/assets/images (5).jpg';
+// import bannerGiay from '@/assets/bannergiay.jpg';
+// import imgNews1 from '@/assets/images (3).jpg';
+// import imgNews2 from '@/assets/images (4).jpg';
+// import imgNews3 from '@/assets/images (2).jpg';
+// import imgCv2110 from '@/assets/cv-2110.jpg';
+// import imgCanhan3 from '@/assets/canhan3.jpg';
+// import imgCanhan1 from '@/assets/canhan1.jpg';
 
 onMounted(() => {
   // 1. CAROUSEL BANNER LỚN
@@ -158,7 +158,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Header/>
+  <HeaderWeb/>
   <main class="container main-content">
     <!-- SLIDE BANNER LỚN -->
     <section class="hero-carousel">
@@ -592,7 +592,7 @@ onMounted(() => {
       </div>
     </section>
   </main>
-  <Footer/>
+  <footerWeb/>
 </template>
 <style scoped>
 /* --- CSS TỔNG THỂ --- */

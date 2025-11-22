@@ -5,8 +5,14 @@ import Quanlydanhmuc from '../components/Admin/Quanlydanhmuc.vue';
 import Quanlythuonghieu from '../components/Admin/Quanlythuonghieu.vue';
 import Quanlykhachhang from '../components/Admin/Quanlykhachhang.vue';
 import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
+import Quanlymausac from '../components/Admin/Quanlymausac.vue';
+import Quanlysize from '../components/Admin/Quanlysize.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
-import ThanhtoanGiohang from '../components/web/Thanhtoangiohang.vue';
+import ThanhtoanGiohang from '../components/Web/Thanhtoangiohang.vue';
+import ChiTiet from '../components/Web/ChiTiet.vue';
+import SanPham from '../components/Web/SanPham.vue';
+import ThongTin from '../components/Web/ThongTin.vue';
+import trangchu from '../components/Web/trangchu.vue';
 
 const routes = [
     { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
@@ -15,7 +21,13 @@ const routes = [
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
     { path: '/', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
-
+    { path: '/ThanhtoanGiohang', name: 'ThanhtoanGiohang', component: ThanhtoanGiohang, meta: { isAuth: false } },
+    { path: '/SanPham', name: 'SanPham', component: SanPham, meta: { isAuth: false } },
+    { path: '/ChiTiet', name: 'ChiTiet', component: ChiTiet, meta: { isAuth: false } },
+    { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
+    { path: '/trangchu', name: 'trangchu', component: trangchu, meta: { isAuth: false } },
+    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
+    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
 ]
 
 const router = createRouter({
