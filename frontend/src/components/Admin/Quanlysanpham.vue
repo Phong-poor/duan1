@@ -46,13 +46,25 @@
           </button>
         </div>
 
-        <!-- Search -->
-        <input
-          v-model="search"
-          type="text"
-          class="form-control mb-3"
-          placeholder="🔍 Tìm sản phẩm..."
-        />
+        <!-- Search + Filter -->
+        <div class="d-flex gap-2 mb-3">
+          
+          <!-- Search (tìm tên SP, danh mục, thương hiệu) -->
+          <input
+            v-model="search"
+            type="text"
+            class="form-control"
+            placeholder="🔍 Tìm sản phẩm, danh mục hoặc thương hiệu..."
+          />
+
+          <!-- Dropdown giảm giá -->
+          <select v-model="filterDiscount" class="form-select filter-select">
+            <option value="">Tất cả</option>
+            <option value="yes">Đang giảm giá</option>
+            <option value="no">Chưa giảm giá</option>
+          </select>
+
+        </div>
 
         <!-- Product Table -->
         <table class="table table-bordered text-center">
@@ -312,6 +324,7 @@ const backendBase = "http://localhost/duan1/backend/";
 
 /* --------- STATE --------- */
 const search = ref("");
+const filterDiscount = ref("");
 
 const categories = ref([]);
 const brands = ref([]);
@@ -575,9 +588,25 @@ const page = ref(1);
 const perPage = 5;
 
 const filteredProducts = computed(() =>
-  products.value.filter((p) =>
-    (p.name || "").toLowerCase().includes(search.value.toLowerCase())
-  )
+  products.value.filter((p) => {
+
+    // tìm theo: Tên SP + Danh mục + Thương hiệu
+    const searchText = search.value.toLowerCase();
+    const matchSearch =
+      p.name.toLowerCase().includes(searchText) ||
+      p.category.toLowerCase().includes(searchText) ||
+      p.brand.toLowerCase().includes(searchText);
+
+    // lọc giảm giá
+    const matchDiscount =
+      filterDiscount.value === ""
+        ? true
+        : filterDiscount.value === "yes"
+        ? p.giamgiaSP > 0
+        : p.giamgiaSP == 0 || p.giamgiaSP == null;
+
+    return matchSearch && matchDiscount;
+  })
 );
 
 const totalPages = computed(() =>
@@ -792,5 +821,8 @@ table th {
 table td:not(.no-resize) {
   font-size: 13px;
   vertical-align: middle;
+}
+.filter-select {
+  width: 160px;
 }
 </style>
