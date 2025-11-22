@@ -1,9 +1,14 @@
 <script setup>
-import trangchu from './trangchu.vue';
-import FooterComponent  from './footer.vue';
+//import trangchu from './trangchu.vue';
+//import FooterComponent  from './footer.vue';
+import Dangnhap from './components/Auth/Dangnhap.vue';
+//import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
+
+
 </script>
 <template>
-  <trangchu />
+  <Dangnhap/>
+  <Quenmatkhau/>
   <main>
     
   </main>
