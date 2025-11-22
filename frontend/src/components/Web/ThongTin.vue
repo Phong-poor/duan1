@@ -60,7 +60,7 @@
                   <td>4,800,000 VNĐ</td>
                   <td><span class="status-shipping">Đang xử lý</span></td>
                   <td class="action-cell">
-                    <a href="#" class="action-link">Xem</a>
+                    <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
                     <a href="#" class="action-btn-custom cancel-btn">Hủy Đơn</a>
                   </td>
                 </tr>
@@ -68,20 +68,20 @@
                   <td>#KH10240</td>
                   <td>15/10/2025</td>
                   <td>3,500,000 VNĐ</td>
-                  <td><span class="status-paid">Đã giao hàng</span></td>
+                  <td><span class="status-paid">Thành công</span></td>
                   <td class="action-cell">
-                    <a href="#" class="action-link">Xem</a>
-                    <a href="#" class="action-btn-custom reorder-btn">Mua lại</a>
+                    <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
+                    <a href="#" class="action-btn-custom cancel-btn">Trả hàng</a>
                   </td>
                 </tr>
                 <tr>
                   <td>#KH10221</td>
                   <td>28/09/2025</td>
                   <td>7,200,000 VNĐ</td>
-                  <td><span class="status-paid">Đã giao hàng</span></td>
+                  <td><span class="status-paid">Thành công</span></td>
                   <td class="action-cell">
-                    <a href="#" class="action-link">Xem</a>
-                    <a href="#" class="action-btn-custom reorder-btn">Mua lại</a>
+                    <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
+                    <a href="#" class="action-btn-custom cancel-btn">Trả hàng</a>
                   </td>
                 </tr>
                 <tr>
@@ -90,7 +90,8 @@
                   <td>2,990,000 VNĐ</td>
                   <td class="status-cancelled">Đã hủy</td>
                   <td class="action-cell">
-                    <a href="#" class="action-link">Xem</a>
+                    <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
+                    <a href="#" class="action-btn-custom reorder-btn">Mua lại</a>
                   </td>
                 </tr>
               </tbody>
@@ -104,7 +105,6 @@
   <footerWeb/>
 </template>
 <script setup>
-
 import HeaderWeb from '../../Header-web.vue';
 import footerWeb from '../../footer-web.vue';
 </script>
@@ -327,4 +327,3 @@ import footerWeb from '../../footer-web.vue';
   }
 }
 </style>
-
