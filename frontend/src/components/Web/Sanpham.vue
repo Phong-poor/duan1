@@ -1,153 +1,195 @@
 <template>
   <div class="nike-page">
     <HeaderWeb />
+
     <main class="container">
+
+      <!-- BANNER -->
       <section class="brand-banner">
         <div class="slide-container" ref="slideContainer">
           <div class="slide active">
-            <img :src="bannerSlide1" alt="Nike Air Slide 1" />
+            <img :src="bannerSlide1" />
             <h1>THẾ GIỚI CỦA NIKE AIR</h1>
           </div>
           <div class="slide">
-            <img :src="bannerSlide2" alt="Nike Air Slide 2" />
+            <img :src="bannerSlide2" />
             <h1>ĐẲNG CẤP CÔNG NGHỆ NIKE</h1>
           </div>
           <div class="slide">
-            <img :src="bannerSlide3" alt="Nike Air Slide 3" />
+            <img :src="bannerSlide3" />
             <h1>CHẠY BỨT TỐC – AIR MAX</h1>
           </div>
         </div>
       </section>
 
+       <h2 class="section-title">Sản phẩm</h2>
+      <!-- FILTER -->
       <div class="filter-bar">
         <div>
-          <label for="sort">Sắp xếp theo:</label>
-          <select id="sort">
+          <label>Sắp xếp theo:</label>
+          <select>
             <option value="moi_nhat">Mới nhất</option>
             <option value="gia_tang">Giá tăng dần</option>
             <option value="gia_giam">Giá giảm dần</option>
           </select>
         </div>
+
         <div class="filter-inline">
-          <label for="filter_size">Kích cỡ:</label>
-          <select id="filter_size">
+          <label>Kích cỡ:</label>
+          <select>
             <option value="all">Tất cả</option>
-            <option value="40">40</option>
-            <option value="41">41</option>
-            <option value="42">42</option>
+              <option value="36">36</option>
+              <option value="37">37</option>
+              <option value="38">38</option>
+              <option value="39">39</option>
+              <option value="39">40</option>
+              <option value="39">41</option>
+              <option value="39">42</option>
+              <option value="39">43</option>
+              <option value="39">44</option>
           </select>
 
-          <label for="filter_type">Loại:</label>
-          <select id="filter_type">
+          <label>Loại:</label>
+          <select>
             <option value="all">Tất cả</option>
-            <option value="air_max">Air Max</option>
-            <option value="dunk">Dunk</option>
-            <option value="jordan">Jordan</option>
+            <option value="air_max">Giày thể thao</option>
+            <option value="dunk">Giày chạy bộ</option>
+            <option value="jordan">Giày đi học</option>
+            <option value="training">Giày training</option>
           </select>
         </div>
       </div>
 
-      <h2 class="section-title">TẤT CẢ GIÀY NIKE (100+)</h2>
+      <!-- ======= LAYOUT 2 CỘT ======= -->
+      <div class="layout-2col">
 
-      <section class="product-grid">
-        <div class="product-card">
-          <img :src="productImg1" alt="Nike Dunk Low Retro Panda" />
-          <h3>Nike Dunk Low Retro Panda</h3>
-          <div class="stars">★★★★★</div>
-          <p>3,500,000 VNĐ</p>
-          <div class="product-actions">
-            <button class="action-btn" type="button">Mua ngay</button>
-            <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
-          </div>
-        </div>
+        <!-- CỘT TRÁI -->
+        <aside class="left-menu">
+          <h3>Danh mục sản phẩm</h3>
+          <ul>
+            <li 
+              v-for="item in categories" 
+              :key="item"
+              @click="chooseCategory(item)"
+              :class="{ active: selectedCategory === item }"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </aside>
 
-        <div class="product-card">
-          <img :src="productImg2" alt="Nike Air Force 1 '07 LV8" />
-          <h3>Nike Air Force 1 '07 LV8</h3>
-          <div class="stars">★★★★☆</div>
-          <p>2,890,000 VNĐ</p>
-          <div class="product-actions">
-            <button class="action-btn" type="button">Mua ngay</button>
-            <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
-          </div>
-        </div>
+        
 
-        <div class="product-card">
-          <img :src="productImg2" alt="Nike Air Force 1 '07 LV8" />
-          <h3>Nike Air Force 1 '07 LV8</h3>
-          <div class="stars">★★★★☆</div>
-          <p>2,890,000 VNĐ</p>
-          <div class="product-actions">
-            <button class="action-btn" type="button">Mua ngay</button>
-            <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
-          </div>
-        </div>
+        <!-- CỘT PHẢI -->
+        <section class="right-content">
 
-        <div class="product-card">
-          <img :src="productImg2" alt="Nike Air Force 1 '07 LV8" />
-          <h3>Nike Air Force 1 '07 LV8</h3>
-          <div class="stars">★★★★☆</div>
-          <p>2,890,000 VNĐ</p>
-          <div class="product-actions">
-            <button class="action-btn" type="button">Mua ngay</button>
-            <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
-          </div>
-        </div>
+          <!-- GRID SẢN PHẨM -->
+          <section class="product-grid">
+            <div class="product-card" v-for="p in paginatedProducts" :key="p.id">
+              <img :src="p.img" />
+              <h3>{{ p.title }}</h3>
+              <div class="stars">{{ p.stars }}</div>
+              <p>{{ p.price }}</p>
 
-        <div class="product-card">
-          <img :src="productImg2" alt="Nike Air Force 1 '07 LV8" />
-          <h3>Nike Air Force 1 '07 LV8</h3>
-          <div class="stars">★★★★☆</div>
-          <p>2,890,000 VNĐ</p>
-          <div class="product-actions">
-            <button class="action-btn" type="button">Mua ngay</button>
-            <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              <div class="product-actions">
+                <button class="action-btn">Mua ngay</button>
+                <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- PHÂN TRANG -->
+          <div class="pagination">
+            <button 
+              @click.prevent="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >«</button>
+
+            <button 
+              v-for="page in totalPages" 
+              :key="page"
+              @click.prevent="changePage(page)"
+              :class="{ active: currentPage === page }"
+            >
+              {{ page }}
+            </button>
+
+            <button 
+              @click.prevent="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >»</button>
           </div>
-        </div>
-      </section>
+
+        </section>
+      </div>
     </main>
+
     <footerWeb />
   </div>
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref }from 'vue';
-import { useRouter } from 'vue-router';
-const router=useRouter();
-const goTo = (path) => {
-  router.push(path);
-};
-import HeaderWeb from '../../Header-web.vue';
-import footerWeb from '../../footer-web.vue';
-// import bannerSlide1 from '@/assets/banner-slide-1.png';
-// import bannerSlide2 from '@/assets/banner-slide-2.jpg';
-// import bannerSlide3 from '@/assets/banner-slide-3.jpg';
-// import productImg1 from '@/assets/images (2).jpg';
-// import productImg2 from '@/assets/images (3).jpg';
+import { onBeforeUnmount, onMounted, ref, computed } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const goTo = (path) => router.push(path);
+
+import HeaderWeb from "../../Header-web.vue";
+import footerWeb from "../../footer-web.vue";
+
+import bannerSlide1 from "../../assets/banner-slide-1.png";
+import bannerSlide2 from "../../assets/banner-slide-2.jpg";
+import bannerSlide3 from "../../assets/banner-slide-3.jpg";
+
+import productImg2 from "../../assets/images (3).jpg";
 
 const slideContainer = ref(null);
 let slideTimer;
 
 onMounted(() => {
-  const slides = slideContainer.value?.querySelectorAll('.slide') ?? [];
-  let currentSlide = 0;
-
-  const showSlide = (index) => {
-    slides.forEach((slide) => slide.classList.remove('active'));
-    slides[index]?.classList.add('active');
-  };
+  const slides = slideContainer.value.querySelectorAll(".slide");
+  let current = 0;
 
   slideTimer = setInterval(() => {
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
+    slides.forEach((s) => s.classList.remove("active"));
+    current = (current + 1) % slides.length;
+    slides[current].classList.add("active");
   }, 4000);
 });
 
-onBeforeUnmount(() => {
-  if (slideTimer) {
-    clearInterval(slideTimer);
-  }
+onBeforeUnmount(() => clearInterval(slideTimer));
+
+/* CATEGORY CLICK */
+const categories = ["Puma", "Nike", "Adidas", "Jordan", "Vans", "Converse", "Louis"];
+const selectedCategory = ref(null);
+const chooseCategory = (cat) => selectedCategory.value = cat;
+
+/* ======================= PAGINATION ======================= */
+const currentPage = ref(1);
+const perPage = 8;
+
+// Demo sản phẩm
+const products = Array.from({ length: 24 }, (_, i) => ({
+  id: i + 1,
+  title: "Nike Air Force 1 '07 LV8",
+  img: productImg2,
+  stars: "★★★★★",
+  price: "2,890,000 VNĐ"
+}));
+
+const totalPages = computed(() => Math.ceil(products.length / perPage));
+
+const paginatedProducts = computed(() => {
+  const start = (currentPage.value - 1) * perPage;
+  return products.slice(start, start + perPage);
 });
+
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
 </script>
 
 <style scoped>
@@ -156,22 +198,24 @@ onBeforeUnmount(() => {
 .nike-page {
   font-family: 'Roboto', sans-serif;
   background-color: #f7f7f7;
-  color: #1a1a1a;
 }
 
-.container {
+/* CONTAINER */
+container {
   width: 90%;
   max-width: 1300px;
   margin: 0 auto;
-  padding-bottom: 60px;
 }
 
+/* BANNER */
 .brand-banner {
-  position: relative;
-  height: 350px;
+  width: 100vw;              /* kéo full chiều ngang màn hình */
+  margin-left: 50%;          /* căn giữa khi dùng 100vw */
+  transform: translateX(-50%);
+  height: 480px;
   overflow: hidden;
-  border-radius: 6px;
-  margin: 40px 0;
+  position: relative;
+  border-radius: 0;        
 }
 
 .slide-container {
@@ -185,7 +229,7 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transition: 1s;
 }
 
 .slide.active {
@@ -203,40 +247,20 @@ onBeforeUnmount(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #fff;
   font-size: 48px;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
-  letter-spacing: 4px;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-  text-align: center;
-  width: 100%;
+  color: white;
+  text-shadow: 2px 3px 8px black;
 }
 
+/* FILTER */
 .filter-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  background-color: #ffffff;
+  background: white;
   padding: 15px 20px;
-  margin-bottom: 30px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.filter-bar label {
-  font-weight: 500;
-  color: #555;
-  margin-right: 10px;
-}
-
-.filter-bar select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 6px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .filter-inline {
@@ -245,114 +269,193 @@ onBeforeUnmount(() => {
   gap: 20px;
 }
 
-.section-title {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 32px;
-  font-weight: 600;
-  text-align: center;
-  margin: 40px 0 30px;
+/* LAYOUT 2 CỘT */
+.layout-2col {
+  display: flex;
+  gap: 25px;
 }
 
+/* MENU TRÁI */
+.left-menu {
+  width: 22%;
+  background: white;
+  padding: 18px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.left-menu h3 {
+  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.left-menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.left-menu li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+.left-menu li:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.left-menu li.active {
+  color: #007bff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* CỘT PHẢI */
+.right-content {
+  width: 78%;
+}
+
+/* GRID */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-bottom: 50px;
 }
 
+/* CARD */
 .product-card {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: 0.2s;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .product-card img {
   width: 100%;
-  height: 190px;
-  border-radius: 5px;
+  height: 170px;
+  border-radius: 10px;
   object-fit: cover;
   margin-bottom: 8px;
 }
 
 .product-card h3 {
   font-size: 15px;
-  font-weight: 500;
-  margin: 10px 0 5px;
-  color: #333;
-}
-
-.product-card p {
-  font-size: 17px;
-  font-weight: 700;
-  color: #007bff;
-  margin: 5px 0 10px;
+  font-weight: 600;
+  margin: 5px 0;
 }
 
 .stars {
   color: #ffc107;
+  margin: 3px 0;
   font-size: 14px;
 }
 
+.product-card p {
+  font-size: 16px;
+  font-weight: 700;
+  color: #007bff;
+  margin: 3px 0 6px;
+}
+
+/* FIX NÚT ĐỀU NHAU + KHOẢNG CÁCH */
 .product-actions {
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: 0.2s;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
 }
 
 .product-card:hover .product-actions {
   opacity: 1;
+  margin-top: 10px;
 }
 
 .action-btn {
-  background-color: #007bff;
+  background: #007bff;
   color: white;
-  padding: 7px 12px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 4px;
-  font-weight: 500;
-  font-size: 13px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  min-width: 105px;
+  text-align: center;
+  font-weight: 600;
 }
 
 .action-btn.secondary {
-  background-color: #555;
+  background: #444;
 }
 
-.action-btn:hover {
-  background-color: #0056b3;
+/* PHÂN TRANG */
+.pagination {
+  margin-top: 25px;
+  margin: 40px 0 40px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
+.pagination button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE */
 @media (max-width: 1024px) {
-  .product-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .layout-2col {
+    flex-direction: column;
   }
+  .left-menu { width: 100%; }
+  .right-content { width: 100%; }
+  .product-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .slide h1 {
-    font-size: 32px;
-  }
-
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .brand-banner { height: 260px; }
+  .slide h1 { font-size: 28px; }
+  .filter-bar { flex-direction: column; gap: 15px; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 540px) {
-  .product-grid {
-    grid-template-columns: 1fr;
-  }
+  .brand-banner { height: 200px; }
+  .slide h1 { font-size: 22px; }
+  .product-grid { grid-template-columns: 1fr; }
+}
+.section-title{
+  text-align: center;
+  font-size: 40px;
+}
+.section-title {
+    margin: 40px 0; /* Trên 40px – Dưới 40px */
+    text-align: center;
 }
 </style>
-

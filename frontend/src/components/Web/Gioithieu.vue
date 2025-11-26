@@ -1,7 +1,7 @@
 <template>
-    <HeaderWeb/>
+  <HeaderWeb/>
   <div class="about-page bg-light">
-    <!-- MAIN -->
+
     <main class="container py-5">
       <h1 class="text-center fw-bold mb-5 section-main-title">
         MIRAE: THỜI TRANG CỦA TƯƠNG LAI
@@ -16,8 +16,7 @@
             mà còn mang trong mình một linh hồn – một triết lý sống hướng đến tương lai.
           </p>
           <p>
-            Triết lý <b>"Future Movement"</b> đưa sự đổi mới, công nghệ và sáng tạo vào từng chi tiết,
-            tạo nên những sản phẩm bền bỉ – linh hoạt.
+            Triết lý <b>"Future Movement"</b> đưa sự đổi mới, công nghệ và sáng tạo vào từng chi tiết.
           </p>
           <p>
             MIRAE đã phát triển thành thương hiệu được yêu thích
@@ -38,10 +37,10 @@
             Đế giày <b>FusionFoam™</b> ứng dụng bọt khí phân tầng cho khả năng hấp thụ lực tối ưu.
           </p>
           <p>
-            Chất liệu <b>AeroMesh</b> giúp thoáng khí tối đa nhưng vẫn giữ form ôm chân và bền.
+            Chất liệu <b>AeroMesh</b> giúp thoáng khí tối đa nhưng vẫn giữ form ôm chân.
           </p>
           <p>
-            Công nghệ MIRAE luôn được thử nghiệm trong nhiều điều kiện trước khi sản xuất.
+            Công nghệ MIRAE luôn được thử nghiệm kỹ càng trước khi sản xuất.
           </p>
         </div>
 
@@ -50,7 +49,7 @@
         </div>
       </section>
 
-      <hr class="my-5" />
+      <hr class="my-5"/>
 
       <!-- TEAM -->
       <section class="text-center mb-5">
@@ -63,13 +62,13 @@
 
           <div class="col-md-3 team-card">
             <div class="team-img team1-img"></div>
-            <h5 class="fw-bold mt-3">jonh wick</h5>
+            <h5 class="fw-bold mt-3">John Wick</h5>
             <p>Trưởng nhóm thiết kế cấp cao.</p>
           </div>
 
           <div class="col-md-3 team-card">
             <div class="team-img team2-img"></div>
-            <h5 class="fw-bold mt-3">Mr.Beats</h5>
+            <h5 class="fw-bold mt-3">Mr. Beats</h5>
             <p>Giám đốc phát triển vật liệu.</p>
           </div>
 
@@ -82,7 +81,7 @@
         </div>
       </section>
 
-      <hr class="my-5" />
+      <hr class="my-5"/>
 
       <!-- BLOCK 3 -->
       <section class="row align-items-center mb-5">
@@ -126,10 +125,10 @@
         <p class="mt-2">Khám phá bộ sưu tập mới nhất ngay hôm nay.</p>
         <a href="/SanPham" class="btn btn-dark px-4 py-2 mt-3">Khám Phá Ngay</a>
       </div>
+
     </main>
     <footerWeb/>
   </div>
-
 </template>
 
 <script setup>
@@ -138,25 +137,11 @@ import footerWeb from '../../footer-web.vue';
 </script>
 
 <style scoped>
-.about-page{
-    margin-top: 50px;
-}
-/* ========== NAVIGATION ========== */
-.nav-link {
-  cursor: pointer;
-}
-.nav-link.active {
-  color: #000;
-  font-weight: 700;
-}
-.nav-link.muted {
-  color: #d62424;
-}
-.nav-link:hover {
-  color: #ff6600;
+.about-page {
+  margin-top: 50px;
 }
 
-/* TITLE */
+/* SECTION TITLES */
 .section-title {
   font-size: 1.8rem;
   font-weight: 700;
@@ -165,6 +150,7 @@ import footerWeb from '../../footer-web.vue';
 }
 .section-main-title {
   font-size: 2.4rem;
+  font-weight: 800;
 }
 
 /* IMAGE BLOCKS */
@@ -179,17 +165,20 @@ import footerWeb from '../../footer-web.vue';
 .block1-img {
   background-image: url('https://www.jordan1.vn/wp-content/uploads/2023/09/jordan-stadium-90-white-teal-fb2__5__e7e929ed24ec463fb9a3f80607fcee08.png');
 }
+
 .block2-img {
   background-image: url('https://cf.shopee.vn/file/9a13e9d23c33ce8e605b79e3b134b566');
 }
+
 .block3-img {
-  background-image: url('https://cdn.storims.com/api/v2/image/resize?path=https://storage.googleapis.com/storims_cdn/storims/uploads/f494d6f689de4546907fc7814ab512b1.jpeg&format=jpeg');
+  background-image: url('https://cdn.storims.com/api/v2/image/resize?path=https://storage.googleapis.com/storims_cdn/storims/uploads/f494d6f689de4546907fc7814ab512b1.jpeg');
 }
+
 .block4-img {
   background-image: url('https://bizweb.dktcdn.net/100/467/909/products/mot-so-hinh-anh-cua-nike-air-for-1.jpg?v=1722598855297');
 }
 
-/* TEAM CARD */
+/* TEAM SECTION */
 .team-card {
   background: #fff;
   border-radius: 18px;
@@ -202,7 +191,6 @@ import footerWeb from '../../footer-web.vue';
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
 }
 
-/* Avatar */
 .team-img {
   width: 120px;
   height: 120px;
@@ -213,15 +201,18 @@ import footerWeb from '../../footer-web.vue';
   border: 3px solid #ddd;
 }
 
-/* Team images */
+/* TEAM IMAGES */
 .team1-img {
   background-image: url('https://cdn-img.thethao247.vn/upload/thanhtung/2019/10/17/adidas-football-lionel-messi-15-years-nemeziz.jpg');
 }
+
 .team2-img {
   background-image: url('https://kenh14cdn.com/2016/cristiano-ronaldo-cr7-football-player-real-madrid-jersey-king-nike-shoes-1478667893107.jpg');
 }
+
+/* GIÁM ĐỐC – ĐÃ CẬP NHẬT ẢNH */
 .team3-img {
-  background-image: url('');
+  background-image: url('https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=500&q=80');
 }
 
 /* HIGHLIGHT BOX */
