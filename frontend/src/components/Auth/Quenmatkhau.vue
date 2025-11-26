@@ -1,8 +1,7 @@
 <template>
     <div class="forgot-container">
 
-        <!-- LOGO MIRAE -->
-        <img class="banner-img" src="@/assets/logone.png" alt="forgot password" />
+        <img class="banner-img" src="../../assets/logone.png" alt="forgot password" />
 
         <h2 class="title">Quên mật khẩu</h2>
 
@@ -14,7 +13,7 @@
 
             <button class="main-btn" @click="sendOTP">Gửi mã OTP</button>
 
-            <div class="back-login" @click="switchPage('LoginSignup')">
+            <div class="back-login" @click="goLogin">
                 ← Quay lại đăng nhập
             </div>
         </div>
@@ -36,23 +35,13 @@
         <div v-if="step === 3" class="step-box">
             <p class="desc">Mã OTP hợp lệ! Hãy đặt mật khẩu mới.</p>
 
-            <input
-                type="password"
-                v-model="newPassword"
-                placeholder="Mật khẩu mới"
-                class="input-box"
-            />
+            <input type="password" v-model="newPassword" placeholder="Mật khẩu mới" class="input-box" />
 
-            <input
-                type="password"
-                v-model="confirmPassword"
-                placeholder="Nhập lại mật khẩu mới"
-                class="input-box"
-            />
+            <input type="password" v-model="confirmPassword" placeholder="Nhập lại mật khẩu mới" class="input-box" />
 
             <button class="main-btn" @click="resetPassword">Đặt lại mật khẩu</button>
 
-            <div class="back-login" @click="switchPage('LoginSignup')">
+            <div class="back-login" @click="goLogin">
                 ← Quay lại đăng nhập
             </div>
         </div>
@@ -62,7 +51,6 @@
 
 <script>
 export default {
-    inject: ["switchPage"],
     data() {
         return {
             step: 1,
@@ -74,6 +62,10 @@ export default {
     },
 
     methods: {
+        goLogin() {
+            this.$router.push({ name: "Dangnhap" });
+        },
+
         sendOTP() {
             if (!this.email) return alert("Vui lòng nhập email");
             console.log("Gửi OTP:", this.email);
@@ -92,100 +84,108 @@ export default {
                 return alert("Mật khẩu không trùng khớp!");
 
             alert("Đặt lại mật khẩu thành công!");
-            this.switchPage("LoginSignup");
+
+            this.$router.push({ name: "Dangnhap" });
         }
     }
 };
 </script>
 
-<style scoped>
-.forgot-container {
-    width: 380px;
-    padding: 32px 26px;
-    margin: 60px auto;
-    background: #ffffff;
-    border-radius: 22px;
-    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.08);
-    text-align: center;
-    border: 1px solid #f0f0f0;
-}
+<style
+    scoped>
+    .forgot-container {
+        width: 380px;
+        padding: 32px 26px;
+        margin: 60px auto;
+        background: #ffffff;
+        border-radius: 22px;
+        box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        border: 1px solid #f0f0f0;
+    }
 
-/* LOGO MIRAE */
-.banner-img {
-    width: 140px;
-    height: 60px;
-    object-fit: contain;     /* Giữ nguyên tỉ lệ logo */
-    margin-bottom: 20px;
-    border-radius: 0;        /* Không bo góc */
-    border: none;            /* Không viền */
-    padding: 0;              /* Không khoảng cách */
-    background: transparent; /* Không nền */
-    box-shadow: none;        /* Không bóng */
-}
+    /* LOGO MIRAE */
+    .banner-img {
+        width: 140px;
+        height: 60px;
+        object-fit: contain;
+        /* Giữ nguyên tỉ lệ logo */
+        margin-bottom: 20px;
+        border-radius: 0;
+        /* Không bo góc */
+        border: none;
+        /* Không viền */
+        padding: 0;
+        /* Không khoảng cách */
+        background: transparent;
+        /* Không nền */
+        box-shadow: none;
+        /* Không bóng */
+    }
 
-.title {
-    margin-bottom: 5px;
-    font-size: 27px;
-    font-weight: 700;
-    color: #222;
-}
+    .title {
+        margin-bottom: 5px;
+        font-size: 27px;
+        font-weight: 700;
+        color: #222;
+    }
 
-.desc {
-    font-size: 15px;
-    color: #666;
-    margin-bottom: 14px;
-}
+    .desc {
+        font-size: 15px;
+        color: #666;
+        margin-bottom: 14px;
+    }
 
-.step-box {
-    margin-top: 20px;
-}
+    .step-box {
+        margin-top: 20px;
+    }
 
-.input-box {
-    width: 95%;
-    padding: 14px;
-    margin-top: 12px;
-    border-radius: 14px;
-    border: 1.5px solid #d2d2d2;
-    background: #fafafa;
-    font-size: 15px;
-    transition: 0.25s;
-}
+    .input-box {
+        width: 95%;
+        padding: 14px;
+        margin-top: 12px;
+        border-radius: 14px;
+        border: 1.5px solid #d2d2d2;
+        background: #fafafa;
+        font-size: 15px;
+        transition: 0.25s;
+    }
 
-.input-box:focus {
-    border-color: #4A6CF7;
-    background: #fff;
-    box-shadow: 0px 0px 8px rgba(74, 108, 247, 0.35);
-}
+    .input-box:focus {
+        border-color: #4A6CF7;
+        background: #fff;
+        box-shadow: 0px 0px 8px rgba(74, 108, 247, 0.35);
+    }
 
-.main-btn {
-    width: 100%;
-    padding: 14px;
-    margin-top: 20px;
-    background: linear-gradient(135deg, #4A6CF7, #5a7bff);
-    color: white;
-    border: none;
-    border-radius: 15px;
-    font-size: 17px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.25s;
-}
+    .main-btn {
+        width: 100%;
+        padding: 14px;
+        margin-top: 20px;
+        background: linear-gradient(135deg, #4A6CF7, #5a7bff);
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-size: 17px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.25s;
+    }
 
-.main-btn:hover {
-    opacity: 0.95;
-    transform: translateY(-2px);
-}
+    .main-btn:hover {
+        opacity: 0.95;
+        transform: translateY(-2px);
+    }
 
-.back-login {
-    margin-top: 15px;
-    color: #4A6CF7;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: 0.2s;
-}
+    .back-login {
+        margin-top: 15px;
+        color: #4A6CF7;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: 0.2s;
+    }
 
-.back-login:hover {
-    opacity: 0.75;
-}
+    .back-login:hover {
+        opacity: 0.75;
+    }
 </style>
