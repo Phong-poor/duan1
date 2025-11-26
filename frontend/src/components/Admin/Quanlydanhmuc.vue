@@ -4,10 +4,10 @@
     <aside class="sidebar bg-dark text-white p-3">
         <img :src="logoImage" alt="Logo" class="logo-img" />
         <ul class="sidebar-menu">
-            <router-link to="/Dashboard" class="menu-item" active-class="active">
+            <router-link to="/" class="menu-item" active-class="active">
                 <i class="fa-solid fa-chart-line"></i> Dashboard
             </router-link>
-            <router-link to="/" class="menu-item" active-class="active">
+            <router-link to="/Quanlysanpham" class="menu-item" active-class="active">
                 <i class="fa-solid fa-box"></i> Sản phẩm
             </router-link>
             <router-link to="/Quanlydanhmuc" class="menu-item" active-class="active">
@@ -15,6 +15,13 @@
             </router-link>
             <router-link to="/Quanlythuonghieu" class="menu-item" active-class="active">
                 <i class="fa-solid fa-bookmark"></i> Thương hiệu
+            </router-link>
+            <router-link to="/Quanlymausac" class="menu-item" active-class="active">
+              <i class="fa-solid fa-palette"></i> Màu sắc
+            </router-link>
+
+            <router-link to="/Quanlysize" class="menu-item" active-class="active">
+              <i class="fa-solid fa-maximize"></i> Size
             </router-link>
             <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
                 <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
@@ -51,12 +58,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="dm in paginatedCategories" :key="dm.id">
-              <td>{{ dm.id }}</td>
-              <td>{{ dm.name }}</td>
+            <tr v-for="dm in paginatedCategories" :key="dm.id_danhmuc">
+              <td>{{ dm.maDM }}</td>
+              <td>{{ dm.tenDM }}</td>
               <td>
-                <button class="btn btn-warning btn-sm" @click="scrollToForm">Sửa</button>
-                <button class="btn btn-danger btn-sm ms-2">Xóa</button>
+                <button class="btn btn-warning btn-sm" @click="editCategory(dm)">Sửa</button>
+                <button class="btn btn-danger btn-sm ms-2" @click="deleteCategory(dm.id_danhmuc)">Xóa</button>
               </td>
             </tr>
           </tbody>
@@ -70,20 +77,16 @@
         </div>
 
         <!-- Add Category Form -->
-        <div class="card p-4 mt-4" id="add-form">
-          <h4 class="fw-bold mb-3">Thêm / Chỉnh sửa danh mục</h4>
+        <div class="card p-4 mt-5" id="add-form">
+          <h4 class="fw-bold mb-3">{{ isEdit ? "Cập nhật danh mục" : "Thêm danh mục" }}</h4>
 
           <div class="mb-3">
-            <label>Tên danh mục</label>
-            <input type="text" class="form-control" />
+            <label class="fw-semibold">Tên danh mục</label>
+            <input v-model="form.tenDM" type="text" class="form-control" placeholder="Nhập tên danh mục..." />
+            <p v-if="errors.tenDM" class="text-danger mt-1">{{ errors.tenDM }}</p>
           </div>
 
-          <div class="mb-3">
-            <label>Mô tả</label>
-            <textarea rows="4" class="form-control"></textarea>
-          </div>
-
-          <button class="btn btn-success">Lưu danh mục</button>
+          <button @click="saveCategory" class="btn btn-success">{{ isEdit ? "Cập nhật" : "Thêm mới" }}</button>
         </div>
       </div>
     </div>
@@ -95,35 +98,107 @@ import { ref, computed } from "vue";
 import HeaderAdmin from "../../Header-admin.vue";
 import logoImage from "../../assets/logo.png";
 
+/* --- STATE --- */
+const categories = ref([]);
 const search = ref("");
-const scrollToForm = () => {
-  const form = document.getElementById("add-form");
-  if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
-};
-
-// Demo Data
-const categories = ref([
-  { id: 1, name: "Điện thoại"},
-  { id: 2, name: "Laptop"},
-  { id: 3, name: "Tablet"}
-]);
-
 const page = ref(1);
 const perPage = 5;
 
-const filteredCategories = computed(() => {
-  return categories.value.filter((c) =>
-    c.name.toLowerCase().includes(search.value.toLowerCase())
-  );
+const form = ref({
+  id_danhmuc: null,
+  tenDM: ""
 });
 
-const totalPages = computed(() => Math.ceil(filteredCategories.value.length / perPage));
+const errors = ref({});
+const isEdit = ref(false);
+
+/* --- LOAD CATEGORY --- */
+const loadCategories = async () => {
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetCategory.php");
+    categories.value = await res.json();
+  } catch (err) {
+    console.error("Lỗi load danh mục:", err);
+  }
+};
+
+/* --- SAVE CATEGORY (ADD/UPDATE) --- */
+const saveCategory = async () => {
+  errors.value = {};
+
+  if (!form.value.tenDM.trim()) {
+    errors.value.tenDM = "Tên danh mục không được để trống!";
+    return;
+  }
+
+  const url = isEdit.value
+      ? "http://localhost/duan1/backend/api/Admin/UpdateCategory.php"
+      : "http://localhost/duan1/backend/api/Admin/AddCategory.php";
+
+  await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form.value)
+  });
+
+  resetForm();
+  loadCategories();
+};
+
+/* --- DELETE CATEGORY --- */
+const deleteCategory = async (id) => {
+  if (!confirm("Bạn có chắc chắn muốn xóa không?")) return;
+
+  await fetch(
+    `http://localhost/duan1/backend/api/Admin/DeleteCategory.php?id=${id}`
+  );
+
+  loadCategories();
+};
+
+/* --- EDIT CATEGORY --- */
+const editCategory = (dm) => {
+  form.value = {
+    id_danhmuc: dm.id_danhmuc,
+    tenDM: dm.tenDM
+  };
+  isEdit.value = true;
+  scrollToForm();
+};
+
+/* --- RESET --- */
+const resetForm = () => {
+  form.value = { id_danhmuc: null, tenDM: "" };
+  errors.value = {};
+  isEdit.value = false;
+};
+
+/* --- PAGINATION --- */
+const filteredCategories = computed(() =>
+  categories.value.filter((c) =>
+    c.tenDM.toLowerCase().includes(search.value.toLowerCase())
+  )
+);
+
+const totalPages = computed(() =>
+  Math.ceil(filteredCategories.value.length / perPage)
+);
 
 const paginatedCategories = computed(() => {
   const start = (page.value - 1) * perPage;
   return filteredCategories.value.slice(start, start + perPage);
 });
+
+/* --- SCROLL --- */
+const scrollToForm = () => {
+  const formDom = document.getElementById("add-form");
+  if (formDom) formDom.scrollIntoView({ behavior: "smooth" });
+};
+
+/* INIT */
+loadCategories();
 </script>
+
 
 <style scoped>
 .logo-img {

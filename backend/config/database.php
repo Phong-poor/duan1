@@ -35,3 +35,5 @@ class Database {
         }
     }
 }
+$database = new Database();
+$pdo = $database->getConnection();

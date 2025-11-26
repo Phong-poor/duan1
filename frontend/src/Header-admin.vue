@@ -11,7 +11,7 @@
     </div>
 
     <div>
-      <button class="btn btn-primary me-2 back">Trở về trang web</button>
+      <router-link to="/trangchu" class="btn btn-primary me-2 back">Trở về trang web</router-link>
       <button class="btn btn-danger">Đăng xuất</button>
     </div>
   </header>

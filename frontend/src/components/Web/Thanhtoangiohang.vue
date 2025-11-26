@@ -1,4 +1,3 @@
-
 <template>
   <HeaderWeb  />
   <div class="bg-light">
