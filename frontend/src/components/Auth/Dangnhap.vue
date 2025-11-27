@@ -317,7 +317,7 @@ body {
   background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
   margin: 0;
   /* tránh padding/margin mặc định */
-
+}
 /* Khung bao toàn bộ login/register */
 .container {
   position: relative;
