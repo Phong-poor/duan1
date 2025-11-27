@@ -23,12 +23,13 @@
         <router-link to="/Quanlysize" class="menu-item" active-class="active">
           <i class="fa-solid fa-maximize"></i> Size
         </router-link>
-        <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
-          <i class="fa-solid fa-users"></i> Khách hàng
-        </router-link>
         <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
+        <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
+          <i class="fa-solid fa-users"></i> Khách hàng
+        </router-link>
+        
       </ul>
     </aside>
 
