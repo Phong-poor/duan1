@@ -123,7 +123,7 @@ if ($insert_result) {
     }
 
     // Lấy thông tin user theo ID
-    $newUser = $db_util->getOne("SELECT id, tenKH, email, role FROM khachhang WHERE id = ?", [$newUserId]);
+    $newUser = $db_util->getOne("SELECT id_khachhang, tenKH, email, role FROM khachhang WHERE id_khachhang = ?", [$newUserId]);
     if (!$newUser) {
         echo json_encode([
             "status" => "error",
@@ -131,10 +131,6 @@ if ($insert_result) {
         ]);
         exit();
     }
-
-    // Lưu session
-    $_SESSION['user'] = $newUser;
-
     // Gửi mail
     $subject = "Thông báo đăng ký thành công";
     $body = "Cảm ơn bạn đã đăng ký tài khoản với email: $email";
@@ -143,7 +139,6 @@ if ($insert_result) {
     echo json_encode([
         "status" => "success",
         "msg" => "Đăng ký thành công!",
-        "user" => $_SESSION['user']
     ]);
 
 } else {

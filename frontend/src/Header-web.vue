@@ -1,57 +1,48 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import logoImage from './assets/logone.png';
-const dropdownOpen = ref(false);
 
+// Dropdown
+const dropdownOpen = ref(false);
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
 
-// Lấy user từ localStorage
-const currentUser = computed(() => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
+// User state (không dùng auth.js nữa)
+const currentUser = ref(null);
+
+// Load user từ localStorage khi mở trang
+onMounted(() => {
+  const user = localStorage.getItem("currentUser");
+  if (user) {
+    currentUser.value = JSON.parse(user);
+  }
 });
 
-// Kiểm tra xem có phải admin không
-const isAdmin = computed(() => {
-  return currentUser.value && currentUser.value.role === "admin";
-});
+// Kiểm tra admin
+const isAdmin = computed(() => currentUser.value?.role === "admin");
 
 // Logout
 const logout = () => {
-  localStorage.removeItem("user");
+  localStorage.removeItem("currentUser");
+  currentUser.value = null;
   window.location.href = "/Dangnhap";
-
 };
 </script>
 
 <template>
   <header class="main-header">
     <div class="inner-header">
-
       <div class="logo">
-        <router-link to="/">
-          <img :src="logoImage" alt="Logo" />
-        </router-link>
+        <router-link to="/"><img :src="logoImage" alt="Logo" /></router-link>
       </div>
 
       <nav class="nav-links">
-        <router-link to="/" class="menu-item" active-class="active">
-                 Trang chủ
-            </router-link>
-        <router-link to="/Sanpham" class="menu-item" active-class="active">
-                 Sản phẩm
-            </router-link>
-        <router-link to="/tintuc" class="menu-item" active-class="active">
-                 Tin tức
-            </router-link>
-        <router-link to="/Gioithieu" class="menu-item" active-class="active">
-                 Giới thiệu
-            </router-link>
-        <router-link to="/Sanpham" class="menu-item" active-class="active">
-                 Liên hệ
-            </router-link>
+        <router-link to="/" class="menu-item" active-class="active">Trang chủ</router-link>
+        <router-link to="/Sanpham" class="menu-item">Sản phẩm</router-link>
+        <router-link to="/tintuc" class="menu-item">Tin tức</router-link>
+        <router-link to="/Gioithieu" class="menu-item">Giới thiệu</router-link>
+        <router-link to="/Sanpham" class="menu-item">Liên hệ</router-link>
       </nav>
 
       <div class="actions">
@@ -62,44 +53,35 @@ const logout = () => {
 
         <div class="icons">
           <a href="#" class="icon-heart"><i class="fas fa-heart"></i></a>
-          <router-link to="/Thanhtoangiohang" class="icon-shopping-cart">
-            <i class="fas fa-shopping-cart"></i>
-          </router-link>
+          <router-link to="/Thanhtoangiohang" class="icon-shopping-cart"><i class="fas fa-shopping-cart"></i></router-link>
+
           <div class="user-dropdown-wrapper">
             <a href="#" class="icon-user" @click.prevent="toggleDropdown">
               <i class="fas fa-user"></i>
             </a>
 
             <div v-if="dropdownOpen" class="user-dropdown">
-              <!-- Chỉ hiện nếu đã đăng nhập -->
-              <router-link v-if="currentUser" to="/Thongtin" class="item">
-                Thông tin người dùng
-              </router-link>
               
-              <!-- Chỉ admin mới thấy -->
-              <router-link v-if="isAdmin" to="/Dashboard" class="item">
-                Quản lý trang web
-              </router-link>
+              <!-- Đã đăng nhập -->
+              <template v-if="currentUser">
+                <router-link to="/Thongtin" class="item">Thông tin người dùng</router-link>
+                <router-link v-if="isAdmin" to="/Dashboard" class="item">Quản lý trang web</router-link>
+                <a href="#" class="item" @click.prevent="logout">Đăng xuất</a>
+              </template>
 
-              <!-- Nếu chưa đăng nhập -->
-              <router-link v-if="!currentUser" to="/Dangnhap" class="item">
-                Đăng nhập
-              </router-link>
+              <!-- Chưa đăng nhập -->
+              <template v-else>
+                <router-link to="/Dangnhap" class="item">Đăng nhập</router-link>
+              </template>
 
-              <!-- Nếu đã đăng nhập -->
-              <a v-if="currentUser" href="#" class="item" @click.prevent="logout">
-                Đăng xuất
-              </a>
             </div>
           </div>
+
         </div>
       </div>
-
     </div>
   </header>
 </template>
-
-
 <style scoped>
 /* RESET MARGIN/PADDING TOÀN TRANG */
 :global(body) {
