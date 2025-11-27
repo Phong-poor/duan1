@@ -4,7 +4,7 @@
     <aside class="sidebar bg-dark text-white p-3">
       <img :src="logoImage" alt="Logo" class="logo-img">
       <ul class="sidebar-menu">
-        <router-link to="/" class="menu-item" active-class="active">
+        <router-link to="/Dashboard" class="menu-item" active-class="active">
           <i class="fa-solid fa-chart-line"></i> Dashboard
         </router-link>
 

@@ -30,17 +30,16 @@ const routes = [
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
     { path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
-    { path: '/', name: 'TrangChu', component: TrangChu, meta: { isAuth: false } },
-    { path: '/Sanpham', name: 'Sanpham', component: Sanpham, meta: { isAuth: false } },
-    { path: '/ChiTietDonHang', name: 'ChiTietDonHang', component: ChiTietDonHang, meta: { isAuth: false } },
+    { path: '/ThanhtoanGiohang', name: 'ThanhtoanGiohang', component: ThanhtoanGiohang, meta: { isAuth: false } },
+    { path: '/SanPham', name: 'SanPham', component: SanPham, meta: { isAuth: false } },
     { path: '/ChiTiet', name: 'ChiTiet', component: ChiTiet, meta: { isAuth: false } },
-    { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
+    { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
+    { path: '/', name: 'trangchu', component: trangchu, meta: { isAuth: false } },
+    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
+    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
     { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
-    // { path: '/tintuc', name: 'tintuc', component: tintuc, meta: { isAuth: false } },  
-    { path: '/Thanhtoangiohang', name: 'Thanhtoangiohang', component: Thanhtoangiohang, meta: { isAuth: false } }, 
-
-]
+  ]
 
 const router = createRouter({
     history: createWebHistory(),
@@ -52,13 +51,13 @@ router.beforeEach((to, from, next) => {
   if (to.meta.isAuth) {
     if (!currentUser) {
       // chưa login -> về trang login
-      return next({ name: 'Login' });
+      return next({ name: 'Dangnhap' });
     }
 
     const user = JSON.parse(currentUser);
     if (!user.role) {
       // user không có quyền hợp lệ
-      return next({ name: 'Login' });
+      return next({ name: 'Dangnhap' });
     }
   }
 

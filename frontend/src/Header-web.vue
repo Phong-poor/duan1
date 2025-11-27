@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import logoImage from './assets/logone.png';
 const dropdownOpen = ref(false);
 
@@ -7,20 +7,33 @@ const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
 
+// Lấy user từ localStorage
+const currentUser = computed(() => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+});
+
+// Kiểm tra xem có phải admin không
+const isAdmin = computed(() => {
+  return currentUser.value && currentUser.value.role === "admin";
+});
+
+// Logout
 const logout = () => {
-  localStorage.removeItem("currentUser");
-  window.location.href = "/"; // chuyển về trang chủ hoặc login
+  localStorage.removeItem("user");
+  window.location.href = "/Dangnhap";
+
 };
 </script>
 
 <template>
   <header class="main-header">
     <div class="inner-header">
-      
+
       <div class="logo">
-        <a href="#">
+        <router-link to="/">
           <img :src="logoImage" alt="Logo" />
-        </a>
+        </router-link>
       </div>
 
       <nav class="nav-links">
@@ -46,28 +59,46 @@ const logout = () => {
           <input type="text" placeholder="Tìm kiếm..." />
           <button><i class="fas fa-search"></i></button>
         </div>
+
         <div class="icons">
           <a href="#" class="icon-heart"><i class="fas fa-heart"></i></a>
-          <a href="#" class="icon-shopping-cart"></a>
-          <router-link to="/Thanhtoangiohang" class="icon-shopping-cart"><i class="fas fa-shopping-cart"></i></router-link>
+          <router-link to="/Thanhtoangiohang" class="icon-shopping-cart">
+            <i class="fas fa-shopping-cart"></i>
+          </router-link>
           <div class="user-dropdown-wrapper">
             <a href="#" class="icon-user" @click.prevent="toggleDropdown">
               <i class="fas fa-user"></i>
             </a>
 
             <div v-if="dropdownOpen" class="user-dropdown">
-              <router-link to="/Thongtin" class="item">Thông tin người dùng</router-link>
-              <router-link to="/Dashboard" class="item">Quản lý trang web</router-link>
-              <router-link to="/Dangnhap" class="item">Đăng xuất</router-link>
+              <!-- Chỉ hiện nếu đã đăng nhập -->
+              <router-link v-if="currentUser" to="/Thongtin" class="item">
+                Thông tin người dùng
+              </router-link>
+              
+              <!-- Chỉ admin mới thấy -->
+              <router-link v-if="isAdmin" to="/Dashboard" class="item">
+                Quản lý trang web
+              </router-link>
+
+              <!-- Nếu chưa đăng nhập -->
+              <router-link v-if="!currentUser" to="/Dangnhap" class="item">
+                Đăng nhập
+              </router-link>
+
+              <!-- Nếu đã đăng nhập -->
+              <a v-if="currentUser" href="#" class="item" @click.prevent="logout">
+                Đăng xuất
+              </a>
             </div>
           </div>
-
         </div>
       </div>
 
     </div>
   </header>
 </template>
+
 
 <style scoped>
 /* RESET MARGIN/PADDING TOÀN TRANG */
@@ -81,23 +112,32 @@ const logout = () => {
 /* ============================ */
 
 .main-header {
-  width: 100%;                /* full ngang */
-  position: fixed;            /* cố định trên cùng */
-  top: 0;                     /* sát viền trên */
-  left: 0;                    /* sát bên trái */
-  right: 0;                   /* sát bên phải */
+  width: 100%;
+  /* full ngang */
+  position: fixed;
+  /* cố định trên cùng */
+  top: 0;
+  /* sát viền trên */
+  left: 0;
+  /* sát bên trái */
+  right: 0;
+  /* sát bên phải */
   background-color: #e0e0e0;
-  padding: 5px 0;             /* mỏng */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  z-index: 9999;              /* luôn nổi */
+  padding: 5px 0;
+  /* mỏng */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  /* luôn nổi */
 }
 
 /* Container */
 .inner-header {
   width: 100%;
-  max-width: 1400px;          /* rộng tối đa (tuỳ chỉnh) */
+  max-width: 1400px;
+  /* rộng tối đa (tuỳ chỉnh) */
   margin: 0 auto;
-  padding: 0 20px;            /* để nội dung không đụng sát màn hình */
+  padding: 0 20px;
+  /* để nội dung không đụng sát màn hình */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -154,9 +194,11 @@ const logout = () => {
   font-size: 14px;
   flex: 1;
 }
+
 .search-box input::placeholder {
   color: #ffffff;
 }
+
 .search-box button {
   background: none;
   border: none;
@@ -164,6 +206,7 @@ const logout = () => {
   color: #fff;
   cursor: pointer;
 }
+
 /* ACTION ICONS */
 .icons a {
   font-size: 20px;
@@ -194,9 +237,11 @@ const logout = () => {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .nav-links {
     margin-top: 10px;
   }
+
   .actions {
     width: 100%;
     justify-content: space-between;
@@ -209,6 +254,7 @@ const logout = () => {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .search-box {
     width: 100%;
     margin-bottom: 10px;

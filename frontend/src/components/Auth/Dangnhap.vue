@@ -1,16 +1,17 @@
 <template>
   <div class="container" :class="{ 'active': isRegisterActive }">
+    <!-- Form login -->
     <div class="form-box login">
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleLogin" autocomplete="off">
         <h1>Đăng Nhập</h1>
 
         <div class="input-box">
-          <input type="email" v-model="loginEmail" placeholder="email" required>
+          <input type="email" v-model="loginEmail" placeholder="Email" required autocomplete="off">
           <i class="fa-solid fa-user"></i>
         </div>
 
         <div class="input-box">
-          <input type="password" v-model="loginPassword" placeholder="Password" required>
+          <input type="password" v-model="loginPassword" placeholder="Password" required autocomplete="new-password">
           <i class="fa-solid fa-lock"></i>
         </div>
 
@@ -24,28 +25,52 @@
         <div class="social-icons">
           <a href="#"><img :src="googleIconPath" alt="Google"></a>
           <a href="#"><img :src="facebookIconPath" alt="Facebook"></a>
-          <a href="#"><img :src="githubIconPath" alt="GitHub"></a>
         </div>
       </form>
     </div>
-
+    <!-- Form register -->
     <div class="form-box register">
-      <form @submit.prevent="handleRegister">
+      <form @submit.prevent="handleRegister" autocomplete="off">
         <h1>Đăng Kí</h1>
+
         <div class="input-box">
-          <input type="text" v-model="regUser" placeholder="Username" required>
-          <i class="fa-solid fa-envelope"></i>
-        </div>
-        <div class="input-box">
-          <input type="email" v-model="regEmail" placeholder="email" required>
+          <input type="text" v-model="regUser" placeholder="Tên của bạn" required autocomplete="off">
           <i class="fa-solid fa-user"></i>
         </div>
+
         <div class="input-box">
-          <input type="password" v-model="regPassword" placeholder="Mật Khẩu" required>
+          <input type="email" v-model="regEmail" placeholder="Email" required autocomplete="off">
+          <i class="fa-solid fa-envelope"></i>
+        </div>
+
+        <div class="input-box">
+          <input type="tel" v-model="regPhone" placeholder="Số điện thoại" required autocomplete="off">
+          <i class="fa-solid fa-phone"></i>
+        </div>
+
+        <div class="input-box">
+          <select v-model="regGender" required>
+            <option value="" disabled selected>Chọn giới tính</option>
+            <option value="Nam">Nam</option>
+            <option value="Nữ">Nữ</option>
+            <option value="Khác">Khác</option>
+          </select>
+          <i class="fa-solid fa-venus-mars"></i>
+        </div>
+
+        <div class="input-box">
+          <input type="date" v-model="regBirth" required>
+          <i class="fa-solid fa-calendar"></i>
+        </div>
+
+        <div class="input-box">
+          <input type="password" v-model="regPassword" placeholder="Nhập mật khẩu" required autocomplete="new-password">
           <i class="fa-solid fa-lock"></i>
         </div>
+
         <div class="input-box">
-          <input type="password" v-model="regConfirmPassword" placeholder="Xác nhận mật khẩu" required>
+          <input type="password" v-model="regPasswordConfirm" placeholder="Xác nhận mật khẩu" required
+            autocomplete="new-password">
           <i class="fa-solid fa-lock"></i>
         </div>
         <button class="btn">Đăng Kí</button>
@@ -54,11 +79,10 @@
         <div class="social-icons">
           <a href="#"><img :src="googleIconPath" alt="Google"></a>
           <a href="#"><img :src="facebookIconPath" alt="Facebook"></a>
-          <a href="#"><img :src="githubIconPath" alt="GitHub"></a>
         </div>
       </form>
     </div>
-
+    <!-- Toggle panel -->
     <div class="toggle-box">
       <img :src="toggleImagePath" alt="Login Banner" class="toggle-image">
 
@@ -81,7 +105,6 @@
 import toggleImg from '../../assets/images.jpg';
 import googleIcon from '../../assets/Google__G__logo.svg.jpg';
 import facebookIcon from '../../assets/Facebook_Logo_(2019).jpg';
-import githubIcon from '../../assets/github1.jpg';
 
 export default {
   data() {
@@ -95,61 +118,181 @@ export default {
       // register
       regUser: "",
       regEmail: "",
+      regPhone: "",
+      regGender: "",
+      regBirth: "",
       regPassword: "",
-      regConfirmPassword: "",
+      regPasswordConfirm: "",
 
       toggleImagePath: toggleImg,
       googleIconPath: googleIcon,
       facebookIconPath: facebookIcon,
-      githubIconPath: githubIcon,
     };
   },
 
   methods: {
-    showRegister() {
-      this.isRegisterActive = true;
-    },
-    showLogin() {
-      this.isRegisterActive = false;
-    },
+    showRegister() { this.isRegisterActive = true; },
+    showLogin() { this.isRegisterActive = false; },
 
-    //  ĐĂNG NHẬP
-    handleLogin() {
+    // ===== PHẦN ĐĂNG NHẬP =====
+    async handleLogin() {
       if (!this.loginEmail || !this.loginPassword) {
         alert("Vui lòng nhập đủ thông tin!");
         return;
       }
+      try {
+        const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: this.loginEmail,
+            password: this.loginPassword
+          })
+        });
 
-      // Sau khi login hợp lệ → chuyển trang Home
-      this.$router.push("/");
+        const text = await res.text();
+        let data;
+
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.warn("Server trả dữ liệu không phải JSON:", text);
+          alert("Lỗi server! Vui lòng thử lại.");
+          return;
+        }
+
+        if (data.status === "success" && data.user) {
+          // Lưu user vào LocalStorage
+          localStorage.setItem("currentUser", JSON.stringify(data.user));
+          alert(data.msg);
+
+          // Chuyển hướng dựa vào role
+          const role = (data.user.role || "").trim().toLowerCase();
+          if (role === "admin") {
+            this.$router.push("/Dashboard");
+          } else {
+            this.$router.push("/");
+          }
+
+        } else {
+          // Server trả lỗi hoặc user null
+          alert(data.msg || "Email hoặc mật khẩu không đúng!");
+        }
+
+      } catch (error) {
+        console.error("Lỗi kết nối server:", error);
+        alert("Lỗi kết nối server! Vui lòng thử lại.");
+      }
     },
 
-    //  ĐĂNG KÝ
-    handleRegister() {
-      if (this.regPassword !== this.regConfirmPassword) {
-        alert("Mật khẩu xác nhận không khớp!");
-        return;
-      }
-
-      if (!this.regUser || !this.regEmail || !this.regPassword) {
+    // ===== PHẦN ĐĂNG KÍ =====
+    async handleRegister() {
+      if (!this.regUser || !this.regEmail || !this.regPhone || !this.regGender ||
+        !this.regBirth || !this.regPassword || !this.regPasswordConfirm) {
         alert("Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
-      alert("Đăng ký thành công!");
-      this.showLogin();
-    },
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      if (!emailPattern.test(this.regEmail)) {
+        alert("Email phải kết thúc bằng @gmail.com!");
+        return;
+      }
 
-    //  CHUYỂN TRANG QUÊN MẬT KHẨU
-    goForgotPassword() {
-      this.$router.push("/Quenmatkhau");
-    }
+      const phonePattern = /^\d{10}$/;
+      if (!phonePattern.test(this.regPhone)) {
+        alert("Số điện thoại phải đủ 10 số!");
+        return;
+      }
+
+      if (this.regPassword.length < 6) {
+        alert("Mật khẩu phải ít nhất 6 ký tự!");
+        return;
+      }
+
+      if (this.regPassword !== this.regPasswordConfirm) {
+        alert("Mật khẩu xác nhận không khớp!");
+        return;
+      }
+
+      const payload = {
+        tenKH: this.regUser,
+        email: this.regEmail,
+        phone: this.regPhone,
+        gender: this.regGender,
+        ngaysinh: this.regBirth,
+        password: this.regPassword,
+        confirm_password: this.regPasswordConfirm,
+      };
+
+      try {
+        const res = await fetch("http://localhost/duan1/backend/api/Auth/register.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let data;
+
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.warn("Server trả dữ liệu không phải JSON, dùng fallback:", text);
+          // Fallback: tạo object user từ form
+          const fallbackUser = {
+            tenKH: this.regUser,
+            email: this.regEmail,
+            phone: this.regPhone,
+            gender: this.regGender,
+            ngaysinh: this.regBirth,
+            role: "user"
+          };
+          localStorage.setItem("registeredUser", JSON.stringify(fallbackUser));
+          alert("Đăng ký thành công!");
+          this.showLogin();
+          return;
+        }
+
+        if (data.status === "success" && data.user) {
+          alert(data.msg);
+          // Lưu user từ server trả về
+          localStorage.setItem("registeredUser", JSON.stringify(data.user));
+          this.showLogin();
+        } else {
+          // Nếu server trả lỗi hoặc không có user, vẫn fallback lưu form
+          const fallbackUser = {
+            tenKH: this.regUser,
+            email: this.regEmail,
+            phone: this.regPhone,
+            gender: this.regGender,
+            ngaysinh: this.regBirth,
+            role: "user"
+          };
+          localStorage.setItem("registeredUser", JSON.stringify(fallbackUser));
+          alert(data.msg || "Đăng ký thành công!");
+          this.showLogin();
+        }
+
+      } catch (error) {
+        console.error(error);
+        // Kết nối lỗi vẫn lưu fallback
+        const fallbackUser = {
+          tenKH: this.regUser,
+          email: this.regEmail,
+          phone: this.regPhone,
+          gender: this.regGender,
+          ngaysinh: this.regBirth,
+          role: "user"
+        };
+        localStorage.setItem("registeredUser", JSON.stringify(fallbackUser));
+        alert("Đăng ký thành công (offline fallback)!");
+        this.showLogin();
+      }
+    },
   }
 };
 </script>
-
-
-
 <style scoped>
 /* Import Font Awesome & Google Font Poppins */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css");
@@ -172,18 +315,25 @@ body {
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
-}
+  margin: 0;
+  /* tránh padding/margin mặc định */
 
 /* Khung bao toàn bộ login/register */
 .container {
   position: relative;
-  width: 850px;
-  height: 550px;
+  width: 1000px;
+  max-width: 95%;
+  height: 850px;
   background: #fff;
-  margin: 20px;
   border-radius: 30px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+
+  /* Căn giữa màn hình */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
 }
 
 /* Tiêu đề */
@@ -230,7 +380,45 @@ form {
 /* Khi active → form register trượt vào vị trí */
 .container.active .form-box.register {
   right: 50%;
-  transition-delay: 0s;
+  transition-delay: 0.2s;
+}
+
+/* Chỉnh select giống input-box */
+.input-box select {
+  width: 100%;
+  padding: 13px 50px 13px 20px;
+  background: #eee;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+  -webkit-appearance: none;
+  /* loại bỏ style mặc định trên Chrome/Safari */
+  -moz-appearance: none;
+  /* Firefox */
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Placeholder màu xám */
+.input-box select option[value=""][disabled] {
+  color: #888;
+}
+
+/* Icon bên phải vẫn đúng vị trí */
+.input-box i {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #333;
+}
+
+.input-box i.fa-calendar {
+  color: #7494ec;
 }
 
 /* Ẩn register khi chưa active */
