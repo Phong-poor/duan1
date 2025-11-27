@@ -162,18 +162,15 @@ export default {
         }
 
         if (data.status === "success" && data.user) {
-          // Lưu user vào LocalStorage
-          localStorage.setItem("currentUser", JSON.stringify(data.user));
-          alert(data.msg);
+            localStorage.setItem("currentUser", JSON.stringify(data.user));
+            alert(data.msg);
 
-          // Chuyển hướng dựa vào role
-          const role = (data.user.role || "").trim().toLowerCase();
-          if (role === "admin") {
-            this.$router.push("/Dashboard");
-          } else {
-            this.$router.push("/");
-          }
-
+            const role = (data.user.role || "").trim().toLowerCase();
+            if (role === "admin") {
+                this.$router.push("/Dashboard");
+            } else {
+                this.$router.push("/");
+            }
         } else {
           // Server trả lỗi hoặc user null
           alert(data.msg || "Email hoặc mật khẩu không đúng!");
@@ -188,11 +185,12 @@ export default {
     // ===== PHẦN ĐĂNG KÍ =====
     async handleRegister() {
       if (!this.regUser || !this.regEmail || !this.regPhone || !this.regGender ||
-        !this.regBirth || !this.regPassword || !this.regPasswordConfirm) {
+          !this.regBirth || !this.regPassword || !this.regPasswordConfirm) {
         alert("Vui lòng nhập đầy đủ thông tin!");
         return;
       }
 
+      // Validate email, phone, password
       const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
       if (!emailPattern.test(this.regEmail)) {
         alert("Email phải kết thúc bằng @gmail.com!");
@@ -222,7 +220,7 @@ export default {
         gender: this.regGender,
         ngaysinh: this.regBirth,
         password: this.regPassword,
-        confirm_password: this.regPasswordConfirm,
+        confirm_password: this.regPasswordConfirm
       };
 
       try {
@@ -232,62 +230,18 @@ export default {
           body: JSON.stringify(payload)
         });
 
-        const text = await res.text();
-        let data;
+        const data = await res.json();
 
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          console.warn("Server trả dữ liệu không phải JSON, dùng fallback:", text);
-          // Fallback: tạo object user từ form
-          const fallbackUser = {
-            tenKH: this.regUser,
-            email: this.regEmail,
-            phone: this.regPhone,
-            gender: this.regGender,
-            ngaysinh: this.regBirth,
-            role: "user"
-          };
-          localStorage.setItem("registeredUser", JSON.stringify(fallbackUser));
-          alert("Đăng ký thành công!");
-          this.showLogin();
-          return;
-        }
-
-        if (data.status === "success" && data.user) {
-          alert(data.msg);
-          // Lưu user từ server trả về
-          localStorage.setItem("registeredUser", JSON.stringify(data.user));
+        if (data.status === "success") {
+          alert("Đăng ký thành công! Vui lòng đăng nhập.");
           this.showLogin();
         } else {
-          // Nếu server trả lỗi hoặc không có user, vẫn fallback lưu form
-          const fallbackUser = {
-            tenKH: this.regUser,
-            email: this.regEmail,
-            phone: this.regPhone,
-            gender: this.regGender,
-            ngaysinh: this.regBirth,
-            role: "user"
-          };
-          localStorage.setItem("registeredUser", JSON.stringify(fallbackUser));
-          alert(data.msg || "Đăng ký thành công!");
-          this.showLogin();
+          alert(data.msg || "Đăng ký thất bại!");
         }
 
       } catch (error) {
         console.error(error);
-        // Kết nối lỗi vẫn lưu fallback
-        const fallbackUser = {
-          tenKH: this.regUser,
-          email: this.regEmail,
-          phone: this.regPhone,
-          gender: this.regGender,
-          ngaysinh: this.regBirth,
-          role: "user"
-        };
-        localStorage.setItem("registeredUser", JSON.stringify(fallbackUser));
-        alert("Đăng ký thành công (offline fallback)!");
-        this.showLogin();
+        alert("Lỗi kết nối server! Vui lòng thử lại.");
       }
     },
   }

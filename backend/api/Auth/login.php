@@ -65,6 +65,7 @@ if ($user && password_verify($password, $user['password'])) {
 } else {
     echo json_encode([
         "status" => "error",
-        "msg" => "Email hoặc mật khẩu không đúng"
+        "msg" => "Email hoặc mật khẩu không đúng",
+
     ]);
 }
