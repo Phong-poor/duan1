@@ -1,8 +1,9 @@
 <template>
-  <HeaderWeb/>
+  <HeaderWeb />
   <div class="product-detail-wrapper">
     <main class="container product-detail-page">
       <div class="product-content">
+        <!-- GALLERY TRÁI -->
         <section class="product-gallery">
           <img
             class="main-image"
@@ -22,6 +23,7 @@
           </div>
         </section>
 
+        <!-- THÔNG TIN SẢN PHẨM PHẢI -->
         <section class="product-info">
           <nav class="breadcrumb">
             <a href="#">NIKE</a> / <a href="#">Air Max</a> / Air Max 97 OG Silver
@@ -44,6 +46,7 @@
             <span class="discount-tag">GIẢM 10%</span>
           </div>
 
+          <!-- SIZE -->
           <div class="option-group">
             <label>Kích cỡ (Size):</label>
             <div class="size-options">
@@ -63,6 +66,7 @@
             </div>
           </div>
 
+          <!-- MÀU -->
           <div class="option-group">
             <label>Màu sắc:</label>
             <div class="color-options">
@@ -70,7 +74,7 @@
                 v-for="color in colors"
                 :key="color.id"
                 :title="color.label"
-                :class="{ selected: color.id === selectedColor }"
+                :class="{ selected: color.id === selectedColor.id }"
                 :style="{
                   backgroundColor: color.swatch,
                   borderColor: color.border ?? '#ccc',
@@ -78,10 +82,19 @@
                 @click="selectColor(color)"
               />
             </div>
+            <p class="selected-color-label">
+              Màu đã chọn:
+              <strong>{{ selectedColor.label }}</strong>
+            </p>
           </div>
 
+          <!-- NÚT HÀNH ĐỘNG -->
           <div class="action-buttons">
-            <button class="btn-add-to-cart" type="button" @click="handleAddToCart">
+            <button
+              class="btn-add-to-cart"
+              type="button"
+              @click="handleAddToCart"
+            >
               <i class="fas fa-shopping-cart" /> THÊM VÀO GIỎ
             </button>
             <button class="btn-buy-now" type="button" @click="handleBuyNow">
@@ -89,40 +102,64 @@
             </button>
           </div>
 
+          <!-- CHÍNH SÁCH -->
           <section class="product-policy">
             <h3><i class="fas fa-shield-alt" /> Chính sách mua hàng</h3>
             <ul>
-              <li><i class="fas fa-truck" /> Miễn phí vận chuyển** cho đơn hàng trên 2.000.000 VNĐ.</li>
-              <li><i class="fas fa-undo" /> Đổi size thoải mái** trong vòng 7 ngày (giữ nguyên tag).</li>
-              <li><i class="fas fa-certificate" /> Cam kết chính hãng 100%, đền gấp đôi nếu phát hiện hàng giả.</li>
+              <li>
+                <i class="fas fa-truck" /> Miễn phí vận chuyển** cho đơn hàng
+                trên 2.000.000 VNĐ.
+              </li>
+              <li>
+                <i class="fas fa-undo" /> Đổi size thoải mái** trong vòng 7 ngày
+                (giữ nguyên tag).
+              </li>
+              <li>
+                <i class="fas fa-certificate" /> Cam kết chính hãng 100%, đền
+                gấp đôi nếu phát hiện hàng giả.
+              </li>
             </ul>
           </section>
 
+          <!-- MÔ TẢ -->
           <section class="product-description">
             <h3>Mô tả chi tiết</h3>
             <p>
-              Nike Air Max 97 OG Silver Bullet là biểu tượng của văn hóa sneaker, lấy cảm hứng từ tàu cao tốc Nhật Bản.
-              Với thiết kế gợn sóng đặc trưng và lớp đệm Air Max full-length tiên tiến, đôi giày mang lại sự thoải mái tối đa và phong cách đường phố không thể nhầm lẫn.
-              Phiên bản Silver Bullet này là bản tái phát hành được săn đón nhất mọi thời đại.
+              Nike Air Max 97 OG Silver Bullet là biểu tượng của văn hóa
+              sneaker, lấy cảm hứng từ tàu cao tốc Nhật Bản. Với thiết kế gợn
+              sóng đặc trưng và lớp đệm Air Max full-length tiên tiến, đôi giày
+              mang lại sự thoải mái tối đa và phong cách đường phố không thể
+              nhầm lẫn. Phiên bản Silver Bullet này là bản tái phát hành được
+              săn đón nhất mọi thời đại.
             </p>
             <p>
-              * <strong>Chất liệu:</strong> Da tổng hợp cao cấp, lưới thoáng khí.
-              * <strong>Đặc điểm:</strong> Hệ thống dây buộc ẩn, lớp phản quang 3M.
-              * <strong>Phù hợp:</strong> Đi chơi, đi làm, phối hợp thời trang đường phố (streetwear).
+              * <strong>Chất liệu:</strong> Da tổng hợp cao cấp, lưới thoáng
+              khí. * <strong>Đặc điểm:</strong> Hệ thống dây buộc ẩn, lớp phản
+              quang 3M. * <strong>Phù hợp:</strong> Đi chơi, đi làm, phối hợp
+              thời trang đường phố (streetwear).
             </p>
           </section>
         </section>
       </div>
 
+      <!-- SẢN PHẨM LIÊN QUAN -->
       <section class="related-products">
         <h2 class="section-title">SẢN PHẨM LIÊN QUAN</h2>
         <div class="product-grid-wrapper">
-          <button class="carousel-arrow left" type="button" @click="scrollCarousel(-1)">
+          <button
+            class="carousel-arrow left"
+            type="button"
+            @click="scrollCarousel(-1)"
+          >
             <i class="fas fa-chevron-left" />
           </button>
 
           <div class="product-grid" ref="carouselRef">
-            <article v-for="product in relatedProducts" :key="product.id" class="product-card">
+            <article
+              v-for="product in relatedProducts"
+              :key="product.id"
+              class="product-card"
+            >
               <img :src="product.image" :alt="product.title" />
               <h3>{{ product.title }}</h3>
               <div class="stars">{{ product.rating }}</div>
@@ -135,42 +172,50 @@
             </article>
           </div>
 
-          <button class="carousel-arrow right" type="button" @click="scrollCarousel(1)">
+          <button
+            class="carousel-arrow right"
+            type="button"
+            @click="scrollCarousel(1)"
+          >
             <i class="fas fa-chevron-right" />
           </button>
         </div>
       </section>
     </main>
 
+    <!-- POPUP TOAST -->
     <transition name="popup">
-      <div v-if="popupVisible"class="popup-toast">
+      <div v-if="popupVisible" class="popup-toast">
         {{ popupMessage }}
       </div>
     </transition>
   </div>
-  <footerWeb/>
+  <FooterWeb/>
 </template>
+
+
 <script setup>
-import { onBeforeUnmount,ref } from'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import HeaderWeb from '../../Header-web.vue';
-import footerWeb from '../../footer-web.vue';
-// import heroImage from '@/assets/bannergiay.jpg';
-// import thumb1 from '@/assets/images (4).jpg';
-// import thumb2 from '@/assets/images (2).jpg';
-// import thumb3 from '@/assets/images (5).jpg';
-// import thumb4 from '@/assets/images (1).jpg';
-// import related1 from '@/assets/images (2).jpg';
-// import related2 from '@/assets/images (3).jpg';
-// import related3 from '@/assets/images (4).jpg';
-// import related4 from '@/assets/cv-2110.jpg';
-// import related5 from '@/assets/images.jpg';
-// import related6 from '@/assets/bannergiay2.jpg';
+import FooterWeb from '../../footer-web.vue';
+import heroImage from '../../assets/bannergiay.jpg';
+import thumb1 from '../../assets/images (4).jpg';
+import thumb2 from '../../assets/images (2).jpg';
+import thumb3 from '../../assets/images (5).jpg';
+import thumb4 from '../../assets/images (1).jpg';
+import related1 from '../../assets/images (2).jpg';
+import related2 from '../../assets/images (3).jpg';
+import related3 from '../../assets/images (4).jpg';
+import related4 from '../../assets/cv-2110.jpg';
+import related5 from '../../assets/images.jpg';
+import related6 from '../../assets/bannergiay2.jpg';
+
 const thumbnails = [
-  { id: 0, src: heroImage, alt: 'Nike Air Max Hero' },
-  { id: 1, src: thumb1, alt: 'View 1' },
-  { id: 2, src: thumb2, alt: 'View 2' },
-  { id: 3, src: thumb3, alt: 'View 3' },
-  { id: 4, src: thumb4, alt: 'View 4' },
+  { id: 0, src: heroImage, alt: "Nike Air Max Hero" },
+  { id: 1, src: thumb1, alt: "View 1" },
+  { id: 2, src: thumb2, alt: "View 2" },
+  { id: 3, src: thumb3, alt: "View 3" },
+  { id: 4, src: thumb4, alt: "View 4" },
 ];
 
 const selectedImage = ref(thumbnails[0]);
@@ -179,82 +224,88 @@ const selectImage = (image) => {
   selectedImage.value = image;
 };
 
+/* SIZE */
 const sizes = [
-  { value: '39', disabled: false },
-  { value: '40', disabled: false },
-  { value: '41', disabled: false },
-  { value: '42', disabled: false },
-  { value: '43', disabled: true },
-  { value: '44', disabled: false },
-  { value: '45', disabled: false },
+  { value: "39", disabled: false },
+  { value: "40", disabled: false },
+  { value: "41", disabled: false },
+  { value: "42", disabled: false },
+  { value: "43", disabled: true },
+  { value: "44", disabled: false },
+  { value: "45", disabled: false },
 ];
-const selectedSize = ref('40');
+
+const selectedSize = ref("40");
 
 const selectSize = (size) => {
   if (size.disabled) return;
   selectedSize.value = size.value;
 };
 
+/* COLORS */
 const colors = [
-  { id: 'silver', label: 'Silver Bullet', swatch: 'silver' },
-  { id: 'black', label: 'Black/White', swatch: 'black' },
-  { id: 'navy', label: 'Navy Blue', swatch: 'navy' },
-  { id: 'white', label: 'Triple White', swatch: 'white', border: '#000' },
+  { id: "silver", label: "Silver Bullet", swatch: "silver" },
+  { id: "black", label: "Black/White", swatch: "black" },
+  { id: "navy", label: "Navy Blue", swatch: "navy" },
+  { id: "white", label: "Triple White", swatch: "white", border: "#000" },
 ];
+
+// lưu luôn object màu, để dùng label & swatch
 const selectedColor = ref(colors[0]);
 
 const selectColor = (color) => {
   selectedColor.value = color;
 };
 
+/* SẢN PHẨM LIÊN QUAN */
 const relatedProducts = [
   {
     id: 1,
     image: related1,
-    title: 'Nike Dunk High Retro Black/Red',
-    rating: '★★★★★',
-    originalPrice: '3,800,000 VNĐ',
-    currentPrice: '3,000,000 VNĐ',
+    title: "Nike Dunk High Retro Black/Red",
+    rating: "★★★★★",
+    originalPrice: "3,800,000 VNĐ",
+    currentPrice: "3,000,000 VNĐ",
   },
   {
     id: 2,
     image: related2,
     title: "Nike Air Max 1 'Patta' Wave",
-    rating: '★★★★☆',
-    originalPrice: '5,500,000 VNĐ',
-    currentPrice: '4,800,000 VNĐ',
+    rating: "★★★★☆",
+    originalPrice: "5,500,000 VNĐ",
+    currentPrice: "4,800,000 VNĐ",
   },
   {
     id: 3,
     image: related3,
     title: "Nike Air Force 1 'White'",
-    rating: '★★★★★',
-    originalPrice: '2,890,000 VNĐ',
-    currentPrice: '2,500,000 VNĐ',
+    rating: "★★★★★",
+    originalPrice: "2,890,000 VNĐ",
+    currentPrice: "2,500,000 VNĐ",
   },
   {
     id: 4,
     image: related4,
     title: "Nike Blazer Mid '77 Jumbo",
-    rating: '★★★★☆',
-    originalPrice: '2,990,000 VNĐ',
-    currentPrice: '2,600,000 VNĐ',
+    rating: "★★★★☆",
+    originalPrice: "2,990,000 VNĐ",
+    currentPrice: "2,600,000 VNĐ",
   },
   {
     id: 5,
     image: related5,
-    title: 'Nike Jordan 1 Mid Grey/Black',
-    rating: '★★★★★',
-    originalPrice: '4,200,000 VNĐ',
-    currentPrice: '3,900,000 VNĐ',
+    title: "Nike Jordan 1 Mid Grey/Black",
+    rating: "★★★★★",
+    originalPrice: "4,200,000 VNĐ",
+    currentPrice: "3,900,000 VNĐ",
   },
   {
     id: 6,
     image: related6,
-    title: 'Nike x Sacai VaporWaffle',
-    rating: '★★★★★',
-    originalPrice: '8,000,000 VNĐ',
-    currentPrice: '7,500,000 VNĐ',
+    title: "Nike x Sacai VaporWaffle",
+    rating: "★★★★★",
+    originalPrice: "8,000,000 VNĐ",
+    currentPrice: "7,500,000 VNĐ",
   },
 ];
 
@@ -263,20 +314,23 @@ const carouselRef = ref(null);
 const scrollCarousel = (direction) => {
   carouselRef.value?.scrollBy({
     left: direction * 500,
-    behavior: 'smooth',
+    behavior: "smooth",
   });
 };
 
+/* POPUP TOAST */
 const popupVisible = ref(false);
-const popupMessage = ref('');
+const popupMessage = ref("");
 let popupTimer;
 
 const triggerPopup = (message) => {
   popupMessage.value = message;
   popupVisible.value = true;
+
   if (popupTimer) {
     clearTimeout(popupTimer);
   }
+
   popupTimer = setTimeout(() => {
     popupVisible.value = false;
   }, 1500);
@@ -284,15 +338,17 @@ const triggerPopup = (message) => {
 
 const handleAddToCart = () => {
   if (!selectedSize.value || !selectedColor.value) {
-    triggerPopup('⚠ Vui lòng chọn size và màu!');
+    triggerPopup("⚠ Vui lòng chọn size và màu!");
     return;
   }
 
-  triggerPopup(`✔ Đã thêm: Size ${selectedSize.value} – Màu ${selectedColor.value.label}`);
+  triggerPopup(
+    `✔ Đã thêm: Size ${selectedSize.value} – Màu ${selectedColor.value.label}`
+  );
 };
 
 const handleBuyNow = () => {
-  triggerPopup('🚚 Đặt hàng thành công! Chúng tôi sẽ liên hệ ngay.');
+  triggerPopup("🚚 Đặt hàng thành công! Chúng tôi sẽ liên hệ ngay.");
 };
 
 const cleanupPopup = () => {
@@ -305,11 +361,11 @@ onBeforeUnmount(cleanupPopup);
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
 
 .product-detail-wrapper {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: #f7f7f7;
   color: #1a1a1a;
   min-height: 100vh;
@@ -412,7 +468,7 @@ onBeforeUnmount(cleanupPopup);
 }
 
 .current-price {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 32px;
   font-weight: 700;
   color: #e53935;
@@ -489,6 +545,12 @@ onBeforeUnmount(cleanupPopup);
   box-shadow: 0 0 0 2px #007bff;
 }
 
+.selected-color-label {
+  font-size: 12px;
+  margin-top: 4px;
+  color: #555;
+}
+
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -530,7 +592,7 @@ onBeforeUnmount(cleanupPopup);
 
 .product-policy h3,
 .product-description h3 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 16px;
   font-weight: 600;
   margin-top: 15px;
@@ -556,6 +618,7 @@ onBeforeUnmount(cleanupPopup);
   color: #1a1a1a;
 }
 
+/* RELATED PRODUCTS */
 .related-products {
   padding: 40px 0;
   background-color: #a50138;
@@ -566,7 +629,7 @@ onBeforeUnmount(cleanupPopup);
 }
 
 .related-products::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -584,7 +647,7 @@ onBeforeUnmount(cleanupPopup);
 }
 
 .related-products .section-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 30px;
   font-weight: 700;
   text-align: center;
@@ -595,7 +658,7 @@ onBeforeUnmount(cleanupPopup);
 }
 
 .related-products .section-title::before {
-  content: '🔥';
+  content: "🔥";
   margin-right: 10px;
 }
 
@@ -666,7 +729,7 @@ onBeforeUnmount(cleanupPopup);
 }
 
 .current-price-large {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 22px;
   font-weight: 700;
   color: #e53935;
@@ -716,6 +779,7 @@ onBeforeUnmount(cleanupPopup);
   right: 10px;
 }
 
+/* POPUP TOAST */
 .popup-toast {
   position: fixed;
   top: 20px;
@@ -739,6 +803,7 @@ onBeforeUnmount(cleanupPopup);
   opacity: 0;
 }
 
+/* RESPONSIVE */
 @media (max-width: 1024px) {
   .product-content {
     flex-direction: column;
@@ -770,5 +835,3 @@ onBeforeUnmount(cleanupPopup);
   }
 }
 </style>
-
-

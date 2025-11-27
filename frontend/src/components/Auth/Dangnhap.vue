@@ -1,6 +1,5 @@
 <template>
   <div class="container" :class="{ 'active': isRegisterActive }">
-
     <!-- Form login -->
     <div class="form-box login">
       <form @submit.prevent="handleLogin" autocomplete="off">
@@ -29,7 +28,6 @@
         </div>
       </form>
     </div>
-
     <!-- Form register -->
     <div class="form-box register">
       <form @submit.prevent="handleRegister" autocomplete="off">
@@ -75,7 +73,6 @@
             autocomplete="new-password">
           <i class="fa-solid fa-lock"></i>
         </div>
-
         <button class="btn">Đăng Kí</button>
 
         <p>Hoặc đăng kí bằng</p>
@@ -85,7 +82,6 @@
         </div>
       </form>
     </div>
-
     <!-- Toggle panel -->
     <div class="toggle-box">
       <img :src="toggleImagePath" alt="Login Banner" class="toggle-image">
@@ -102,7 +98,6 @@
         <button class="btn login-btn" @click="showLogin">Đăng Nhập</button>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -145,7 +140,6 @@ export default {
         alert("Vui lòng nhập đủ thông tin!");
         return;
       }
-
       try {
         const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
           method: "POST",
@@ -296,28 +290,9 @@ export default {
         this.showLogin();
       }
     },
-
-
   }
 };
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style scoped>
 /* Import Font Awesome & Google Font Poppins */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css");
@@ -342,7 +317,6 @@ body {
   background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
   margin: 0;
   /* tránh padding/margin mặc định */
-}
 
 /* Khung bao toàn bộ login/register */
 .container {

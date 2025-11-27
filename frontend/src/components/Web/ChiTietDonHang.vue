@@ -1,6 +1,6 @@
 <template>
   <div class="order-page">
-    <Header />
+    <HeaderWeb />
     <main class="container">
       <div class="account-layout">
         <aside class="sidebar">
@@ -139,13 +139,14 @@
         </section>
       </div>
     </main>
-    <Footer/>
+    <footerWeb/>
   </div>
 </template>
+
 <script setup>
 import { computed, ref, watchEffect }from 'vue';
-import Header from'../../header.vue';
-import Footer from'../../footer.vue';
+import HeaderWeb from '../../Header-web.vue';
+import footerWeb from '../../footer-web.vue';
 const allOrders = [
   {
     id: 'KH00245',
@@ -579,4 +580,3 @@ const statusLabel = (status) => {
   }
 }
 </style>
-

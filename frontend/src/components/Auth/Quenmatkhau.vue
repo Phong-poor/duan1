@@ -1,6 +1,6 @@
 <template>
     <div class="forgot-container">
-
+        <!-- LOGO MIRAE -->
         <img class="banner-img" src="../../assets/logone.png" alt="forgot password" />
 
         <h2 class="title">Quên mật khẩu</h2>
@@ -12,7 +12,6 @@
             <input type="email" v-model="email" placeholder="Nhập email" class="input-box" />
 
             <button class="main-btn" @click="sendOTP">Gửi mã OTP</button>
-
             <div class="back-login" @click="goLogin">
                 ← Quay lại đăng nhập
             </div>
@@ -29,6 +28,7 @@
             <div class="back-login" @click="step = 1">
                 Gửi lại mã
             </div>
+            <router-link to="/Dangnhap" class="back-login">← Quay lại đăng nhập</router-link>
         </div>
 
         <!-- BƯỚC 3: ĐẶT MẬT KHẨU MỚI -->
@@ -65,7 +65,6 @@ export default {
         goLogin() {
             this.$router.push({ name: "Dangnhap" });
         },
-
         sendOTP() {
             if (!this.email) return alert("Vui lòng nhập email");
             console.log("Gửi OTP:", this.email);
@@ -90,7 +89,6 @@ export default {
     }
 };
 </script>
-
 <style
     scoped>
     .forgot-container {

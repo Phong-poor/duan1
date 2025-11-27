@@ -88,7 +88,7 @@
           </div>
 
           <div class="partner-section">
-            <img :src="logoImage" alt="FPT Polytechnic" style="max-height:40px;margin-top:5px;">
+            <img src="../src/assets/logo.png" alt="FPT Polytechnic" style="max-height:100px;margin-top:5px;">
           </div>
         </div>
 
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import logoImage from './assets/logo.png';
+
 </script>
 
 <style scoped>

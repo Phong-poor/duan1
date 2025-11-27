@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import logoImage from './assets/logone.png';
-
 const dropdownOpen = ref(false);
 
 const toggleDropdown = () => {
@@ -23,6 +22,7 @@ const isAdmin = computed(() => {
 const logout = () => {
   localStorage.removeItem("user");
   window.location.href = "/Dangnhap";
+
 };
 </script>
 
@@ -37,11 +37,21 @@ const logout = () => {
       </div>
 
       <nav class="nav-links">
-        <router-link to="/" class="menu-item" active-class="active">Trang chủ</router-link>
-        <router-link to="/Sanpham" class="menu-item" active-class="active">Sản phẩm</router-link>
-        <router-link to="/tintuc" class="menu-item" active-class="active">Tin tức</router-link>
-        <router-link to="/Gioithieu" class="menu-item" active-class="active">Giới thiệu</router-link>
-        <router-link to="/Sanpham" class="menu-item" active-class="active">Liên hệ</router-link>
+        <router-link to="/" class="menu-item" active-class="active">
+                 Trang chủ
+            </router-link>
+        <router-link to="/Sanpham" class="menu-item" active-class="active">
+                 Sản phẩm
+            </router-link>
+        <router-link to="/tintuc" class="menu-item" active-class="active">
+                 Tin tức
+            </router-link>
+        <router-link to="/Gioithieu" class="menu-item" active-class="active">
+                 Giới thiệu
+            </router-link>
+        <router-link to="/Sanpham" class="menu-item" active-class="active">
+                 Liên hệ
+            </router-link>
       </nav>
 
       <div class="actions">
@@ -55,14 +65,12 @@ const logout = () => {
           <router-link to="/Thanhtoangiohang" class="icon-shopping-cart">
             <i class="fas fa-shopping-cart"></i>
           </router-link>
-
           <div class="user-dropdown-wrapper">
             <a href="#" class="icon-user" @click.prevent="toggleDropdown">
               <i class="fas fa-user"></i>
             </a>
 
             <div v-if="dropdownOpen" class="user-dropdown">
-
               <!-- Chỉ hiện nếu đã đăng nhập -->
               <router-link v-if="currentUser" to="/Thongtin" class="item">
                 Thông tin người dùng
@@ -252,7 +260,6 @@ const logout = () => {
     margin-bottom: 10px;
   }
 }
-
 .user-dropdown-wrapper {
   position: relative;
   display: inline-block;
@@ -271,7 +278,7 @@ const logout = () => {
   background: #fff;
   border-radius: 6px;
   width: 200px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   padding: 8px 0;
   z-index: 999;
 }

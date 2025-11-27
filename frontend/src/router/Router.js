@@ -8,18 +8,25 @@ import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
 import Quanlymausac from '../components/Admin/Quanlymausac.vue';
 import Quanlysize from '../components/Admin/Quanlysize.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
-import ThanhtoanGiohang from '../components/Web/Thanhtoangiohang.vue';
+import TrangChu from '../components/Web/TrangChu.vue';
+import Sanpham from '../components/Web/Sanpham.vue';
+import ChiTietDonHang from '../components/Web/ChiTietDonHang.vue';
 import ChiTiet from '../components/Web/ChiTiet.vue';
-import SanPham from '../components/Web/SanPham.vue';
 import ThongTin from '../components/Web/ThongTin.vue';
-import trangchu from '../components/Web/trangchu.vue';
-import Quenmatkhau from '../components/Auth/Quenmatkhau.vue'
-import Dangnhap from '../components/Auth/Dangnhap.vue'
+import Gioithieu from '../components/Web/Gioithieu.vue';
+import Dangnhap from '../components/Auth/Dangnhap.vue'; 
+import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
+// import tintuc from '../components/Web/tintuc.vue';
+import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
+
 
 const routes = [
     { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
+    { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
     { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
     { path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu, meta: { isAuth: false } },
+    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
+    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
     { path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
