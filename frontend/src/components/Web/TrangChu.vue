@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 import HeaderWeb from '../../Header-web.vue';
@@ -20,7 +20,67 @@ import imgCv2110 from '../../assets/cv-2110.jpg';
 import imgCanhan3 from '../../assets/canhan3.jpg';
 import imgCanhan1 from '../../assets/canhan1.jpg';
 
-onMounted(() => {
+const bestSellers = ref([]);
+const popularProducts = ref([]);
+const flashSaleProducts = ref([]);
+
+// FLASH SALE TIMER STATE
+const days = ref('00');
+const hours = ref('00');
+const minutes = ref('00');
+const seconds = ref('00');
+let timerInterval = null;
+let slideInterval = null;
+
+const updateTimer = () => {
+  const endTime = new Date();
+  endTime.setDate(endTime.getDate() + 4);
+  endTime.setHours(endTime.getHours() + 4);
+
+  // Cập nhật ngay lập tức lần đầu
+  const update = () => {
+    const now = new Date().getTime();
+    const distance = endTime.getTime() - now;
+
+    if (distance < 0) {
+      if (timerInterval) clearInterval(timerInterval);
+      days.value = '00';
+      hours.value = '00';
+      minutes.value = '00';
+      seconds.value = '00';
+      return;
+    }
+
+    days.value = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
+    hours.value = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+    minutes.value = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    seconds.value = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+  };
+
+  update(); // Chạy ngay không cần đợi 1s
+  timerInterval = setInterval(update, 1000);
+};
+
+onMounted(async () => {
+  try {
+    // Lấy sản phẩm đang giảm giá cho Flash Sale
+    const flashResponse = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?giamgia=1&limit=8');
+    const flashData = await flashResponse.json();
+    if (flashData.success) {
+      flashSaleProducts.value = flashData.data;
+    }
+
+    // Lấy tất cả sản phẩm cho Bán chạy và Phổ biến
+    const response = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?limit=8');
+    const data = await response.json();
+    if (data.success) {
+      bestSellers.value = data.data;
+      popularProducts.value = [...data.data].reverse();
+    }
+  } catch (error) {
+    console.error('Lỗi khi tải sản phẩm:', error);
+  }
+
   // 1. CAROUSEL BANNER LỚN
   const slideContainer = document.getElementById('slideContainer');
   const slides = document.querySelectorAll('.hero-carousel .slide');
@@ -45,7 +105,7 @@ onMounted(() => {
     updateSlidePosition();
   }
 
-  let slideInterval = setInterval(goToNextSlide, 5000);
+  slideInterval = setInterval(goToNextSlide, 5000);
 
   nextBtn?.addEventListener('click', () => {
     clearInterval(slideInterval);
@@ -59,40 +119,8 @@ onMounted(() => {
     slideInterval = setInterval(goToNextSlide, 5000);
   });
 
-  // 2. FLASH SALE TIMER (CÓ THÊM NGÀY)
-function updateFlashSaleTimer() {
-  // Ví dụ: flash sale kết thúc sau 4 ngày + 4 giờ
-  const endTime = new Date();
-  endTime.setDate(endTime.getDate() + 4);
-  endTime.setHours(endTime.getHours() + 4);
-
-  const timerFunction = setInterval(() => {
-    const now = new Date().getTime();
-    const distance = endTime.getTime() - now;
-
-    if (distance < 0) {
-      clearInterval(timerFunction);
-      ['dayBox', 'hoursBox', 'minutesBox', 'secondsBox'].forEach(id => {
-        const box = document.getElementById(id);
-        if (box) box.textContent = '00';
-      });
-      return;
-    }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    document.getElementById('dayBox').textContent = String(days).padStart(2, '0');
-    document.getElementById('hoursBox').textContent = String(hours).padStart(2, '0');
-    document.getElementById('minutesBox').textContent = String(minutes).padStart(2, '0');
-    document.getElementById('secondsBox').textContent = String(seconds).padStart(2, '0');
-  }, 1000);
-}
-
-
-  updateFlashSaleTimer();
+  // 2. FLASH SALE TIMER
+  updateTimer();
 
   // 3. PRODUCT CAROUSEL
   function updateProductNav(listElement, targetId) {
@@ -148,6 +176,12 @@ function updateFlashSaleTimer() {
   window.addEventListener('resize', initProductCarousels);
   initProductCarousels();
 });
+
+onBeforeUnmount(() => {
+  if (timerInterval) clearInterval(timerInterval);
+  if (slideInterval) clearInterval(slideInterval);
+});
+
 </script>
 
 <template>
@@ -188,76 +222,32 @@ function updateFlashSaleTimer() {
 
         <div class="timer-container-new">
           <p>Chỉ còn lại:</p>
-          <div class="sale-timer">
+              <div class="sale-timer">
 
-              <div class="timer-box" id="dayBox">00</div>
-           
-                <span class="timer-separator">:</span>
+                  <div class="timer-box">{{ days }}</div>
+               
+                    <span class="timer-separator">:</span>
 
-                <div class="timer-box" id="hoursBox">00</div>
-                  <span class="timer-separator">:</span>
+                    <div class="timer-box">{{ hours }}</div>
+                      <span class="timer-separator">:</span>
 
-                <div class="timer-box" id="minutesBox">00</div>
-                  <span class="timer-separator">:</span>
+                    <div class="timer-box">{{ minutes }}</div>
+                      <span class="timer-separator">:</span>
 
-                <div class="timer-box" id="secondsBox">00</div>
-            </div>
+                    <div class="timer-box">{{ seconds }}</div>
+                </div>
 
         </div>
 
         <div class="sale-product-grid">
-          <div class="sale-product-card">
-            <img :src="imgSale1" alt="Giày Sale 1" />
-            <h3>Nike Blazer Mid '77</h3>
-            <p class="original-price">2,600,000 VNĐ</p>
-            <p class="sale-price">1,500,000 VNĐ</p>
+          <div class="sale-product-card" v-for="product in flashSaleProducts" :key="product.id_sanpham">
+            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP" @error="$event.target.src = imgSale1" />
+            <h3>{{ product.tenSP }}</h3>
+            <p class="original-price">{{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}</p>
+            <p class="sale-price">{{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauGiam) }}</p>
 
             <div class="sale-actions">
-              <a href="#" class="sale-btn">Mua ngay</a>
-            </div>
-          </div>
-
-          <div class="sale-product-card">
-            <img :src="imgSale1" alt="Giày Sale 2" />
-            <h3>Adidas Samba Classic</h3>
-            <p class="original-price">1,990,000 VNĐ</p>
-            <p class="sale-price">1,190,000 VNĐ</p>
-
-            <div class="sale-actions">
-              <a href="#" class="sale-btn">Mua ngay</a>
-            </div>
-          </div>
-
-          <div class="sale-product-card">
-            <img :src="imgSale3" alt="Giày Sale 3" />
-            <h3>Puma Caven Dime</h3>
-            <p class="original-price">1,550,000 VNĐ</p>
-            <p class="sale-price">999,000 VNĐ</p>
-
-            <div class="sale-actions">
-              <a href="#" class="sale-btn">Mua ngay</a>
-            </div>
-          </div>
-
-          <div class="sale-product-card">
-            <img :src="imgSale4" alt="Giày Sale 4" />
-            <h3>Vans Sk8-Hi Black</h3>
-            <p class="original-price">1,800,000 VNĐ</p>
-            <p class="sale-price">900,000 VNĐ</p>
-
-            <div class="sale-actions">
-              <a href="#" class="sale-btn">Mua ngay</a>
-            </div>
-          </div>
-
-          <div class="sale-product-card">
-            <img :src="imgSale5" alt="Giày Sale 5" />
-            <h3>NB 327 Black/White</h3>
-            <p class="original-price">3,100,000 VNĐ</p>
-            <p class="sale-price">1,999,000 VNĐ</p>
-
-            <div class="sale-actions">
-              <a href="#" class="sale-btn">Mua ngay</a>
+              <RouterLink :to="`/ChiTiet?id=${product.id_sanpham}`" class="sale-btn">Mua ngay</RouterLink>
             </div>
           </div>
         </div>
@@ -269,113 +259,24 @@ function updateFlashSaleTimer() {
     <section class="product-carousel-wrap">
       <div class="product-list-container">
         <div class="product-list" id="bestSellerList">
-          <div class="product-card-slide">
-            <img :src="imgSale5" alt="Nike Air Force 1" />
-            <h3>Nike Air Force 1 Low</h3>
-            <div class="stars">★★★★☆</div>
-            <p>2,890,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="Adidas Ultraboost" />
-            <h3>Adidas Ultraboost 22</h3>
+          <div class="product-card-slide" v-for="product in bestSellers" :key="product.id_sanpham">
+            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP" @error="$event.target.src = imgSale1" />
+            <h3>{{ product.tenSP }}</h3>
             <div class="stars">★★★★★</div>
-            <p>3,990,000 VNĐ</p>
+            <p v-if="product.coGiamGia">
+              <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
+                {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
+              </span>
+              <span style="color: #d20505;">
+                {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauGiam) }}
+              </span>
+            </p>
+            <p v-else>
+              {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
+            </p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="Air Jordan 1" />
-            <h3>Air Jordan 1 Low 'Panda'</h3>
-            <div class="stars">★★★★★</div>
-            <p>4,500,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale2" alt="Converse Chuck Taylor" />
-            <h3>Converse Chuck Taylor All Star Classic</h3>
-            <div class="stars">★★★★☆</div>
-            <p>1,500,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale1" alt="Vans Old Skool" />
-            <h3>Vans Old Skool Black/White</h3>
-            <div class="stars">★★★★☆</div>
-            <p>1,690,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale1" alt="Puma RS-X" />
-            <h3>Puma RS-X Pop</h3>
-            <div class="stars">★★★★☆</div>
-            <p>2,990,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="New Balance 550" />
-            <h3>New Balance 550 White/Grey</h3>
-            <div class="stars">★★★★★</div>
-            <p>3,700,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="Yeezy 350" />
-            <h3>Adidas Yeezy Boost 350 V2</h3>
-            <div class="stars">★★★★★</div>
-            <p>8,500,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="Nike Dunk" />
-            <h3>Nike Dunk Low Retro Blue</h3>
-            <div class="stars">★★★★☆</div>
-            <p>3,700,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale5" alt="New Balance 574" />
-            <h3>New Balance 574 Core</h3>
-            <div class="stars">★★★★☆</div>
-            <p>2,190,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
+              <RouterLink :to="`/ChiTiet?id=${product.id_sanpham}`" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
         </div>
@@ -389,91 +290,24 @@ function updateFlashSaleTimer() {
     <section class="product-carousel-wrap">
       <div class="product-list-container">
         <div class="product-list" id="popularKicksList">
-          <div class="product-card-slide">
-            <img :src="imgSale1" alt="Popular Sneaker 1" />
-            <h3>New Balance 990v6</h3>
-            <div class="stars">★★★★★</div>
-            <p>5,500,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="Popular Sneaker 2" />
-            <h3>Nike Blazer Low Jumbo</h3>
+          <div class="product-card-slide" v-for="product in popularProducts" :key="product.id_sanpham">
+            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP" @error="$event.target.src = imgSale1" />
+            <h3>{{ product.tenSP }}</h3>
             <div class="stars">★★★★☆</div>
-            <p>2,350,000 VNĐ</p>
+            <p v-if="product.coGiamGia">
+              <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
+                {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
+              </span>
+              <span style="color: #d20505;">
+                {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauGiam) }}
+              </span>
+            </p>
+            <p v-else>
+              {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
+            </p>
             <div class="product-actions">
               <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale4" alt="Popular Sneaker 3" />
-            <h3>Converse Chuck 70 Classic</h3>
-            <div class="stars">★★★★☆</div>
-            <p>1,990,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale3" alt="Popular Sneaker 4" />
-            <h3>Adidas Stan Smith White/Green</h3>
-            <div class="stars">★★★★★</div>
-            <p>2,590,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale4" alt="Popular Sneaker 5" />
-            <h3>Puma Suede Classic</h3>
-            <div class="stars">★★★★☆</div>
-            <p>1,800,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale2" alt="Popular Sneaker 6" />
-            <h3>Vans Checkerboard Slip-On</h3>
-            <div class="stars">★★★★☆</div>
-            <p>1,490,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale5" alt="Popular Sneaker 7" />
-            <h3>Nike Air Max 90 Black</h3>
-            <div class="stars">★★★★★</div>
-            <p>3,190,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
-            </div>
-          </div>
-
-          <div class="product-card-slide">
-            <img :src="imgSale4" alt="Popular Sneaker 8" />
-            <h3>Adidas Gazelle Green</h3>
-            <div class="stars">★★★★☆</div>
-            <p>2,400,000 VNĐ</p>
-            <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
-              <RouterLink to="/ChiTiet" class="action-btn secondary">Chi tiết</RouterLink>
+              <RouterLink :to="`/ChiTiet?id=${product.id_sanpham}`" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
         </div>

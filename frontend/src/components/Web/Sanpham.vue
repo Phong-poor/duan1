@@ -27,7 +27,7 @@
       <div class="filter-bar">
         <div>
           <label>Sắp xếp theo:</label>
-          <select>
+          <select v-model="sortBy" @change="applyFilters">
             <option value="moi_nhat">Mới nhất</option>
             <option value="gia_tang">Giá tăng dần</option>
             <option value="gia_giam">Giá giảm dần</option>
@@ -36,26 +36,15 @@
 
         <div class="filter-inline">
           <label>Kích cỡ:</label>
-          <select>
-            <option value="all">Tất cả</option>
-              <option value="36">36</option>
-              <option value="37">37</option>
-              <option value="38">38</option>
-              <option value="39">39</option>
-              <option value="39">40</option>
-              <option value="39">41</option>
-              <option value="39">42</option>
-              <option value="39">43</option>
-              <option value="39">44</option>
+          <select v-model="selectedSize" @change="applyFilters">
+            <option value="">Tất cả</option>
+            <option v-for="size in sizes" :key="size.id_size" :value="size.size">{{ size.size }}</option>
           </select>
 
           <label>Loại:</label>
-          <select>
-            <option value="all">Tất cả</option>
-            <option value="air_max">Giày thể thao</option>
-            <option value="dunk">Giày chạy bộ</option>
-            <option value="jordan">Giày đi học</option>
-            <option value="training">Giày training</option>
+          <select v-model="selectedCategory" @change="applyFilters">
+            <option :value="null">Tất cả</option>
+            <option v-for="cat in categories" :key="cat.id_danhmuc" :value="cat">{{ cat.tenDM }}</option>
           </select>
         </div>
       </div>
@@ -68,12 +57,17 @@
           <h3>Danh mục sản phẩm</h3>
           <ul>
             <li 
-              v-for="item in categories" 
-              :key="item"
-              @click="chooseCategory(item)"
-              :class="{ active: selectedCategory === item }"
+              @click="chooseBrand(null)"
+              :class="{ active: selectedBrand === null }">
+              Tất cả
+            </li>
+            <li 
+              v-for="item in brands" 
+              :key="item.id_thuonghieu"
+              @click="chooseBrand(item)"
+              :class="{ active: selectedBrand && selectedBrand.id_thuonghieu === item.id_thuonghieu }"
             >
-              {{ item }}
+              {{ item.tenTH }}
             </li>
           </ul>
         </aside>
@@ -85,15 +79,25 @@
 
           <!-- GRID SẢN PHẨM -->
           <section class="product-grid">
-            <div class="product-card" v-for="p in paginatedProducts" :key="p.id">
-              <img :src="p.img" />
-              <h3>{{ p.title }}</h3>
-              <div class="stars">{{ p.stars }}</div>
-              <p>{{ p.price }}</p>
+            <div class="product-card" v-for="p in products" :key="p.id_sanpham">
+              <img :src="`http://localhost/duan1/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
+              <h3>{{ p.tenSP }}</h3>
+              <div class="stars">★★★★★</div>
+              <p v-if="p.coGiamGia">
+                <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
+                  {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.giaSP) }}
+                </span>
+                <span style="color: #d20505;">
+                  {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.giaSauGiam) }}
+                </span>
+              </p>
+              <p v-else>
+                {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.giaSP) }}
+              </p>
 
               <div class="product-actions">
                 <button class="action-btn">Mua ngay</button>
-                <a @click.prevent="goTo('chiTiet')" class="action-btn secondary">Chi tiết</a>
+                <RouterLink :to="`/ChiTiet?id=${p.id_sanpham}`" class="action-btn secondary">Chi tiết</RouterLink>
               </div>
             </div>
           </section>
@@ -129,7 +133,7 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref, computed } from "vue";
+import { onBeforeUnmount, onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -141,11 +145,17 @@ import footerWeb from "../../footer-web.vue";
 import bannerSlide1 from "../../assets/banner-slide-1.png";
 import bannerSlide2 from "../../assets/banner-slide-2.jpg";
 import bannerSlide3 from "../../assets/banner-slide-3.jpg";
-
-import productImg2 from "../../assets/images (3).jpg";
+import imgSale1 from '../../assets/images (1).jpg'; // Fallback image
 
 const slideContainer = ref(null);
 let slideTimer;
+
+// Filter states
+const sortBy = ref('moi_nhat');
+const selectedSize = ref('');
+const selectedBrand = ref('');
+const sizes = ref([]);
+const brands = ref([]);
 
 onMounted(() => {
   const slides = slideContainer.value.querySelectorAll(".slide");
@@ -156,38 +166,120 @@ onMounted(() => {
     current = (current + 1) % slides.length;
     slides[current].classList.add("active");
   }, 4000);
+
+  fetchCategories();
+  fetchBrands();
+  fetchSizes();
+  fetchProducts();
 });
 
 onBeforeUnmount(() => clearInterval(slideTimer));
 
-/* CATEGORY CLICK */
-const categories = ["Puma", "Nike", "Adidas", "Jordan", "Vans", "Converse", "Louis"];
+/* CATEGORY */
+const categories = ref([]);
 const selectedCategory = ref(null);
-const chooseCategory = (cat) => selectedCategory.value = cat;
 
-/* ======================= PAGINATION ======================= */
+const fetchCategories = async () => {
+  try {
+    const res = await fetch('http://localhost/duan1/backend/api/Web/DanhMuc.php');
+    const data = await res.json();
+    if (data.success) {
+      categories.value = data.data;
+    }
+  } catch (error) {
+    console.error("Lỗi lấy danh mục:", error);
+  }
+};
+
+const fetchBrands = async () => {
+  try {
+    const res = await fetch('http://localhost/duan1/backend/api/Web/ThuongHieu.php');
+    const data = await res.json();
+    if (data.success) {
+      brands.value = data.data;
+    }
+  } catch (error) {
+    console.error("Lỗi lấy thương hiệu:", error);
+  }
+};
+
+const fetchSizes = async () => {
+  try {
+    const res = await fetch('http://localhost/duan1/backend/api/Web/KichCo.php');
+    const data = await res.json();
+    if (data.success) {
+      sizes.value = data.data;
+    }
+  } catch (error) {
+    console.error("Lỗi lấy kích cỡ:", error);
+  }
+};
+
+const chooseBrand = (brand) => {
+  selectedBrand.value = brand;
+  currentPage.value = 1;
+  fetchProducts();
+};
+
+const chooseSize = (size) => {
+  selectedSize.value = size;
+  currentPage.value = 1;
+  fetchProducts();
+};
+
+const chooseCategory = (cat) => {
+  selectedCategory.value = cat;
+  currentPage.value = 1;
+  fetchProducts();
+};
+
+const applyFilters = () => {
+  currentPage.value = 1;
+  fetchProducts();
+};
+
+/* PRODUCTS & PAGINATION */
+const products = ref([]);
 const currentPage = ref(1);
 const perPage = 8;
+const totalProducts = ref(0);
 
-// Demo sản phẩm
-const products = Array.from({ length: 24 }, (_, i) => ({
-  id: i + 1,
-  title: "Nike Air Force 1 '07 LV8",
-  img: productImg2,
-  stars: "★★★★★",
-  price: "2,890,000 VNĐ"
-}));
+const fetchProducts = async () => {
+  try {
+    let url = `http://localhost/duan1/backend/api/Web/SanPham.php?limit=${perPage}&offset=${(currentPage.value - 1) * perPage}`;
+    
+    if (selectedCategory.value) {
+      url += `&id_danhmuc=${selectedCategory.value.id_danhmuc}`;
+    }
+    if (selectedBrand.value) {
+      url += `&id_thuonghieu=${selectedBrand.value.id_thuonghieu}`;
+    }
+    if (selectedSize.value) {
+      url += `&size=${selectedSize.value}`;
+    }
+    if (sortBy.value) {
+      url += `&sort=${sortBy.value}`;
+    }
+    
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if (data.success) {
+      products.value = data.data;
+      totalProducts.value = data.total;
+    }
+  } catch (error) {
+    console.error("Lỗi lấy sản phẩm:", error);
+  }
+};
 
-const totalPages = computed(() => Math.ceil(products.length / perPage));
-
-const paginatedProducts = computed(() => {
-  const start = (currentPage.value - 1) * perPage;
-  return products.slice(start, start + perPage);
-});
+const totalPages = computed(() => Math.ceil(totalProducts.value / perPage));
 
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
+    fetchProducts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
 </script>

@@ -1,0 +1,21 @@
+<?php
+require_once '../../config/database.php';
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+
+
+$database = new Database();
+$db = $database->getConnection();
+
+$query = "SELECT id_danhmuc, tenDM FROM danhmuc ORDER BY tenDM ASC";
+$stmt = $db->prepare($query);
+$stmt->execute();
+$categories = $stmt->fetchAll();
+
+echo json_encode([
+    'success' => true,
+    'data' => $categories
+], JSON_UNESCAPED_UNICODE);
+?>
