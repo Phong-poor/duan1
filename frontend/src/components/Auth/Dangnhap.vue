@@ -143,6 +143,7 @@ export default {
       try {
         const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: this.loginEmail,
