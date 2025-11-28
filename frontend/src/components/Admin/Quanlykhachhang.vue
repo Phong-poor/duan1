@@ -63,23 +63,29 @@
               <th>Tên</th>
               <th>Email</th>
               <th>SĐT</th>
-              <th>Chức năng</th>
+              <th>Giới tính</th>
+              <th>Ngày sinh</th>
+              <th>Vai trò</th>
               <th>Hành động</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="c in paginatedItems" :key="c.id">
-              <td>{{ c.id }}</td>
-              <td>{{ c.name }}</td>
+            <tr v-for="c in paginatedItems" :key="c.id_khachhang">
+              <td>{{ c.id_khachhang }}</td>
+              <td>{{ c.tenKH }}</td>
               <td>{{ c.email }}</td>
-              <td>{{ c.phone }}</td>
+              <td>{{ c.sodienthoai }}</td>
+              <td>{{ c.gioitinh || "Chưa cập nhật" }}</td>
+              <td>{{ c.ngaysinh || "Chưa cập nhật" }}</td>
               <td>
-                <span class="badge bg-primary" v-if="c.role === 'Admin'">Admin</span>
-                <span class="badge bg-secondary" v-else>User</span>
+                <span :class="c.role === 'Admin' ? 'badge bg-primary' : 'badge bg-secondary'">
+                  {{ c.role }}
+                </span>
               </td>
               <td>
-                <button class="btn btn-danger btn-sm" @click="deleteUser(c.id)">Xóa</button>
+                <button class="btn btn-warning btn-sm me-2" @click="selectUser(c)">Phân quyền</button>
+                <button class="btn btn-danger btn-sm" @click="deleteUser(c.id_khachhang)">Xóa</button>
               </td>
             </tr>
           </tbody>
@@ -93,28 +99,23 @@
         </div>
 
         <!-- Role Update Form -->
-        <div class="card p-4 mt-4">
+        <div v-if="selectedUser" class="card p-4 mt-4">
           <h4 class="fw-bold mb-3">Phân quyền tài khoản</h4>
 
           <div class="mb-3">
-            <label>Chọn khách hàng</label>
-            <select v-model="selectedUser" class="form-select">
-              <option disabled value="">-- Chọn --</option>
-              <option v-for="u in customers" :value="u.id">
-                {{ u.name }} ({{ u.email }})
-              </option>
-            </select>
+            <label>Khách hàng:</label>
+            <input class="form-control" disabled :value="selectedUser.tenKH + ' (' + selectedUser.email + ')'" />
           </div>
 
           <div class="mb-3">
             <label>Chức năng</label>
             <select v-model="selectedRole" class="form-select">
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
+              <option>user</option>
+              <option>admin</option>
             </select>
           </div>
 
-          <button class="btn btn-primary" @click="updateRole">Cập nhật</button>
+          <button class="btn btn-primary" @click="updateRole">Cập nhật quyền</button>
         </div>
       </div>
     </div>
@@ -122,28 +123,46 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import HeaderAdmin from "../../Header-admin.vue";
 import logoImage from "../../assets/logo.png";
 
 const search = ref("");
+const customers = ref([]);
 
-// Demo customer list
-const customers = ref([
-  { id: 1, name: "Nguyễn Văn A", email: "a@gmail.com", phone: "0909123456", role: "User" },
-  { id: 2, name: "Trần Văn B", email: "b@gmail.com", phone: "0988222333", role: "Admin" },
-  { id: 3, name: "Phạm Thị C", email: "c@gmail.com", phone: "0911222333", role: "User" },
-]);
+const selectedUser = ref(null);
+const selectedRole = ref("User");
 
-// Pagination
 const page = ref(1);
-const perPage = 5;
+const perPage = 6;
+
+const loadUsers = async () => {
+  try {
+    const res = await fetch(
+      "http://localhost/duan1/backend/api/Admin/GetUser.php",
+      {
+        method: "GET",
+        credentials: "include"
+      }
+    );
+    const data = await res.json();
+
+    if (data.status === "success") {
+      customers.value = data.data;
+    }
+  } catch (err) {
+    console.error("Lỗi tải khách hàng:", err);
+  }
+};
+
+onMounted(loadUsers);
 
 const filtered = computed(() =>
   customers.value.filter(
     (c) =>
-      c.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.value.toLowerCase())
+      c.tenKH.toLowerCase().includes(search.value.toLowerCase()) ||
+      c.email.toLowerCase().includes(search.value.toLowerCase()) ||
+      (c.sodienthoai + "").includes(search.value)
   )
 );
 
@@ -154,24 +173,47 @@ const paginatedItems = computed(() => {
   return filtered.value.slice(start, start + perPage);
 });
 
-// Role update form
-const selectedUser = ref("");
-const selectedRole = ref("User");
-
-const updateRole = () => {
-  if (!selectedUser.value) return alert("Vui lòng chọn khách hàng!");
-
-  const user = customers.value.find((c) => c.id === selectedUser.value);
-  if (user) {
-    user.role = selectedRole.value;
-    alert("✔ Cập nhật thành công!");
-  }
+const selectUser = (user) => {
+  selectedUser.value = user;
+  selectedRole.value = user.role;
 };
 
-const deleteUser = (id) => {
-  customers.value = customers.value.filter((c) => c.id !== id);
+const updateRole = async () => {
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/UpdateRoleUser.php", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      id: selectedUser.value.id_khachhang,
+      role: selectedRole.value,
+    }),
+  });
+
+  const data = await res.json();
+  alert(data.msg);
+  loadUsers();
+};
+
+const deleteUser = async (id) => {
+  if (!confirm("Bạn có chắc muốn xóa không?")) return;
+
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/DeleteUser.php", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ id }),
+  });
+
+  const data = await res.json();
+  alert(data.msg);
+  loadUsers();
 };
 </script>
+
 
 <style scoped>
 .logo-img {

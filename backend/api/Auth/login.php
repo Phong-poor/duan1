@@ -7,7 +7,8 @@ require_once "../../config/config.php";
 require_once "../../config/db_utils.php";
 
 $db_util = new DB_UTILS();
-
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
 // ===== CORS =====
 $allowedOrigins = ['http://localhost:5173']; // origin dev server Vue
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)) {
