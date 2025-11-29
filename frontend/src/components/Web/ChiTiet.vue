@@ -94,6 +94,10 @@
               Màu đã chọn:
               <strong>{{ selectedColor.label }}</strong>
             </p>
+            <p class="selected-color-label">
+              Số lượng:
+              <strong>{{ currentStock }}</strong>
+            </p>
           </div>
 
           <!-- NÚT HÀNH ĐỘNG -->
@@ -261,6 +265,7 @@ const route = useRoute();
 const product = ref(null);
 const loading = ref(true);
 const error = ref(null);
+const currentStock = ref(0);
 
 // Fallback data for UI elements not yet in DB
 const thumbnails = ref([]);
@@ -378,9 +383,10 @@ const fetchProductDetail = async () => {
 };
 
 onMounted(() => {
-  fetchProductDetail();
+  fetchProductDetail().then(() => {
+    updateAvailability();
+  });
 });
-
 // Watch for route changes (e.g. clicking related product)
 watch(() => route.query.id, () => {
   fetchProductDetail();
@@ -408,10 +414,8 @@ const updateAvailability = () => {
   const variant = product.value.variants.find(
     v => v.size == selectedSize.value && v.id_mausac == selectedColor.value.id
   );
-  
-  if (!variant || variant.so_luong <= 0) {
-    console.warn('Combination not available');
-  }
+
+  currentStock.value = variant ? variant.so_luong : 0;
 };
 
 /* SẢN PHẨM LIÊN QUAN */
