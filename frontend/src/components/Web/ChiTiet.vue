@@ -438,29 +438,41 @@ const triggerPopup = (message) => {
   popupTimer = setTimeout(() => { popupVisible.value = false; }, 1500);
 };
 
-const handleAddToCart = () => {
-  if (!selectedSize.value) {
-    triggerPopup("⚠ Vui lòng chọn size!");
+const handleAddToCart = async () => {
+  if (!selectedSize.value || !selectedColor.value) {
+    triggerPopup("⚠ Vui lòng chọn size và màu!");
     return;
   }
-  if (!selectedColor.value) {
-    triggerPopup("⚠ Vui lòng chọn màu!");
-    return;
-  }
-  
-  // Find the variant
-  const variant = product.value?.variants?.find(
+
+  const variant = product.value.variants.find(
     v => v.size == selectedSize.value && v.id_mausac == selectedColor.value.id
   );
-  
-  if (!variant || variant.so_luong <= 0) {
-    triggerPopup("⚠ Sản phẩm này hiện hết hàng!");
+
+  const id_bienthe = variant.id_bienthe;
+  const id_khachhang = localStorage.getItem("currentUser")
+    ? JSON.parse(localStorage.getItem("currentUser")).id_khachhang
+    : null;
+
+  if (!id_khachhang) {
+    triggerPopup("⚠ Bạn cần đăng nhập!");
     return;
   }
-  
-  triggerPopup(`✔ Đã thêm: ${product.value?.tenSP} - Size ${selectedSize.value} - ${selectedColor.value.label}`);
-  // TODO: Add to cart logic with variant.id_bienthe
+
+  await fetch(
+    "http://localhost/duan1/backend/api/Web/Cart.php?action=add",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        id_khachhang,
+        id_bienthe,
+        so_luong: 1
+      })
+    }
+  );
+
+  triggerPopup("✔ Đã thêm vào giỏ hàng!");
 };
+
 
 const handleBuyNow = () => {
   if (!selectedSize.value) {

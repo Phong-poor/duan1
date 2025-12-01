@@ -22,7 +22,7 @@
         </div>
       </section>
 
-       <h2 class="section-title">Sản phẩm</h2>
+      <h2 class="section-title">Sản phẩm</h2>
       <!-- FILTER -->
       <div class="filter-bar">
         <div>
@@ -56,23 +56,17 @@
         <aside class="left-menu">
           <h3>Danh mục sản phẩm</h3>
           <ul>
-            <li 
-              @click="chooseBrand(null)"
-              :class="{ active: selectedBrand === null }">
+            <li @click="chooseBrand(null)" :class="{ active: selectedBrand === null }">
               Tất cả
             </li>
-            <li 
-              v-for="item in brands" 
-              :key="item.id_thuonghieu"
-              @click="chooseBrand(item)"
-              :class="{ active: selectedBrand && selectedBrand.id_thuonghieu === item.id_thuonghieu }"
-            >
+            <li v-for="item in brands" :key="item.id_thuonghieu" @click="chooseBrand(item)"
+              :class="{ active: selectedBrand && selectedBrand.id_thuonghieu === item.id_thuonghieu }">
               {{ item.tenTH }}
             </li>
           </ul>
         </aside>
 
-        
+
 
         <!-- CỘT PHẢI -->
         <section class="right-content">
@@ -96,37 +90,35 @@
               </p>
 
               <div class="product-actions">
-                <button class="action-btn">Mua ngay</button>
-                <RouterLink :to="`/ChiTiet?id=${p.id_sanpham}`" class="action-btn secondary">Chi tiết</RouterLink>
+                <button class="action-btn" @click="goBuyNow(p.id_sanpham)">
+                  Mua ngay
+                </button>
+
+                <RouterLink :to="`/ChiTiet?id=${p.id_sanpham}`" class="action-btn secondary">
+                  Chi tiết
+                </RouterLink>
               </div>
+
             </div>
           </section>
 
           <!-- PHÂN TRANG -->
           <div class="pagination">
-            <button 
-              @click.prevent="changePage(currentPage - 1)" 
-              :disabled="currentPage === 1"
-            >«</button>
+            <button @click.prevent="changePage(currentPage - 1)" :disabled="currentPage === 1">«</button>
 
-            <button 
-              v-for="page in totalPages" 
-              :key="page"
-              @click.prevent="changePage(page)"
-              :class="{ active: currentPage === page }"
-            >
+            <button v-for="page in totalPages" :key="page" @click.prevent="changePage(page)"
+              :class="{ active: currentPage === page }">
               {{ page }}
             </button>
 
-            <button 
-              @click.prevent="changePage(currentPage + 1)" 
-              :disabled="currentPage === totalPages"
-            >»</button>
+            <button @click.prevent="changePage(currentPage + 1)" :disabled="currentPage === totalPages">»</button>
           </div>
 
         </section>
       </div>
     </main>
+    <Thanhtoanmini v-if="showMini" :id_sanpham="miniID" @close="showMini = false" />
+
 
     <footerWeb />
   </div>
@@ -135,6 +127,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
+import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
 const router = useRouter();
 const goTo = (path) => router.push(path);
@@ -147,6 +140,11 @@ import bannerSlide2 from "../../assets/banner-slide-2.jpg";
 import bannerSlide3 from "../../assets/banner-slide-3.jpg";
 import imgSale1 from '../../assets/images (1).jpg'; // Fallback image
 
+
+
+const showMini = ref(false);
+const miniID = ref(null);
+
 const slideContainer = ref(null);
 let slideTimer;
 
@@ -156,6 +154,9 @@ const selectedSize = ref('');
 const selectedBrand = ref('');
 const sizes = ref([]);
 const brands = ref([]);
+
+
+
 
 onMounted(() => {
   const slides = slideContainer.value.querySelectorAll(".slide");
@@ -247,7 +248,7 @@ const totalProducts = ref(0);
 const fetchProducts = async () => {
   try {
     let url = `http://localhost/duan1/backend/api/Web/SanPham.php?limit=${perPage}&offset=${(currentPage.value - 1) * perPage}`;
-    
+
     if (selectedCategory.value) {
       url += `&id_danhmuc=${selectedCategory.value.id_danhmuc}`;
     }
@@ -260,10 +261,10 @@ const fetchProducts = async () => {
     if (sortBy.value) {
       url += `&sort=${sortBy.value}`;
     }
-    
+
     const res = await fetch(url);
     const data = await res.json();
-    
+
     if (data.success) {
       products.value = data.data;
       totalProducts.value = data.total;
@@ -282,6 +283,21 @@ const changePage = (page) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
+
+
+function goBuyNow(id) {
+  const user = localStorage.getItem("currentUser");
+
+  if (!user) {
+    const returnURL = `/Thanhtoanmini?id_sanpham=${id}`;
+    router.push(`/Login?return=${encodeURIComponent(returnURL)}`);
+    return;
+  }
+
+  miniID.value = id;
+  showMini.value = true;
+}
+
 </script>
 
 <style scoped>
@@ -301,13 +317,15 @@ container {
 
 /* BANNER */
 .brand-banner {
-  width: 100vw;              /* kéo full chiều ngang màn hình */
-  margin-left: 50%;          /* căn giữa khi dùng 100vw */
+  width: 100vw;
+  /* kéo full chiều ngang màn hình */
+  margin-left: 50%;
+  /* căn giữa khi dùng 100vw */
   transform: translateX(-50%);
   height: 480px;
   overflow: hidden;
   position: relative;
-  border-radius: 0;        
+  border-radius: 0;
 }
 
 .slide-container {
@@ -352,7 +370,7 @@ container {
   padding: 15px 20px;
   border-radius: 6px;
   margin-bottom: 25px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .filter-inline {
@@ -373,7 +391,7 @@ container {
   background: white;
   padding: 18px;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   max-height: 350px;
   overflow-y: auto;
 }
@@ -426,13 +444,13 @@ container {
   border-radius: 12px;
   padding: 10px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   transition: 0.2s;
 }
 
 .product-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .product-card img {
@@ -525,29 +543,61 @@ container {
   .layout-2col {
     flex-direction: column;
   }
-  .left-menu { width: 100%; }
-  .right-content { width: 100%; }
-  .product-grid { grid-template-columns: repeat(3, 1fr); }
+
+  .left-menu {
+    width: 100%;
+  }
+
+  .right-content {
+    width: 100%;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-  .brand-banner { height: 260px; }
-  .slide h1 { font-size: 28px; }
-  .filter-bar { flex-direction: column; gap: 15px; }
-  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .brand-banner {
+    height: 260px;
+  }
+
+  .slide h1 {
+    font-size: 28px;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 540px) {
-  .brand-banner { height: 200px; }
-  .slide h1 { font-size: 22px; }
-  .product-grid { grid-template-columns: 1fr; }
+  .brand-banner {
+    height: 200px;
+  }
+
+  .slide h1 {
+    font-size: 22px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
 }
-.section-title{
+
+.section-title {
   text-align: center;
   font-size: 40px;
 }
+
 .section-title {
-    margin: 40px 0; /* Trên 40px – Dưới 40px */
-    text-align: center;
+  margin: 40px 0;
+  /* Trên 40px – Dưới 40px */
+  text-align: center;
 }
 </style>

@@ -1,98 +1,75 @@
 <template>
-  <HeaderWeb  />
+  <HeaderWeb />
+
+  <!-- LOADING POPUP -->
+  <div v-if="loadingOrder" class="overlay">
+    <div class="loader"></div>
+  </div>
+
+  <!-- RESULT POPUP -->
+  <div v-if="orderStatus !== null" class="result-popup" :class="orderStatus ? 'success' : 'fail'">
+    <div class="icon">
+      <i v-if="orderStatus" class="fas fa-check-circle"></i>
+      <i v-else class="fas fa-times-circle"></i>
+    </div>
+    <p>{{ orderStatus ? "Đặt hàng thành công!" : "Đặt hàng thất bại!" }}</p>
+  </div>
+
   <div class="bg-light">
-
-    <!-- GIỎ HÀNG -->
     <div class="container py-5">
-
       <h3 class="fw-bold mb-4">GIỎ HÀNG</h3>
 
       <div class="row g-4">
-
-        <!-- LEFT CART LIST -->
+        <!-- LEFT CART -->
         <div class="col-lg-8">
           <div class="bg-white p-3 rounded shadow-sm">
-
-            <!-- HEADER -->
             <div class="row fw-semibold border-bottom pb-2 small text-uppercase text-center">
-
-              <div class="col-2">Hình ảnh</div>
+              <div class="col-2">Hình</div>
               <div class="col-4">Sản phẩm</div>
-              <div class="col-2">Số lượng</div>
-              <div class="col-2">Thành tiền</div>
-              <div class="col-2">Đơn giá</div>
-
+              <div class="col-2">SL</div>
+              <div class="col-2">Giá</div>
+              <div class="col-2">Tổng</div>
             </div>
 
-
-            <!-- PRODUCT 1 -->
-            <div class="row align-items-center py-3 border-bottom text-center">
-
-              <!-- HÌNH ẢNH -->
-              <div class="col-2 d-flex justify-content-center">
-                <img src="https://via.placeholder.com/100" class="img-fluid rounded" />
-              </div>
-
-              <!-- SẢN PHẨM (CỘT 2) -->
-              <div class="col-4 text-start">
-                <div class="fw-semibold">Nike Air Max 97</div>
-                <div class="text-secondary small">(Màu đỏ + size 42)</div>
-              </div>
-
-              <!-- SỐ LƯỢNG -->
+            <div v-for="item in cart" :key="item.id_giohang"
+                 class="row align-items-center py-3 border-bottom text-center">
               <div class="col-2">
-                <input type="number" class="form-control text-center" value="1" />
+                <img :src="`http://localhost/duan1/backend/${item.hinhAnhgoc}`" class="img-fluid rounded"/>
               </div>
 
-              <!-- THÀNH TIỀN -->
-              <div class="col-2 fw-bold">3,700,000</div>
-
-              <!-- ĐƠN GIÁ (CỘT CUỐI) -->
-              <div class="col-2">3,700,000</div>
-
-            </div>
-
-
-            <!-- PRODUCT 2 -->
-            <div class="row align-items-center py-3 border-bottom text-center">
-
-              <div class="col-2 d-flex justify-content-center">
-                <img src="https://via.placeholder.com/100" class="img-fluid rounded" />
-              </div>
-
-              <div class="col-4 text-start">
-                <div class="fw-semibold">Adidas Ultraboost 21</div>
-                <div class="text-secondary small">(Màu xám + size 40)</div>
+              <div class="col-4 text-start product-name">
+                <div class="fw-semibold">{{ item.tenSP }}</div>
+                <div class="text-secondary small">
+                  (Màu: {{ item.mausac }} + Size {{ item.size }})
+                </div>
               </div>
 
               <div class="col-2">
-                <input type="number" class="form-control text-center" value="1" />
+                <input type="number" class="form-control text-center"
+                       v-model="item.so_luong" @change="updateQty(item)"/>
               </div>
 
-              <div class="col-2 fw-bold">3,999,000</div>
+              <div class="col-2">{{ formatPrice(getPrice(item)) }}</div>
 
-              <div class="col-2">3,999,000</div>
-
+              <div class="col-2 fw-bold">
+                {{ formatPrice(item.so_luong * getPrice(item)) }}
+              </div>
             </div>
 
-
+            <div v-if="cart.length === 0" class="text-center py-4">
+              Giỏ hàng trống!
+            </div>
           </div>
         </div>
 
         <!-- RIGHT SUMMARY -->
         <div class="col-lg-4">
           <div class="bg-white p-3 rounded shadow-sm">
-            <h5 class="fw-semibold mb-3">Tóm Tắt Đơn Hàng</h5>
-
-            <label class="small mb-1">Mã giảm giá:</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" placeholder="Nhập mã" />
-              <button class="btn btn-dark">Áp dụng</button>
-            </div>
+            <h5 class="fw-semibold mb-3">Tóm Tắt</h5>
 
             <div class="d-flex justify-content-between small py-1">
-              <span>Tạm tính sản phẩm:</span>
-              <span>7,699,000 VNĐ</span>
+              <span>Tạm tính:</span>
+              <span>{{ formatPrice(totalPrice) }} VNĐ</span>
             </div>
 
             <div class="d-flex justify-content-between small py-1">
@@ -105,83 +82,219 @@
               <span>-10,000 VNĐ</span>
             </div>
 
-            <hr />
+            <hr/>
 
-            <div class="d-flex justify-content-between fw-bold">
-              <span>Thanh toán:</span>
-              <span class="text-danger">7,720,000 VNĐ</span>
+            <div class="d-flex justify-content-between fw-bold text-danger">
+              <span>Tổng thanh toán:</span>
+              <span>{{ formatPrice(totalPrice + 30000 - 10000) }} VNĐ</span>
             </div>
-
-            <button class="btn btn-dark w-100 mt-3">Thanh toán</button>
           </div>
         </div>
-
       </div>
 
-      <!-- CHECKOUT FORM -->
+      <!-- FORM ĐẶT HÀNG -->
       <h3 class="fw-bold mt-5 mb-3">HOÀN TẤT ĐƠN HÀNG</h3>
 
       <div class="bg-white p-4 rounded shadow-sm">
-
-        <!-- SHIPPING -->
         <h5 class="fw-semibold mb-3">1. Thông Tin Giao Hàng</h5>
 
         <div class="row g-3">
           <div class="col-md-6">
-            <input type="text" class="form-control" placeholder="Họ và tên" />
+            <input v-model="form.ten" type="text" class="form-control" placeholder="Họ tên"/>
           </div>
           <div class="col-md-6">
-            <input type="text" class="form-control" placeholder="Số điện thoại" />
+            <input v-model="form.sdt" type="text" class="form-control" placeholder="Số điện thoại"/>
           </div>
-
           <div class="col-md-6">
-            <input type="email" class="form-control" placeholder="Email" />
+            <input v-model="form.email" type="email" class="form-control" placeholder="Email"/>
           </div>
-
           <div class="col-md-6">
-            <input type="text" class="form-control" placeholder="Tỉnh / Thành phố" />
+            <input v-model="form.tinh" type="text" class="form-control" placeholder="Tỉnh / TP"/>
           </div>
         </div>
 
-        <input type="text" class="form-control mt-3" placeholder="Địa chỉ cụ thể" />
-        <textarea class="form-control mt-3" rows="4" placeholder="Ghi chú (nếu có)"></textarea>
+        <input v-model="form.diachi" type="text" class="form-control mt-3" placeholder="Địa chỉ"/>
+        <textarea v-model="form.ghichu" class="form-control mt-3" rows="3" placeholder="Ghi chú"></textarea>
 
-        <!-- PAYMENT -->
-        <h5 class="fw-semibold mt-4 mb-3">2. Phương Thức Thanh Toán</h5>
+        <h5 class="fw-semibold mt-4 mb-2">2. Thanh Toán</h5>
 
         <div class="list-group">
-          <label class="list-group-item d-flex align-items-center gap-2">
-            <input class="form-check-input" type="radio" name="pay" />
-            Thanh toán khi nhận hàng (COD)
+          <label class="list-group-item">
+            <input v-model="form.pttt" value="COD" type="radio"/> COD
           </label>
-
-          <label class="list-group-item d-flex align-items-center gap-2">
-            <input class="form-check-input" type="radio" name="pay" />
-            Chuyển khoản ngân hàng
+          <label class="list-group-item">
+            <input v-model="form.pttt" value="bank" type="radio"/> Ngân hàng
           </label>
-
-          <label class="list-group-item d-flex align-items-center gap-2">
-            <input class="form-check-input" type="radio" name="pay" />
-            Ví điện tử (Momo/ZaloPay)
+          <label class="list-group-item">
+            <input v-model="form.pttt" value="momo" type="radio"/> Ví Momo
           </label>
         </div>
 
-        <button class="btn btn-dark px-4 mt-4">Đặt hàng</button>
+        <button class="btn btn-dark px-4 mt-4" @click="submitOrder">
+          Đặt hàng
+        </button>
       </div>
 
     </div>
-
   </div>
-  <footerWeb />
+
+  <footerWeb/>
 </template>
 
 <script setup>
-import HeaderWeb from '../../Header-web.vue';
-import footerWeb from '../../footer-web.vue';
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
+import HeaderWeb from "../../Header-web.vue";
+import footerWeb from "../../footer-web.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+/* POPUP STATE */
+const loadingOrder = ref(false);
+const orderStatus = ref(null);
+
+/* USER + CART */
+const API = "http://localhost/duan1/backend/api/Web/Cart.php";
+const user = JSON.parse(localStorage.getItem("currentUser") || "{}");
+const cart = ref([]);
+
+const form = ref({
+  ten: "",
+  sdt: "",
+  email: "",
+  tinh: "",
+  diachi: "",
+  ghichu: "",
+  pttt: "COD",
+});
+
+/* AUTO-FILL USER INFO WHEN OPEN PAGE */
+onMounted(() => {
+  if (user && user.id_khachhang) {
+    form.value.ten = user.tenKH || "";
+    form.value.sdt = user.sodienthoai || "";
+    form.value.email = user.email || "";
+  }
+
+  loadCart();
+});
+
+const getPrice = (item) => (item.giamgiaSP > 0 ? item.giamgiaSP : item.giaSP);
+const formatPrice = (n) => new Intl.NumberFormat("vi-VN").format(n);
+
+const loadCart = async () => {
+  if (!user.id_khachhang) return;
+  const res = await axios.get(`${API}?action=list&id_khachhang=${user.id_khachhang}`);
+  if (res.data.success) cart.value = res.data.data;
+};
+
+const updateQty = async (item) => {
+  if (item.so_luong < 1) item.so_luong = 1;
+  if (item.so_luong > item.tonkho) item.so_luong = item.tonkho;
+
+  await axios.post(`${API}?action=update`, {
+    id_giohang: item.id_giohang,
+    so_luong: item.so_luong,
+  });
+};
+
+const totalPrice = computed(() =>
+  cart.value.reduce((sum, item) => sum + item.so_luong * getPrice(item), 0)
+);
+
+/* SUBMIT ORDER */
+const submitOrder = async () => {
+  if (!user.id_khachhang) {
+    orderStatus.value = false;
+    return;
+  }
+
+  if (!form.value.ten || !form.value.sdt || !form.value.diachi) {
+    orderStatus.value = false;
+    return;
+  }
+
+  loadingOrder.value = true;
+
+  try {
+    const res = await axios.post("http://localhost/duan1/backend/api/Web/Checkout.php", {
+      id_khachhang: user.id_khachhang,
+      tenKH: form.value.ten,
+      sodienthoai: form.value.sdt,
+      diachi: form.value.diachi,
+      ghichu: form.value.ghichu,
+      pttt: form.value.pttt,
+    });
+
+    loadingOrder.value = false;
+
+    if (res.data.success) {
+      orderStatus.value = true;
+      cart.value = [];
+
+      setTimeout(() => router.push("/"), 2000);
+    } else {
+      orderStatus.value = false;
+    }
+  } catch (err) {
+    loadingOrder.value = false;
+    orderStatus.value = false;
+  }
+};
 </script>
 
 <style scoped>
-.bg-light{
-  margin-top: 50px;
+/* Overlay Loading */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+.loader {
+  width: 55px;
+  height: 55px;
+  border: 6px solid #ddd;
+  border-top: 6px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Result Popup */
+.result-popup {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 25px 35px;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 100000;
+  animation: fadeIn .3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.result-popup.success .icon i { color: #28a745; font-size: 55px; }
+.result-popup.fail .icon i { color: #dc3545; font-size: 55px; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.bg-light { margin-top: 50px; }
+
+.product-name {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
