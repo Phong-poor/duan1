@@ -17,11 +17,11 @@ import Dangnhap from '../components/Auth/Dangnhap.vue';
 import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
 // import tintuc from '../components/Web/tintuc.vue';
 import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
+import Lienhe from '../components/Web/LienHe.vue'
 
 
 const routes = [
     { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
-    { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
     { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
     { path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu, meta: { isAuth: false } },
     { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
@@ -39,6 +39,7 @@ const routes = [
     { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap, meta: { isAuth: false } },
     { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
+    { path: '/Lienhe', name: 'Lienhe', component: Lienhe, meta: { isAuth: false } },
   ]
 
 const router = createRouter({
