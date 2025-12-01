@@ -48,13 +48,16 @@ if ($email === '' || $password === '') {
 }
 
 // Lấy user trong DB
-$user = $db_util->getOne("SELECT id_khachhang, tenKH, email, password, role FROM khachhang WHERE email = ?", [$email]);
+$user = $db_util->getOne("SELECT id_khachhang, tenKH, email, sodienthoai, ngaysinh, gioitinh, password, role FROM khachhang WHERE email = ?", [$email]);
 
 if ($user && password_verify($password, $user['password'])) {
     $_SESSION['user'] = [
         "id_khachhang" => $user['id_khachhang'],
         "tenKH" => $user['tenKH'],
         "email" => $user['email'],
+        "sodienthoai" => $user['sodienthoai'],
+        "ngaysinh" => $user['ngaysinh'],
+        "gioitinh" => $user['gioitinh'],
         "role" => $user['role'] ?? 'user'
     ];
     echo json_encode([
