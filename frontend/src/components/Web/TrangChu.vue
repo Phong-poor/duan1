@@ -20,6 +20,14 @@ import imgCv2110 from '../../assets/cv-2110.jpg';
 import imgCanhan3 from '../../assets/canhan3.jpg';
 import imgCanhan1 from '../../assets/canhan1.jpg';
 
+//thanhtoanmini
+import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
+
+
+const showMini = ref(false);
+const miniID = ref(null);
+
+
 const bestSellers = ref([]);
 const popularProducts = ref([]);
 const flashSaleProducts = ref([]);
@@ -182,10 +190,26 @@ onBeforeUnmount(() => {
   if (slideInterval) clearInterval(slideInterval);
 });
 
+
+function goBuyNow(id) {
+  const user = localStorage.getItem("currentUser");
+
+  if (!user) {
+    const returnURL = `/Thanhtoanmini?id_sanpham=${id}`;
+    router.push(`/Login?return=${encodeURIComponent(returnURL)}`);
+    return;
+  }
+
+  miniID.value = id;      // lưu ID sp
+  showMini.value = true;  // mở modal
+}
+
+
+
 </script>
 
 <template>
-  <HeaderWeb/>
+  <HeaderWeb />
   <main class="container main-content">
     <!-- SLIDE BANNER LỚN -->
     <section class="hero-carousel">
@@ -222,32 +246,40 @@ onBeforeUnmount(() => {
 
         <div class="timer-container-new">
           <p>Chỉ còn lại:</p>
-              <div class="sale-timer">
+          <div class="sale-timer">
 
-                  <div class="timer-box">{{ days }}</div>
-               
-                    <span class="timer-separator">:</span>
+            <div class="timer-box">{{ days }}</div>
 
-                    <div class="timer-box">{{ hours }}</div>
-                      <span class="timer-separator">:</span>
+            <span class="timer-separator">:</span>
 
-                    <div class="timer-box">{{ minutes }}</div>
-                      <span class="timer-separator">:</span>
+            <div class="timer-box">{{ hours }}</div>
+            <span class="timer-separator">:</span>
 
-                    <div class="timer-box">{{ seconds }}</div>
-                </div>
+            <div class="timer-box">{{ minutes }}</div>
+            <span class="timer-separator">:</span>
+
+            <div class="timer-box">{{ seconds }}</div>
+          </div>
 
         </div>
 
         <div class="sale-product-grid">
           <div class="sale-product-card" v-for="product in flashSaleProducts" :key="product.id_sanpham">
-            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP" @error="$event.target.src = imgSale1" />
+            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
+              @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
-            <p class="original-price">{{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}</p>
-            <p class="sale-price">{{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSauGiam) }}</p>
+            <p class="original-price">{{ new Intl.NumberFormat('vi-VN', {
+              style: 'currency', currency: 'VND'
+            }).format(product.giaSP) }}</p>
+            <p class="sale-price">{{ new Intl.NumberFormat('vi-VN', {
+              style: 'currency', currency: 'VND'
+            }).format(product.giaSauGiam) }}</p>
 
             <div class="sale-actions">
-              <RouterLink :to="`/ChiTiet?id=${product.id_sanpham}`" class="sale-btn">Mua ngay</RouterLink>
+              <button class="action-btn" @click="goBuyNow(product.id_sanpham)">
+                Mua ngay
+              </button>
+
             </div>
           </div>
         </div>
@@ -260,7 +292,8 @@ onBeforeUnmount(() => {
       <div class="product-list-container">
         <div class="product-list" id="bestSellerList">
           <div class="product-card-slide" v-for="product in bestSellers" :key="product.id_sanpham">
-            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP" @error="$event.target.src = imgSale1" />
+            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
+              @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
             <div class="stars">★★★★★</div>
             <p v-if="product.coGiamGia">
@@ -275,7 +308,10 @@ onBeforeUnmount(() => {
               {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
             </p>
             <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
+              <button class="action-btn" @click="goBuyNow(product.id_sanpham)">
+                Mua ngay
+              </button>
+
               <RouterLink :to="`/ChiTiet?id=${product.id_sanpham}`" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
@@ -291,7 +327,8 @@ onBeforeUnmount(() => {
       <div class="product-list-container">
         <div class="product-list" id="popularKicksList">
           <div class="product-card-slide" v-for="product in popularProducts" :key="product.id_sanpham">
-            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP" @error="$event.target.src = imgSale1" />
+            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
+              @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
             <div class="stars">★★★★☆</div>
             <p v-if="product.coGiamGia">
@@ -306,7 +343,10 @@ onBeforeUnmount(() => {
               {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
             </p>
             <div class="product-actions">
-              <a href="#" class="action-btn">Mua ngay</a>
+              <button class="action-btn" @click="goBuyNow(product.id_sanpham)">
+                Mua ngay
+              </button>
+
               <RouterLink :to="`/ChiTiet?id=${product.id_sanpham}`" class="action-btn secondary">Chi tiết</RouterLink>
             </div>
           </div>
@@ -379,7 +419,7 @@ onBeforeUnmount(() => {
           </div>
           <div class="news-content">
             <h3>Top 5 cách phối đồ với giày thể thao</h3>
-            <a href="baiiviet.html"class="more">XEM CHI TIẾT ></a>
+            <a href="baiiviet.html" class="more">XEM CHI TIẾT ></a>
           </div>
         </div>
       </div>
@@ -427,7 +467,12 @@ onBeforeUnmount(() => {
       </div>
     </section>
   </main>
-  <footerWeb/>
+  <Thanhtoanmini
+  v-if="showMini"
+  :id_sanpham="miniID"
+  @close="showMini = false"
+/>
+  <footerWeb />
 </template>
 
 <style scoped>
@@ -437,9 +482,12 @@ onBeforeUnmount(() => {
   max-width: 1300px;
   margin: 0 auto;
 }
+
 .main-content {
-  padding-top: 80px; /* Tạo khoảng trống cho header fixed */
+  padding-top: 80px;
+  /* Tạo khoảng trống cho header fixed */
 }
+
 .section-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 24px;
@@ -452,14 +500,17 @@ onBeforeUnmount(() => {
 
 /* --- SLIDE BANNER LỚN --- */
 .hero-carousel {
-  width: 100vw;            /* thêm */
-  margin-left: 50%;        /* thêm */
+  width: 100vw;
+  /* thêm */
+  margin-left: 50%;
+  /* thêm */
   transform: translateX(-50%);
   overflow: hidden;
   position: relative;
   margin-bottom: 40px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-radius: 0; /* xoá bo góc banner nếu muốn giống web mẫu */
+  border-radius: 0;
+  /* xoá bo góc banner nếu muốn giống web mẫu */
 }
 
 .slide-container {
@@ -1070,7 +1121,8 @@ onBeforeUnmount(() => {
     flex-direction: column;
   }
 
-  .left, .right {
+  .left,
+  .right {
     width: 100%;
   }
 
@@ -1222,5 +1274,4 @@ onBeforeUnmount(() => {
     padding: 20px;
   }
 }
-
 </style>
