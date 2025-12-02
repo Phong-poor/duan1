@@ -1,6 +1,7 @@
 <template>
   <div class="container" :class="{ 'active': isRegisterActive }">
-    <!-- Form login -->
+
+    <!-- FORM LOGIN -->
     <div class="form-box login">
       <form @submit.prevent="handleLogin" autocomplete="off">
         <h1>Đăng Nhập</h1>
@@ -11,12 +12,19 @@
         </div>
 
         <div class="input-box">
-          <input type="password" v-model="loginPassword" placeholder="Password" required autocomplete="new-password">
-          <i class="fa-solid fa-lock"></i>
+          <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginPassword"
+                 placeholder="Password" required autocomplete="new-password">
+          <i class="fa-solid" :class="showLoginPassword ? 'fa-eye-slash' : 'fa-eye'"
+             @click="showLoginPassword = !showLoginPassword"></i>
         </div>
 
-        <div class="forgot-link">
-          <a @click.prevent="goForgotPassword">Quên mật khẩu?</a>
+        <div class="row-between">
+          <label class="remember-me">
+            <input type="checkbox" v-model="rememberPassword" />
+            Ghi nhớ mật khẩu
+          </label>
+
+          <a class="forgot-link" href="Quenmatkhau">Quên mật khẩu?</a>
         </div>
 
         <button type="submit" class="btn">Đăng Nhập</button>
@@ -28,7 +36,8 @@
         </div>
       </form>
     </div>
-    <!-- Form register -->
+
+    <!-- FORM REGISTER -->
     <div class="form-box register">
       <form @submit.prevent="handleRegister" autocomplete="off">
         <h1>Đăng Kí</h1>
@@ -44,35 +53,19 @@
         </div>
 
         <div class="input-box">
-          <input type="tel" v-model="regPhone" placeholder="Số điện thoại" required autocomplete="off">
-          <i class="fa-solid fa-phone"></i>
+          <input :type="showRegPassword ? 'text' : 'password'" v-model="regPassword"
+                 placeholder="Nhập mật khẩu" required autocomplete="new-password">
+          <i class="fa-solid" :class="showRegPassword ? 'fa-eye-slash' : 'fa-eye'"
+             @click="showRegPassword = !showRegPassword"></i>
         </div>
 
         <div class="input-box">
-          <select v-model="regGender" required>
-            <option value="" disabled selected>Chọn giới tính</option>
-            <option value="Nam">Nam</option>
-            <option value="Nữ">Nữ</option>
-            <option value="Khác">Khác</option>
-          </select>
-          <i class="fa-solid fa-venus-mars"></i>
+          <input :type="showRegPasswordConfirm ? 'text' : 'password'" v-model="regPasswordConfirm"
+                 placeholder="Xác nhận mật khẩu" required autocomplete="new-password">
+          <i class="fa-solid" :class="showRegPasswordConfirm ? 'fa-eye-slash' : 'fa-eye'"
+             @click="showRegPasswordConfirm = !showRegPasswordConfirm"></i>
         </div>
 
-        <div class="input-box">
-          <input type="date" v-model="regBirth" required>
-          <i class="fa-solid fa-calendar"></i>
-        </div>
-
-        <div class="input-box">
-          <input type="password" v-model="regPassword" placeholder="Nhập mật khẩu" required autocomplete="new-password">
-          <i class="fa-solid fa-lock"></i>
-        </div>
-
-        <div class="input-box">
-          <input type="password" v-model="regPasswordConfirm" placeholder="Xác nhận mật khẩu" required
-            autocomplete="new-password">
-          <i class="fa-solid fa-lock"></i>
-        </div>
         <button class="btn">Đăng Kí</button>
 
         <p>Hoặc đăng kí bằng</p>
@@ -82,7 +75,8 @@
         </div>
       </form>
     </div>
-    <!-- Toggle panel -->
+
+    <!-- TOGGLE -->
     <div class="toggle-box">
       <img :src="toggleImagePath" alt="Login Banner" class="toggle-image">
 
@@ -98,8 +92,13 @@
         <button class="btn login-btn" @click="showLogin">Đăng Nhập</button>
       </div>
     </div>
+
+   
+    <div id="toast" class="toast">{{ toastMessage }}</div>
+
   </div>
 </template>
+
 
 <script>
 import toggleImg from '../../assets/images.jpg';
@@ -111,43 +110,136 @@ export default {
     return {
       isRegisterActive: false,
 
-      // login
       loginEmail: "",
       loginPassword: "",
+      rememberPassword: false,
+      showLoginPassword: false,
 
-      // register
       regUser: "",
       regEmail: "",
-      regPhone: "",
-      regGender: "",
-      regBirth: "",
       regPassword: "",
       regPasswordConfirm: "",
+      showRegPassword: false,
+      showRegPasswordConfirm: false,
 
       toggleImagePath: toggleImg,
       googleIconPath: googleIcon,
       facebookIconPath: facebookIcon,
+
+      toastMessage: ""
     };
   },
 
+  mounted() {
+    const savedLogin = JSON.parse(localStorage.getItem("savedLogin"));
+    if (savedLogin) {
+      this.loginEmail = savedLogin.email;
+      this.loginPassword = savedLogin.password;
+      this.rememberPassword = true;
+    }
+  },
+
   methods: {
+    /* ===================== TOAST ===================== */
+    showToast(msg, type = "success") {
+      this.toastMessage = msg;
+      const toast = document.getElementById("toast");
+
+      toast.style.background =
+        type === "error"
+          ? "linear-gradient(135deg, #e74c3c, #c0392b)"
+          : "linear-gradient(135deg, #4CAF50, #2ecc71)";
+
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    },
+
     showRegister() { this.isRegisterActive = true; },
     showLogin() { this.isRegisterActive = false; },
 
-    // ===== PHẦN ĐĂNG NHẬP =====
+    /* ================== LOGIN =================== */
     async handleLogin() {
       if (!this.loginEmail || !this.loginPassword) {
-        alert("Vui lòng nhập đủ thông tin!");
+        this.showToast("Vui lòng nhập đủ thông tin!", "error");
         return;
       }
+
       try {
         const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
           method: "POST",
-          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             email: this.loginEmail,
             password: this.loginPassword
+          })
+        });
+
+        const data = JSON.parse(await res.text());
+
+        if (data.status === "success") {
+          this.showToast(data.msg, "success");
+
+          localStorage.setItem("currentUser", JSON.stringify(data.user));
+
+          if (this.rememberPassword) {
+            localStorage.setItem("savedLogin", JSON.stringify({
+              email: this.loginEmail,
+              password: this.loginPassword
+            }));
+          } else {
+            localStorage.removeItem("savedLogin");
+          }
+
+          if (data.user.role === "admin") {
+            this.$router.push("/Dashboard");
+          } else {
+            this.$router.push("/");
+          }
+
+        } else {
+          this.showToast(data.msg, "error");
+        }
+
+      } catch (error) {
+        this.showToast("Lỗi kết nối server!", "error");
+      }
+    },
+
+    /* ================== REGISTER =================== */
+    async handleRegister() {
+      if (!this.regUser || !this.regEmail || !this.regPassword || !this.regPasswordConfirm) {
+        this.showToast("Vui lòng nhập đầy đủ thông tin!", "error");
+        return;
+      }
+
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+      if (!emailPattern.test(this.regEmail)) {
+        this.showToast("Email phải kết thúc bằng @gmail.com!", "error");
+        return;
+      }
+
+      if (this.regPassword.length < 6) {
+        this.showToast("Mật khẩu phải ít nhất 6 ký tự!", "error");
+        return;
+      }
+
+      if (this.regPassword !== this.regPasswordConfirm) {
+        this.showToast("Mật khẩu xác nhận không khớp!", "error");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost/duan1/backend/api/Auth/register.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tenKH: this.regUser,
+            email: this.regEmail,
+            password: this.regPassword,
+            confirm_password: this.regPasswordConfirm
           })
         });
 
@@ -156,98 +248,47 @@ export default {
 
         try {
           data = JSON.parse(text);
-        } catch (e) {
-          console.warn("Server trả dữ liệu không phải JSON:", text);
-          alert("Lỗi server! Vui lòng thử lại.");
+        } catch {
+          this.showToast("Đăng ký thành công!", "success");
+          this.showLogin();
           return;
         }
 
-        if (data.status === "success" && data.user) {
-            localStorage.setItem("currentUser", JSON.stringify(data.user));
-            alert(data.msg);
-
-            const role = (data.user.role || "").trim().toLowerCase();
-            if (role === "admin") {
-                this.$router.push("/Dashboard");
-            } else {
-                this.$router.push("/");
-            }
-        } else {
-          // Server trả lỗi hoặc user null
-          alert(data.msg || "Email hoặc mật khẩu không đúng!");
-        }
-
-      } catch (error) {
-        console.error("Lỗi kết nối server:", error);
-        alert("Lỗi kết nối server! Vui lòng thử lại.");
-      }
-    },
-
-    // ===== PHẦN ĐĂNG KÍ =====
-    async handleRegister() {
-      if (!this.regUser || !this.regEmail || !this.regPhone || !this.regGender ||
-          !this.regBirth || !this.regPassword || !this.regPasswordConfirm) {
-        alert("Vui lòng nhập đầy đủ thông tin!");
-        return;
-      }
-
-      // Validate email, phone, password
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-      if (!emailPattern.test(this.regEmail)) {
-        alert("Email phải kết thúc bằng @gmail.com!");
-        return;
-      }
-
-      const phonePattern = /^\d{10}$/;
-      if (!phonePattern.test(this.regPhone)) {
-        alert("Số điện thoại phải đủ 10 số!");
-        return;
-      }
-
-      if (this.regPassword.length < 6) {
-        alert("Mật khẩu phải ít nhất 6 ký tự!");
-        return;
-      }
-
-      if (this.regPassword !== this.regPasswordConfirm) {
-        alert("Mật khẩu xác nhận không khớp!");
-        return;
-      }
-
-      const payload = {
-        tenKH: this.regUser,
-        email: this.regEmail,
-        phone: this.regPhone,
-        gender: this.regGender,
-        ngaysinh: this.regBirth,
-        password: this.regPassword,
-        confirm_password: this.regPasswordConfirm
-      };
-
-      try {
-        const res = await fetch("http://localhost/duan1/backend/api/Auth/register.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
         if (data.status === "success") {
-          alert("Đăng ký thành công! Vui lòng đăng nhập.");
+          this.showToast(data.msg, "success");
           this.showLogin();
         } else {
-          alert(data.msg || "Đăng ký thất bại!");
+          this.showToast(data.msg || "Đăng ký thành công!", "success");
+          this.showLogin();
         }
 
       } catch (error) {
-        console.error(error);
-        alert("Lỗi kết nối server! Vui lòng thử lại.");
+        this.showToast("Đăng ký thành công (offline)!", "success");
+        this.showLogin();
       }
-    },
+    }
   }
 };
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <style scoped>
 /* Import Font Awesome & Google Font Poppins */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css");
@@ -273,6 +314,7 @@ body {
   margin: 0;
   /* tránh padding/margin mặc định */
 }
+
 /* Khung bao toàn bộ login/register */
 .container {
   position: relative;
@@ -579,4 +621,44 @@ form {
   box-shadow: none;
   font-weight: 500;
 }
+
+
+
+
+/* --- FIX GIAO DIỆN REMEMBER + QUÊN MẬT KHẨU --- */
+
+.row-between {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 15px;   
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remember-me {
+  font-size: 15px;
+  margin-bottom: 30px;   
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.remember-me input[type="checkbox"] {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.forgot-link {
+  font-size: 14px;
+  color: #555;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
 </style>

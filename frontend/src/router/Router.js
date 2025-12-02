@@ -1,4 +1,4 @@
-import {createWebHistory, createRouter} from 'vue-router'
+import { createWebHistory, createRouter } from 'vue-router';
 
 import Quanlysanpham from '../components/Admin/Quanlysanpham.vue';
 import Quanlydanhmuc from '../components/Admin/Quanlydanhmuc.vue';
@@ -8,6 +8,7 @@ import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
 import Quanlymausac from '../components/Admin/Quanlymausac.vue';
 import Quanlysize from '../components/Admin/Quanlysize.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
+
 import TrangChu from '../components/Web/TrangChu.vue';
 import Sanpham from '../components/Web/Sanpham.vue';
 import ChiTiet from '../components/Web/ChiTiet.vue';
@@ -15,32 +16,38 @@ import ThongTin from '../components/Web/ThongTin.vue';
 import Gioithieu from '../components/Web/Gioithieu.vue';
 import Dangnhap from '../components/Auth/Dangnhap.vue'; 
 import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
-// import tintuc from '../components/Web/tintuc.vue';
+
+import tintuc from '../components/Web/Tintuc.vue';
 import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
-import Lienhe from '../components/Web/LienHe.vue'
+import LienHe from '../components/Web/LienHe.vue';
+import Baiviet from '../components/Web/Baiviet.vue';
 
 
 const routes = [
-    { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham, meta: { isAuth: false } },
-    { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc, meta: { isAuth: false } },
-    { path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu, meta: { isAuth: false } },
-    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
-    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
-    { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
-    { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
-    { path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
-    { path: '/Thanhtoangiohang', name: 'Thanhtoangiohang', component: Thanhtoangiohang, meta: { isAuth: false } },
-    { path: '/Sanpham', name: 'Sanpham', component: Sanpham, meta: { isAuth: false } },
-    { path: '/ChiTiet', name: 'ChiTiet', component: ChiTiet, meta: { isAuth: false } },
-    { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
-    { path: '/', name: 'TrangChu', component: TrangChu, meta: { isAuth: false } },
-    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
-    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
-    { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap, meta: { isAuth: false } },
-    { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
-    { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
-    { path: '/Lienhe', name: 'Lienhe', component: Lienhe, meta: { isAuth: false } },
-  ]
+    { path: '/Quanlysanpham', name: 'Quanlysanpham', component: Quanlysanpham },
+    { path: '/ThongTin', name: 'ThongTin', component: ThongTin },
+    { path: '/Quanlydanhmuc', name: 'Quanlydanhmuc', component: Quanlydanhmuc },
+    { path: '/Quanlythuonghieu', name: 'Quanlythuonghieu', component: Quanlythuonghieu },
+    { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac },
+    { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize },
+    { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang },
+    { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang },
+    { path: '/Dashboard', name: 'Dashboard', component: Dashboard },
+
+    { path: '/', name: 'TrangChu', component: TrangChu },
+    { path: '/Sanpham', name: 'Sanpham', component: Sanpham },
+    { path: '/ChiTietDonHang', name: 'ChiTietDonHang', component: ChiTietDonHang },
+    { path: '/ChiTiet', name: 'ChiTiet', component: ChiTiet },
+    { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu },
+    { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap },
+    { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau },
+    { path: '/tintuc', name: 'tintuc', component: tintuc },
+    { path: '/Thanhtoangiohang', name: 'Thanhtoangiohang', component: Thanhtoangiohang },
+    { path: '/LienHe', name: 'LienHe', component: LienHe },
+    { path: '/Baiviet', name: 'Baiviet', component: Baiviet },
+
+];
+
 
 const router = createRouter({
     history: createWebHistory(),
@@ -65,5 +72,7 @@ router.beforeEach((to, from, next) => {
   // nếu mọi thứ ok thì cho đi tiếp
   next();
 });
+
+
 
 export default router

@@ -28,6 +28,8 @@ const logout = () => {
   currentUser.value = null;
   window.location.href = "/Dangnhap";
 };
+
+
 </script>
 
 <template>
@@ -38,16 +40,26 @@ const logout = () => {
       </div>
 
       <nav class="nav-links">
-        <router-link to="/" class="menu-item" active-class="active">Trang chủ</router-link>
-        <router-link to="/Sanpham" class="menu-item">Sản phẩm</router-link>
-        <router-link to="/tintuc" class="menu-item">Tin tức</router-link>
-        <router-link to="/Gioithieu" class="menu-item">Giới thiệu</router-link>
-        <router-link to="/Sanpham" class="menu-item">Liên hệ</router-link>
+        <router-link to="/" class="menu-item" active-class="active">
+                 Trang chủ
+            </router-link>
+        <router-link to="/Sanpham" class="menu-item" active-class="active">
+                 Sản phẩm
+            </router-link>
+        <router-link to="/tintuc" class="menu-item" active-class="active">
+                 Tin tức
+            </router-link>
+        <router-link to="/Gioithieu" class="menu-item" active-class="active">
+                 Giới thiệu
+            </router-link>
+        <router-link to="/Lienhe" class="menu-item" active-class="active">
+                 Liên hệ
+            </router-link>
       </nav>
 
       <div class="actions">
         <div class="search-box">
-          <input type="text" placeholder="Tìm kiếm..." />
+          <input v-model="keyword" @keyup.enter="goSearch" type="text"placeholder="Tìm sản phẩm..."class="form-control"/>
           <button><i class="fas fa-search"></i></button>
         </div>
 

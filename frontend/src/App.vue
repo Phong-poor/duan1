@@ -1,9 +1,14 @@
 <script setup>
+import ChatBotDemo from "./components/Web/ChatBotDemo.vue";
 
 </script>
+
 <template>
-  <RouterView></RouterView>
+  <RouterView />
+<ChatBotDemo />
+
 </template>
+
 <style scoped>
 .footer {
   position: fixed;

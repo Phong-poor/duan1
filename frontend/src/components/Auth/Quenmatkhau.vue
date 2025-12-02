@@ -28,7 +28,6 @@
             <div class="back-login" @click="step = 1">
                 Gửi lại mã
             </div>
-            <router-link to="/Dangnhap" class="back-login">← Quay lại đăng nhập</router-link>
         </div>
 
         <!-- BƯỚC 3: ĐẶT MẬT KHẨU MỚI -->
