@@ -9,7 +9,7 @@ require_once __DIR__ . '/../config/config.php';
 
 class MailService
 {
-    public static function send($to, $from, $subject, $content)
+    public static function send($to, $subject, $content)
     {
         try {
             $mail = new PHPMailer(true);
@@ -24,7 +24,7 @@ class MailService
             $mail->CharSet = 'UTF-8';
 
             // NGƯỜI GỬI PHẢI LÀ EMAIL TẠO APP PASSWORD
-            $mail->setFrom($from, 'Laptopgiasi.com');
+            $mail->setFrom(USERNAME_EMAIL, 'MIRAE.com');
 
             // NGƯỜI NHẬN
             $mail->addAddress($to);
