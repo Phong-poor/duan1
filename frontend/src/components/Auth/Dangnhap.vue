@@ -7,24 +7,12 @@
         <h1>Đăng Nhập</h1>
 
         <div class="input-box">
-          <input 
-              type="email" 
-              placeholder="Nhập email" 
-              v-model="loginEmail"
-              @focus="showEmailList = true"
-              @input="filterEmails"
-              @blur="hideEmailList"
-          >
-          <ul 
-              v-if="showEmailList" 
-              class="email-dropdown"
-          >
-              <li 
-                  v-for="acc in filteredEmails" 
-                  @mousedown.prevent="selectEmail(acc)"
-              >
-                  {{ acc.email }}
-              </li>
+          <input type="email" placeholder="Nhập email" v-model="loginEmail" @focus="showEmailList = true"
+            @input="filterEmails" @blur="hideEmailList">
+          <ul v-if="showEmailList" class="email-dropdown">
+            <li v-for="acc in filteredEmails" @mousedown.prevent="selectEmail(acc)">
+              {{ acc.email }}
+            </li>
           </ul>
           <i class="fa-solid fa-user"></i>
         </div>
@@ -223,19 +211,18 @@ const handleLogin = async () => {
       localStorage.setItem("currentUser", JSON.stringify(data.user || {}));
 
       if (rememberPassword.value) {
-        let savedList = JSON.parse(localStorage.getItem("savedAccounts")) || [];
+          let savedList = JSON.parse(localStorage.getItem("savedAccounts")) || [];
 
-        savedList.push({
-          email: loginEmail.value,
-          password: loginPassword.value
-        });
+          // Xóa email cũ để tránh bị trùng
+          savedList = savedList.filter(acc => acc.email !== loginEmail.value);
 
-        // loại email trùng
-        savedList = savedList.filter(
-          (v, i, arr) => arr.findIndex(t => t.email === v.email) === i
-        );
+          // Lưu mật khẩu mới
+          savedList.push({
+            email: loginEmail.value,
+            password: loginPassword.value
+          });
 
-        localStorage.setItem("savedAccounts", JSON.stringify(savedList));
+          localStorage.setItem("savedAccounts", JSON.stringify(savedList));
       }
 
       setTimeout(() => {
@@ -256,24 +243,24 @@ const emailList = ref([]);
 const filteredEmails = ref([]);
 
 onMounted(() => {
-    emailList.value = JSON.parse(localStorage.getItem("savedAccounts")) || [];
-    filteredEmails.value = emailList.value;
+  emailList.value = JSON.parse(localStorage.getItem("savedAccounts")) || [];
+  filteredEmails.value = emailList.value;
 });
 
 const filterEmails = () => {
-    filteredEmails.value = emailList.value.filter(acc =>
-        acc.email.toLowerCase().includes(loginEmail.value.toLowerCase())
-    );
+  filteredEmails.value = emailList.value.filter(acc =>
+    acc.email.toLowerCase().includes(loginEmail.value.toLowerCase())
+  );
 };
 
 const selectEmail = (acc) => {
-    loginEmail.value = acc.email;
-    loginPassword.value = acc.password;
-    showEmailList.value = false;
+  loginEmail.value = acc.email;
+  loginPassword.value = acc.password;
+  showEmailList.value = false;
 };
 
 const hideEmailList = () => {
-    setTimeout(() => showEmailList.value = false, 200);
+  setTimeout(() => showEmailList.value = false, 200);
 };
 
 // ===== GOOGLE LOGIN =====
@@ -390,6 +377,7 @@ body {
   margin: 0;
   /* tránh padding/margin mặc định */
 }
+
 /* Khung bao toàn bộ login/register */
 .container {
   position: relative;
@@ -824,12 +812,14 @@ form {
     opacity: 1;
   }
 }
+
 :deep(i[class^="fa-"]),
 :deep(i[class*=" fa-"]) {
   font-family: "Font Awesome 6 Free" !important;
   font-weight: 900 !important;
   display: inline-block;
 }
+
 .email-dropdown {
   position: absolute;
   top: 46px;
@@ -851,5 +841,4 @@ form {
 .email-dropdown li:hover {
   background: #f0f0f0;
 }
-
 </style>
