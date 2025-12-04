@@ -35,12 +35,6 @@
         </div>
 
         <div class="filter-inline">
-          <label>Kích cỡ:</label>
-          <select v-model="selectedSize" @change="applyFilters">
-            <option value="">Tất cả</option>
-            <option v-for="size in sizes" :key="size.id_size" :value="size.size">{{ size.size }}</option>
-          </select>
-
           <label>Loại:</label>
           <select v-model="selectedCategory" @change="applyFilters">
             <option :value="null">Tất cả</option>
