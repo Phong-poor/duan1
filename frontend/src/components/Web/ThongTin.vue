@@ -13,8 +13,12 @@
           </div>
 
           <div class="profile-menu">
-            <a class="active">Thông tin chung</a>
-            <a>Quản lý đơn hàng</a>
+            <a :class="{active: activeTab === 'info'}" @click="activeTab = 'info'">
+              Thông tin chung
+            </a>
+            <a :class="{active: activeTab === 'orders'}" @click="activeTab = 'orders'">
+              Quản lý đơn hàng
+            </a>
             
       
           </div>
@@ -88,100 +92,153 @@
         </section>
 
         <!-- =================== SECTION: ĐƠN HÀNG GẦN ĐÂY =================== -->
-<section class="order-section">
+        <section class="order-section" v-if="activeTab === 'orders'">
+          <h2 class="section-title-profile">Lịch Sử Đơn Hàng</h2>
+          <div class="card">
+            <table class="order-table">
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Ngày đặt</th>
+                  <th>Tổng tiền</th>
+                  <th>Trạng thái</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="o in paginatedOrders" :key="o.id_donhang">
+                  <td>#{{ o.maDatHang }}</td>
+                  <td>{{ formatDate(o.thoigiantao) }}</td>
+                  <td>{{ formatMoney(o.tongtien) }} VNĐ</td>
+                  <td>
+                    <span :class="statusClass(o.trangthai)">
+                      {{ o.trangthai }}
+                    </span>
+                  </td>
+                  <td class="action-cell">
+                    <!-- Nút Xem -->
+                    <button class="btn btn-primary" @click="openOrderPopup(o.id_donhang)">
+                      Xem
+                    </button>
+                    <!-- Nút Huỷ đơn -->
+                    <button
+                      v-if="['Chờ xác nhận', 'Đã xác nhận', 'Đang giao hàng'].includes(o.trangthai)"
+                      class="btn btn-danger"
+                      @click="cancelOrder(o.id_donhang)"
+                    >
+                      Huỷ đơn
+                    </button>
+                    <!-- Nút Trả hàng -->
+                    <button
+                      v-if="o.trangthai === 'Thành công'"
+                      class="btn btn-danger"
+                      @click="returnOrder(o.id_donhang)"
+                    >
+                      Trả hàng
+                    </button>
+                    <button
+                      v-if="['Hủy đơn', 'Trả hàng'].includes(o.trangthai)"
+                      class="btn btn-success"
+                      @click="rebuy(o.id_donhang)"
+                    >
+                      Mua lại
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <button 
+                :disabled="currentPage === 1" 
+                @click="changePage(currentPage - 1)"
+              >
+                ‹ Trước
+              </button>
 
-  <h2 class="section-title-profile">Đơn Hàng Gần Đây</h2>
+              <button 
+                v-for="p in totalPages" 
+                :key="p"
+                :class="{ active: currentPage === p }"
+                @click="changePage(p)"
+              >
+                {{ p }}
+              </button>
 
-  <div class="card">
-    <table class="order-table">
-      <thead>
-        <tr>
-          <th>Mã Đơn</th>
-          <th>Ngày Đặt</th>
-          <th>Tổng Tiền</th>
-          <th>Trạng Thái</th>
-          <th class="action-cell">Hành Động</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr>
-          <td>#KH10245</td>
-          <td>01/11/2025</td>
-          <td>4,800,000 VNĐ</td>
-          <td><span class="status-shipping">Đang xử lý</span></td>
-          <td class="action-cell">
-            <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
-            <button class="action-btn-custom cancel-btn">Hủy Đơn</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>#KH10240</td>
-          <td>15/10/2025</td>
-          <td>3,500,000 VNĐ</td>
-          <td><span class="status-paid">Thành công</span></td>
-          <td class="action-cell">
-            <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
-            <button class="action-btn-custom cancel-btn">Trả hàng</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>#KH10221</td>
-          <td>28/09/2025</td>
-          <td>7,200,000 VNĐ</td>
-          <td><span class="status-paid">Thành công</span></td>
-          <td class="action-cell">
-            <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
-            <button class="action-btn-custom cancel-btn">Trả hàng</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td>#KH10200</td>
-          <td>10/09/2025</td>
-          <td>2,990,000 VNĐ</td>
-          <td class="status-cancelled">Đã hủy</td>
-          <td class="action-cell">
-            <router-link to="/ChiTietDonHang" class="action-link">Xem</router-link>
-            <button class="action-btn-custom reorder-btn">Mua lại</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <button class="edit-btn primary" style="width:100%; margin-top:15px;">
-      Xem tất cả đơn hàng
-    </button>
-  </div>
-
-</section>
-
-
+              <button 
+                :disabled="currentPage === totalPages" 
+                @click="changePage(currentPage + 1)"
+              >
+                Sau ›
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
+  </div>
+  <!-- ========== POPUP CHI TIẾT ĐƠN ========== -->
+  <div v-if="showOrderPopup" class="order-popup-overlay">
+    <div class="order-popup">
+
+      <h3>Chi tiết đơn hàng #{{ orderDetail?.order?.id_donhang }}</h3>
+
+      <table class="popup-table">
+        <thead>
+          <tr>
+            <th>Mã SP</th>
+            <th>Hình ảnh</th>
+            <th>Tên SP</th>
+            <th>Giá</th>
+            <th>Số lượng mua</th>
+            <th>Thành tiền</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="it in orderDetail.items" :key="it.id_sanpham">
+            <td>{{ it.id_sanpham }}</td>
+            <td>
+              <img :src="it.hinhAnhgoc" class="popup-img" />
+            </td>
+            <td>{{ it.tenSP }}</td>
+            <td>{{ formatMoney(it.giaSP) }} VNĐ</td>
+            <td>{{ it.soLuongMua }}</td>
+            <td>{{ formatMoney(it.thanhtien) }} VNĐ</td>
+            <td>
+              <button 
+                v-if="orderDetail.order.trangthai === 'Thành công'" 
+                class="btn btn-success">
+                Đánh giá
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="popup-actions">
+        <button class="btn btn-secondary" @click="closeOrderPopup">Đóng</button>
+      </div>
+    </div>
   </div>
 
   <footerWeb/>
   <!-- CUSTOM POPUP -->
-<div v-if="showPopup" class="custom-popup">
-  <div class="popup-box">
-    <p>{{ popupMessage }}</p>
-    <button @click="showPopup = false">OK</button>
+  <div v-if="showPopup" class="custom-popup">
+    <div class="popup-box">
+      <p>{{ popupMessage }}</p>
+      <button @click="showPopup = false">OK</button>
+    </div>
   </div>
-</div>
-
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, onMounted, computed } from "vue";
 import HeaderWeb from "../../Header-web.vue";
 import footerWeb from "../../footer-web.vue";
 
 // 🔥 ĐƯỜNG DẪN ĐÚNG
 const API_URL = "http://localhost/duan1/backend/api/Web/user.php";
-
+const activeTab = ref("info");
+const API_ORDER_ACTION = "http://localhost/duan1/backend/api/Web/OrderAction.php";
 /* USER DATA */
 const user = reactive({
   id_khachhang: "",
@@ -296,7 +353,131 @@ const showCenterPopup = (msg) => {
   popupMessage.value = msg;
   showPopup.value = true;
 };
+// PHÂN TRANG
+const currentPage = ref(1);
+const itemsPerPage = 5;
 
+const paginatedOrders = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return orders.value.slice(start, start + itemsPerPage);
+});
+
+const totalPages = computed(() => {
+  return Math.ceil(orders.value.length / itemsPerPage);
+});
+
+const changePage = (p) => {
+  if (p >= 1 && p <= totalPages.value) {
+    currentPage.value = p;
+  }
+};
+// ======= API LẤY LỊCH SỬ ĐƠN HÀNG =======
+const orders = ref([]);
+const API_ORDER = "http://localhost/duan1/backend/api/Web/Lichsudonhang.php";
+
+const loadOrders = async () => {
+  if (!user.id_khachhang) return;
+
+  const res = await fetch(`${API_ORDER}?user_id=${user.id_khachhang}`);
+  const data = await res.json();
+
+  if (data.status) {
+    orders.value = data.data;
+  }
+};
+
+onMounted(() => {
+  loadOrders();
+});
+
+// ======= FORMAT TIỀN =======
+const formatMoney = (n) => Number(n).toLocaleString("vi-VN");
+
+// ======= MÀU TRẠNG THÁI =======
+const statusClass = (st) => {
+  st = st.toLowerCase();
+
+  if (st.includes("hủy") || st.includes("trả")) return "status-danger"; // 🔥 đỏ
+  if (st.includes("chờ")) return "status-warning";                     // cam
+  if (st.includes("đang")) return "status-success";                    // xanh lá
+  if (st.includes("thành công")) return "status-success";              // xanh lá
+
+  return "status-default";
+};
+/* ================== HỦY ĐƠN ================== */
+const cancelOrder = async (id) => {
+  try {
+    const res = await fetch(`${API_ORDER_ACTION}?id=${id}&action=cancel`);
+    const data = await res.json();
+
+    if (data.status) {
+      showCenterPopup("Huỷ đơn hàng thành công!");
+      loadOrders();
+    } else {
+      showCenterPopup(data.msg || "Không thể huỷ đơn hàng");
+    }
+  } catch (err) {
+    showCenterPopup("Lỗi kết nối API huỷ đơn");
+  }
+};
+
+
+/* ================== TRẢ HÀNG ================== */
+const returnOrder = async (id) => {
+  try {
+    const res = await fetch(`${API_ORDER_ACTION}?id=${id}&action=return`);
+    const data = await res.json();
+
+    if (data.status) {
+      showCenterPopup("Trả hàng thành công!");
+      loadOrders();
+    } else {
+      showCenterPopup(data.msg || "Không thể trả hàng");
+    }
+  } catch (err) {
+    showCenterPopup("Lỗi kết nối API trả hàng");
+  }
+};
+
+
+/* ================== MUA LẠI ================== */
+const rebuy = async (id) => {
+  try {
+    const res = await fetch(`${API_ORDER_ACTION}?id=${id}&action=rebuy`);
+    const data = await res.json();
+
+    if (data.status) {
+      showCenterPopup(`Tạo đơn mới thành công! Mã: ${data.new_code}`);
+      loadOrders();
+    } else {
+      showCenterPopup(data.msg || "Không thể mua lại đơn hàng");
+    }
+  } catch (err) {
+    showCenterPopup("Lỗi kết nối API mua lại");
+  }
+};
+const showOrderPopup = ref(false);
+const orderDetail = reactive({
+  order: null,
+  items: []
+});
+/* ================== XEM CHI TIET DON HANG ================== */
+const openOrderPopup = async (id) => {
+  const res = await fetch(`http://localhost/duan1/backend/api/Web/Chitietdonhang.php?id=${id}`);
+  const data = await res.json();
+
+  if (data.status) {
+    orderDetail.order = data.order;
+    orderDetail.items = data.items;
+    showOrderPopup.value = true;
+  } else {
+    showCenterPopup("Không tải được chi tiết đơn hàng!");
+  }
+};
+
+const closeOrderPopup = () => {
+  showOrderPopup.value = false;
+};
 </script>
 
 <style scoped>
@@ -438,7 +619,6 @@ const showCenterPopup = (msg) => {
   font-size: 14px;
   border: none;
   color: white;
-  margin-top: 15px;
   transition: background-color 0.2s;
 }
 
@@ -488,48 +668,26 @@ const showCenterPopup = (msg) => {
   white-space: nowrap;
   text-align: right;
 }
-
-.action-link {
-  color: #007bff;
-  margin-right: 5px;
-  text-decoration: none;
-}
-
-.action-link:hover {
-  text-decoration: underline;
-}
-
-.action-btn-custom {
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: 13px;
-  margin-left: 5px;
-}
-
-.cancel-btn {
-  background-color: #dc3545;
-}
-
-.reorder-btn {
-  background-color: #007bff;
-}
-
 /* ======= STATUS ======= */
-.status-shipping {
-  color: orange;
-  font-weight: 500;
+.status-danger {
+  color: #d9534f; /* đỏ */
+  font-weight: 600;
 }
 
-.status-paid {
-  color: green;
-  font-weight: 500;
+.status-warning {
+  color: #f0ad4e; /* cam */
+  font-weight: 600;
 }
 
-.status-cancelled {
-  color: #777;
-  font-weight: 500;
+.status-success {
+  color: #5cb85c; /* xanh lá */
+  font-weight: 600;
 }
 
+.status-default {
+  color: #555;
+  font-weight: 500;
+}
 /* =================== ORDER SECTION ↓ DƯỚI THÔNG TIN CÁ NHÂN =================== */
 .order-section {
   width: 100%;
@@ -603,5 +761,129 @@ const showCenterPopup = (msg) => {
     padding: 100px 15px 40px;
   }
 }
-</style>
+/* =================== ACTION BUTTONS NEW STYLE =================== */
+.action-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
+/* Nút chung */
+.action-btn-modern {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+.pagination {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.pagination button:hover {
+  background: #007bff;
+  color: white;
+}
+
+.pagination button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.pagination button:disabled {
+  background: #eee;
+  color: #888;
+  cursor: not-allowed;
+}
+/* POPUP OVERLAY */
+.order-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+}
+
+/* POPUP BOX */
+.order-popup {
+  width: 900px;
+  max-height: 80vh;
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  overflow-y: auto;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+}
+
+.order-popup h3 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* TABLE */
+.popup-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.popup-table th,
+.popup-table td {
+  border-bottom: 1px solid #eee;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.popup-table th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+/* IMG */
+.popup-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Bottom buttons */
+.popup-actions {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.btn-secondary {
+  background: #666;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #444;
+}
+
+</style>
