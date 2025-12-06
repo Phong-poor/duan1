@@ -9,7 +9,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 $database = new Database();
 $db = $database->getConnection();
 
-$query = "SELECT id_thuonghieu, tenTH FROM thuonghieu ORDER BY tenTH ASC";
+$query = "SELECT id_thuonghieu, tenTH FROM thuonghieu";
 $stmt = $db->prepare($query);
 $stmt->execute();
 $brands = $stmt->fetchAll();
