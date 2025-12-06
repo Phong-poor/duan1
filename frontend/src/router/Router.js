@@ -40,6 +40,8 @@ const routes = [
     { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
     { path: '/Lienhe', name: 'Lienhe', component: Lienhe, meta: { isAuth: false } },
+    { path: '/chatbot',name: 'Chatbot',component: () => import('../components/Web/Chatbot.vue')},
+
   ]
 
 const router = createRouter({
