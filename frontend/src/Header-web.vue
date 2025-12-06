@@ -1,6 +1,65 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 import logoImage from './assets/logone.png';
+
+
+const router = useRouter();
+
+// Search
+const tuKhoaTimKiem = ref("");
+const ketQuaTimKiem = ref([]);
+const hienThiKetQua = ref(false);
+const currentUser = ref(null); 
+let thoiGianChoTimKiem = null;
+
+const xuLyTimKiem = () => {
+  clearTimeout(thoiGianChoTimKiem);
+  if (!tuKhoaTimKiem.value.trim()) {
+    ketQuaTimKiem.value = [];
+    hienThiKetQua.value = false;
+    return;
+  }
+  
+  thoiGianChoTimKiem = setTimeout(async () => {
+    try {
+      const response = await axios.get(`http://localhost/duan1/backend/api/Web/SanPham.php?search=${tuKhoaTimKiem.value}`);
+      if (response.data.success) {
+        ketQuaTimKiem.value = response.data.data;
+        hienThiKetQua.value = true;
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+    }
+  }, 300);
+};
+
+const denTrangChiTiet = (product) => {
+  hienThiKetQua.value = false;
+  tuKhoaTimKiem.value = "";
+  router.push({ name: 'ChiTiet', query: { id: product.id_sanpham } });
+};
+
+// đóng dropdown
+const xuLyClickBenNgoai = (event) => {
+  const searchBox = document.querySelector('.search-box-container');
+  if (searchBox && !searchBox.contains(event.target)) {
+    hienThiKetQua.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', xuLyClickBenNgoai);
+  const user = localStorage.getItem("currentUser");
+  if (user) {
+    currentUser.value = JSON.parse(user);
+  }
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', xuLyClickBenNgoai);
+});
 
 // Dropdown
 const dropdownOpen = ref(false);
@@ -8,16 +67,9 @@ const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
 
-// User state (không dùng auth.js nữa)
-const currentUser = ref(null);
 
-// Load user từ localStorage khi mở trang
-onMounted(() => {
-  const user = localStorage.getItem("currentUser");
-  if (user) {
-    currentUser.value = JSON.parse(user);
-  }
-});
+
+// User state definition moved up
 
 // Kiểm tra admin
 const isAdmin = computed(() => currentUser.value?.role === "admin");
@@ -46,9 +98,32 @@ const logout = () => {
       </nav>
 
       <div class="actions">
-        <div class="search-box">
-          <input type="text" placeholder="Tìm kiếm..." />
-          <button><i class="fas fa-search"></i></button>
+        <div class="search-box-container" style="position: relative;">
+          <div class="search-box">
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm..." 
+              v-model="tuKhoaTimKiem"
+              @input="xuLyTimKiem"
+              @focus="hienThiKetQua = true"
+            />
+            <button><i class="fas fa-search"></i></button>
+          </div>
+          
+          <div v-if="hienThiKetQua && ketQuaTimKiem.length > 0" class="search-dropdown">
+            <div 
+              v-for="product in ketQuaTimKiem" 
+              :key="product.id_sanpham" 
+              class="search-item"
+              @click="denTrangChiTiet(product)"
+            >
+              <img :src="'http://localhost/duan1/backend/' + product.hinhAnhgoc" alt="" class="item-img" />
+              <div class="item-info">
+                <div class="item-name">{{ product.tenSP }}</div>
+                <div class="item-price">{{ Number(product.giaSauGiam || product.giaSP).toLocaleString() }}đ</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="icons">
@@ -276,5 +351,82 @@ const logout = () => {
 
 .user-dropdown .item:hover {
   background: #f2f2f2;
+}
+
+/* SEARCH DROPDOWN */
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 8px 0;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  gap: 12px;
+}
+
+.search-item:hover {
+  background-color: #f8f9fa;
+}
+
+.item-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-price {
+  font-size: 13px;
+  color: #e53935;
+  font-weight: 600;
+}
+
+/* Custom scrollbar for dropdown */
+.search-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #b3b3b3;
 }
 </style>
