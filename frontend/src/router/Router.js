@@ -15,7 +15,7 @@ import ThongTin from '../components/Web/ThongTin.vue';
 import Gioithieu from '../components/Web/Gioithieu.vue';
 import Dangnhap from '../components/Auth/Dangnhap.vue'; 
 import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
-// import tintuc from '../components/Web/tintuc.vue';
+import tintuc from '../components/Web/tintuc.vue';
 import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
 import Lienhe from '../components/Web/LienHe.vue'
 
@@ -40,6 +40,7 @@ const routes = [
     { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
     { path: '/Lienhe', name: 'Lienhe', component: Lienhe, meta: { isAuth: false } },
+    { path: '/tintuc', name: 'tintuc', component: tintuc, meta: { isAuth: false } },
     { path: '/chatbot',name: 'Chatbot',component: () => import('../components/Web/Chatbot.vue')},
 
   ]
