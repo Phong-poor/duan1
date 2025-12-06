@@ -42,21 +42,43 @@ function searchProducts($db, $text)
 {
     $text = strtolower($text);
 
-    // ===== LẤY TẤT CẢ MÀU TỪ DB =====
+    // ======================
+    //  PRICE EXTRACTION FIX
+    // ======================
+    $minPrice = null;
+    $maxPrice = null;
+
+    // Chuẩn hóa text
+    $clean = str_replace(['.', ',', 'vnđ', 'đ', '₫'], '', strtolower($text));
+
+    /* 1. 700k - 900k hoặc 700 - 900k */
+    if (preg_match('/(\d+)\s*(k)?\s*[-–]\s*(\d+)\s*(k)?/', $clean, $m)) {
+        $minPrice = intval($m[1]) * (isset($m[2]) ? 1000 : 1);
+        $maxPrice = intval($m[3]) * (isset($m[4]) ? 1000 : 1);
+    }
+
+    /* 2. dưới 900k / dưới 900 */
+    elseif (preg_match('/(dưới|nhỏ hơn|below|less than)\s*(\d+)\s*(k)?/', $clean, $m)) {
+        $maxPrice = intval($m[2]) * (isset($m[3]) ? 1000 : 1);
+    }
+
+    /* 3. trên 900k / trên 900 */
+    elseif (preg_match('/(trên|lớn hơn|above|more than)\s*(\d+)\s*(k)?/', $clean, $m)) {
+        $minPrice = intval($m[2]) * (isset($m[3]) ? 1000 : 1);
+    }
+
+    /* 4. từ 500k đến 900k */
+    elseif (preg_match('/từ\s*(\d+)\s*(k)?\s*(đến|tới|-)\s*(\d+)\s*(k)?/', $clean, $m)) {
+        $minPrice = intval($m[1]) * (isset($m[2]) ? 1000 : 1);
+        $maxPrice = intval($m[4]) * (isset($m[5]) ? 1000 : 1);
+    }
+
+
+    // ===== COLORS =====
     $colors = [];
     $r1 = $db->query("SELECT LOWER(mausac) AS mausac FROM bienthemausac");
-    while ($row = $r1->fetch_assoc()) {
-        $colors[] = $row['mausac'];
-    }
+    while ($row = $r1->fetch_assoc()) $colors[] = $row['mausac'];
 
-    // ===== LẤY TẤT CẢ SIZE TỪ DB =====
-    $sizes = [];
-    $r2 = $db->query("SELECT LOWER(size) AS size FROM bienthesize");
-    while ($row = $r2->fetch_assoc()) {
-        $sizes[] = $row['size'];
-    }
-
-    // ===== TÁCH MÀU =====
     $detectedColor = null;
     foreach ($colors as $c) {
         if (str_contains($text, $c)) {
@@ -65,7 +87,11 @@ function searchProducts($db, $text)
         }
     }
 
-    // ===== TÁCH SIZE =====
+    // ===== SIZES =====
+    $sizes = [];
+    $r2 = $db->query("SELECT LOWER(size) AS size FROM bienthesize");
+    while ($row = $r2->fetch_assoc()) $sizes[] = $row['size'];
+
     $detectedSize = null;
     foreach ($sizes as $s) {
         if (str_contains($text, $s)) {
@@ -74,12 +100,20 @@ function searchProducts($db, $text)
         }
     }
 
-    // ===== LỌC TỪ KHÓA TÌM TÊN SẢN PHẨM / BRAND =====
-    $stopWords = ['tôi','toi','muốn','muon','những','nhung','sản','san','phẩm','pham','của','cua','cho','tìm','tim','mua','cần','can','và','va','màu','mau','size', 'giày', 'giay'];
+    // ===== KEYWORDS =====
+    $stopWords = [
+        'tôi','toi','muốn','những','sản','phẩm','của','cho','tìm','mua',
+        'cần','và','màu','size','giày','khoảng','tầm','từ','-', 'có', 'co',
+        'giá', 'gia', 'dưới','trên'
+    ];
 
-    $words = explode(" ", $text);
+    $words = preg_split('/\s+/', $text);
 
     $keywords = array_filter($words, function($w) use ($stopWords, $colors, $sizes) {
+
+        // loại bỏ giá tiền để không ảnh hưởng tìm kiếm tên
+        if (preg_match('/^\d+[kK]?$/', $w)) return false;
+
         return !in_array($w, $stopWords)
             && !in_array($w, $colors)
             && !in_array($w, $sizes)
@@ -104,42 +138,31 @@ function searchProducts($db, $text)
         WHERE 1=1
     ";
 
-    // ===== TỪ KHÓA TÊN, BRAND =====
     foreach ($keywords as $k) {
         $k = $db->real_escape_string($k);
         $sql .= " AND (LOWER(sp.tenSP) LIKE '%$k%' OR LOWER(dm.tenDM) LIKE '%$k%')";
     }
 
-    // ===== LỌC MÀU =====
-    if ($detectedColor) {
-        $c = $db->real_escape_string($detectedColor);
-        $sql .= " AND LOWER(btm.mausac) = '$c'";
-    }
+    if ($minPrice !== null) $sql .= " AND sp.giaSP >= $minPrice";
+    if ($maxPrice !== null) $sql .= " AND sp.giaSP <= $maxPrice";
 
-    // ===== LỌC SIZE (bỏ LOWER vì size = INT) =====
-    if ($detectedSize) {
-        $s = $db->real_escape_string($detectedSize);
-        $sql .= " AND bts.size = '$s'";
-    }
+    if ($detectedColor) $sql .= " AND LOWER(btm.mausac) = '$detectedColor'";
+    if ($detectedSize) $sql .= " AND bts.size = '$detectedSize'";
 
-    // ===== TRÁNH LẶP SẢN PHẨM =====
     $sql .= " GROUP BY sp.id_sanpham LIMIT 20";
 
-    // ===== RUN =====
     $res = $db->query($sql);
-    $arr = [];
+    $data = [];
 
     $baseUrl = "http://localhost/duan1/backend/";
 
     while ($row = $res->fetch_assoc()) {
-
-        // FIX ẢNH
         $img = $row['hinhAnhgoc'];
         if (!str_contains($img, "uploads/Product/")) {
             $img = "uploads/Product/" . $img;
         }
 
-        $arr[] = [
+        $data[] = [
             "id" => $row['id_sanpham'],
             "name" => $row['tenSP'],
             "price" => $row['giaSP'],
@@ -150,8 +173,10 @@ function searchProducts($db, $text)
         ];
     }
 
-    return $arr;
+    return $data;
 }
+
+
 
 
 $products = searchProducts($db, $userMessage);
