@@ -13,6 +13,9 @@ $db = new DB_UTILS();
 // KIỂM TRA THAM SỐ
 $id_donhang = $_GET["id"] ?? null;
 $action = $_GET["action"] ?? null;
+$raw = file_get_contents("php://input");
+$body = json_decode($raw, true);
+$lydo = $body["lydo"] ?? "";
 
 if (!$id_donhang || !$action) {
     echo json_encode(["status" => false, "msg" => "Thiếu tham số id hoặc action"]);
@@ -55,12 +58,25 @@ function subtractStock($db, $id_bienthe, $qty) {
         [$qty, $id_bienthe]
     );
 }
+function saveReason($db, $id_donhang, $lydo) {
+    if (empty(trim($lydo))) return;
+
+    $db->execute(
+        "UPDATE donhang SET lydo = ? WHERE id_donhang = ?",
+        [$lydo, $id_donhang]
+    );
+}
+
+
 // =====================================
 // 🔥 XỬ LÝ 3 HÀNH ĐỘNG CHÍNH
 // =====================================
 switch ($action) {
     // ================== HỦY ĐƠN ==================
     case "cancel":
+
+        // 🔥 Lưu lý do hủy đơn
+        saveReason($db, $id_donhang, $lydo);
         foreach ($items as $row) {
             addStock($db, $row["id_bienthe"], $row["soLuongMua"]);
         }
@@ -72,6 +88,8 @@ switch ($action) {
         break;
     // ================== TRẢ HÀNG ==================
     case "return":
+        // 🔥 Lưu lý do trả hàng
+        saveReason($db, $id_donhang, $lydo);
         foreach ($items as $row) {
             addStock($db, $row["id_bienthe"], $row["soLuongMua"]);
         }

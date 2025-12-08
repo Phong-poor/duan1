@@ -124,7 +124,7 @@
                     <button
                       v-if="['Chờ xác nhận', 'Đã xác nhận', 'Đang giao hàng'].includes(o.trangthai)"
                       class="btn btn-danger"
-                      @click="cancelOrder(o.id_donhang)"
+                      @click="openReasonPopup('cancel', o.id_donhang)"
                     >
                       Huỷ đơn
                     </button>
@@ -132,7 +132,7 @@
                     <button
                       v-if="o.trangthai === 'Thành công'"
                       class="btn btn-danger"
-                      @click="returnOrder(o.id_donhang)"
+                      @click="openReasonPopup('return', o.id_donhang)"
                     >
                       Trả hàng
                     </button>
@@ -175,6 +175,25 @@
         </section>
       </div>
     </main>
+  </div>
+  <!-- POPUP LÝ DO HỦY / TRẢ -->
+  <div v-if="showReasonPopup" class="order-popup-overlay">
+    <div class="order-popup">
+
+      <h3>{{ reasonType === 'cancel' ? 'Lý do hủy đơn' : 'Lý do trả hàng' }}</h3>
+
+      <textarea 
+        v-model="reasonText"
+        placeholder="Nhập lý do..."
+        style="width:100%; height:120px; padding:10px; border:1px solid #ccc; border-radius:6px;"
+      ></textarea>
+
+      <div class="popup-actions" style="margin-top:20px;">
+        <button class="btn-secondary" @click="showReasonPopup = false">Hủy</button>
+        <button class="btn btn-success" @click="submitReason">Xác nhận</button>
+      </div>
+
+    </div>
   </div>
   <!-- ========== POPUP CHI TIẾT ĐƠN ========== -->
   <div v-if="showOrderPopup" class="order-popup-overlay">
@@ -389,6 +408,47 @@ const loadOrders = async () => {
 
   if (data.status) {
     orders.value = data.data;
+  }
+};
+const showReasonPopup = ref(false);
+const reasonType = ref("");  // 'cancel' hoặc 'return'
+const selectedOrderId = ref(null);
+const reasonText = ref("");
+const openReasonPopup = (type, id) => {
+  reasonType.value = type;
+  selectedOrderId.value = id;
+  reasonText.value = "";
+  showReasonPopup.value = true;
+};
+const submitReason = async () => {
+  if (!reasonText.value.trim()) {
+    showCenterPopup("Vui lòng nhập lý do!");
+    return;
+  }
+
+  const action = reasonType.value === "cancel" ? "cancel" : "return";
+
+  const res = await fetch(`${API_ORDER_ACTION}?id=${selectedOrderId.value}&action=${action}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      lydo: reasonText.value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.status) {
+    showCenterPopup(
+      reasonType.value === "cancel"
+      ? "Đã huỷ đơn hàng!"
+      : "Đã gửi yêu cầu trả hàng!"
+    );
+
+    showReasonPopup.value = false;
+    loadOrders();
+  } else {
+    showCenterPopup("Có lỗi xảy ra, vui lòng thử lại!");
   }
 };
 
