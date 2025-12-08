@@ -295,7 +295,7 @@ function goBuyNow(id) {
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
-            <div class="stars">★★★★★</div>
+            
             <p v-if="product.coGiamGia">
               <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
                 {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
@@ -330,7 +330,6 @@ function goBuyNow(id) {
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
-            <div class="stars">★★★★☆</div>
             <p v-if="product.coGiamGia">
               <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
                 {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.giaSP) }}
@@ -442,7 +441,6 @@ function goBuyNow(id) {
         </div>
 
         <div class="review-card">
-          <div class="stars">★★★★★</div>
           <p>"Dịch vụ chăm sóc khách hàng rất tốt, tư vấn nhiệt tình. Sẽ ủng hộ Kicks Haven lâu dài."</p>
           <div class="reviewer-info">
             <img :src="imgCanhan3" alt="Avatar" />
