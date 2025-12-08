@@ -200,7 +200,13 @@
             <td>
               <img :src="it.hinhAnhgoc" class="popup-img" />
             </td>
-            <td>{{ it.tenSP }}</td>
+            <td>
+              {{ it.tenSP }}
+              <br />
+              <small style="color: #666; font-size: 13px;">
+                (Màu: {{ it.mauSac }} + Size: {{ it.sizeSP }})
+              </small>
+            </td>
             <td>{{ formatMoney(it.giaSP) }} VNĐ</td>
             <td>{{ it.soLuongMua }}</td>
             <td>{{ formatMoney(it.thanhtien) }} VNĐ</td>

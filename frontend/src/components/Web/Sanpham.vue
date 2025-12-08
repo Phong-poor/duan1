@@ -198,18 +198,6 @@ const fetchBrands = async () => {
   }
 };
 
-const fetchSizes = async () => {
-  try {
-    const res = await fetch('http://localhost/duan1/backend/api/Web/KichCo.php');
-    const data = await res.json();
-    if (data.success) {
-      sizes.value = data.data;
-    }
-  } catch (error) {
-    console.error("Lỗi lấy kích cỡ:", error);
-  }
-};
-
 const chooseBrand = (brand) => {
   selectedBrand.value = brand;
   currentPage.value = 1;
