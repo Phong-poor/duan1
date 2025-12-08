@@ -62,9 +62,14 @@ $items = $db->getAll("
         sp.giaSP,
         (c.soLuongMua * sp.giaSP) AS thanhtien,
         sp.tenSP,
+        ms.mausac AS mauSac,
+        s.size AS sizeSP,
         sp.hinhAnhgoc
     FROM hoadonchitiet c
     JOIN sanpham sp ON c.id_sanpham = sp.id_sanpham
+    JOIN bienthe bt ON bt.id_bienthe = c.id_bienthe
+    LEFT JOIN bienthemausac ms ON ms.id_mausac = bt.id_mausac
+    LEFT JOIN bienthesize s ON s.id_size = bt.id_size
     WHERE c.id_donhang = ?
 ", [$id]);
 // ============ XỬ LÝ ẢNH ============ 
