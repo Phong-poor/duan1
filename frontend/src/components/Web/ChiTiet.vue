@@ -82,7 +82,7 @@
                 v-for="color in colors"
                 :key="color.id"
                 :title="color.label"
-                :class="{ selected: color.id === selectedColor.id }"
+                :class="{ selected: selectedColor && color.id === selectedColor.id }"
                 :style="{
                   backgroundColor: color.swatch,
                   borderColor: color.border ?? '#ccc',
@@ -90,11 +90,11 @@
                 @click="selectColor(color)"
               />
             </div>
-            <p class="selected-color-label">
+            <p class="selected-color-label" v-if="selectedColor">
               Màu đã chọn:
               <strong>{{ selectedColor.label }}</strong>
             </p>
-            <p class="selected-color-label">
+            <p class="selected-color-label" v-if="selectedColor">
               Số lượng:
               <strong>{{ currentStock }}</strong>
             </p>
@@ -332,7 +332,7 @@ const fetchProductDetail = async () => {
       // Process Variants
       if (data.data.variants && Array.isArray(data.data.variants)) {
         // Get available sizes from variants
-        const availableSizes = [...new Set(data.data.variants.map(v => v.size))];
+        const availableSizes = [...new Set(data.data.variants.map(v => Number(v.size)))];
         
         // Define all possible sizes (38-42)
         const allSizes = [38, 39, 40, 41, 42];
@@ -340,7 +340,7 @@ const fetchProductDetail = async () => {
         // Create size array with availability status
         sizes.value = allSizes.map(s => ({
           value: s,
-          disabled: !availableSizes.includes(s) // Disable if not in stock
+          disabled: !availableSizes.includes(Number(s)),
         }));
 
         // Extract unique colors
