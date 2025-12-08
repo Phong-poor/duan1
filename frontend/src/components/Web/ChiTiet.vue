@@ -37,11 +37,17 @@
           <p class="sku">Mã sản phẩm: {{ product.maSP }}</p>
 
           <div class="rating">
-            <i class="fas fa-star" />
-            <i class="fas fa-star" />
-            <i class="fas fa-star" />
-            <i class="fas fa-star" />
-            <i class="fas fa-star-half-alt" /> (4.8/5) | Đã bán 250+
+            <!-- Hiển thị sao vàng cho số sao trung bình -->
+            <i v-for="n in Math.floor(averageRating)" :key="'full-' + n" class="fas fa-star" style="color: gold;"></i>
+
+            <!-- Hiển thị sao nửa vàng nếu có (nếu có phần thập phân) -->
+            <i v-if="averageRating % 1 !== 0" class="fas fa-star-half-alt" style="color: gold;"></i>
+
+            <!-- Hiển thị sao xám cho phần còn lại đến 5 sao -->
+            <i v-for="n in 5 - Math.ceil(averageRating)" :key="'empty-' + n" class="fas fa-star" style="color: #ccc;"></i>
+
+            <!-- Hiển thị số điểm trung bình -->
+            <span>{{ averageRating.toFixed(1) }} / 5</span>
           </div>
 
           <div class="price-box">
@@ -146,58 +152,33 @@
         </section>
       </div>
 
-      <!-- BÌNH LUẬN -->
       <section class="product-comments-section">
         <div class="container">
           <h3>Bình luận sản phẩm</h3>
-          
-          <!-- Danh sách bình luận -->
-          <div class="comment-list">
-            <div class="comment-item">
-              <div class="comment-header">
-                <div class="comment-stars">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                </div>
-                <span class="comment-time">2 giờ trước</span>
-              </div>
-              <p class="comment-content">Sản phẩm rất đẹp, chất lượng tốt!</p>
-            </div>
+          <!-- Nếu không có bình luận -->
+          <div v-if="productComments.length === 0" class="no-comments">
+            Chưa có bình luận cho sản phẩm này.
+          </div>
 
-            <div class="comment-item">
+          <div v-else class="comment-list">
+            <div v-for="comment in productComments" :key="comment.id_binhluan" class="comment-item">
               <div class="comment-header">
                 <div class="comment-stars">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
+                  <!-- Hiển thị 5 sao màu xám -->
+                  <i v-for="n in 5" :key="'star-' + n" class="fas fa-star" :style="n <= comment.sosao ? { color: 'gold' } : { color: '#ccc' }"></i>
                 </div>
-                <span class="comment-time">1 ngày trước</span>
+                <span class="comment-time">{{ comment.thoigianbinhluan }}</span>
               </div>
-              <p class="comment-content">Giao hàng nhanh, đóng gói cẩn thận.</p>
-            </div>
+              <p class="comment-content">{{ comment.noidung }}</p>
+              <!-- Hiển thị thông báo báo cáo -->
+              <p v-if="comment.report_status === 'Đã báo cáo'" class="report-notice">Có người report</p>
 
-            <div class="comment-item">
-              <div class="comment-header">
-                <div class="comment-stars">
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                  <i class="fas fa-star"></i>
-                </div>
-                <span class="comment-time">3 ngày trước</span>
-              </div>
-              <p class="comment-content">Giá hợp lý, đáng tiền!</p>
+              <!-- Nút report cho bình luận không đúng đắn -->
+              <button class="btn-report" @click="reportComment(comment.id_binhluan)">Báo cáo</button>
             </div>
           </div>
         </div>
       </section>
-
       <!-- SẢN PHẨM LIÊN QUAN -->
       <section class="related-products">
         <h2 class="section-title">SẢN PHẨM LIÊN QUAN</h2>
@@ -218,7 +199,6 @@
             >
               <img :src="`http://localhost/duan1/backend/${prod.hinhAnhgoc}`" :alt="prod.tenSP" />
               <h3>{{ prod.tenSP }}</h3>
-              <div class="stars">★★★★★</div>
               <p v-if="prod.coGiamGia" class="original-price-small">
                 {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(prod.giaSP) }}
               </p>
@@ -266,7 +246,6 @@ const product = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const currentStock = ref(0);
-
 // Fallback data for UI elements not yet in DB
 const thumbnails = ref([]);
 const selectedImage = ref({ src: heroImage, alt: 'Loading...' });
@@ -295,7 +274,6 @@ const fetchProductDetail = async () => {
   loading.value = true;
   error.value = null;
   const id = route.query.id;
-
   if (!id) {
     error.value = "Không tìm thấy ID sản phẩm";
     loading.value = false;
@@ -382,11 +360,7 @@ const fetchProductDetail = async () => {
   }
 };
 
-onMounted(() => {
-  fetchProductDetail().then(() => {
-    updateAvailability();
-  });
-});
+
 // Watch for route changes (e.g. clicking related product)
 watch(() => route.query.id, () => {
   fetchProductDetail();
@@ -424,6 +398,69 @@ const relatedProducts = ref([]);
 const carouselRef = ref(null);
 const scrollCarousel = (direction) => {
   carouselRef.value?.scrollBy({ left: direction * 300, behavior: "smooth" });
+};
+/* BÌNH LUẬN */
+const productComments = ref([]);
+const averageRating = ref(0);
+
+const calculateAverageRating = () => {
+  if (productComments.value.length === 0) {
+    averageRating.value = 0;
+    return;
+  }
+  
+  const totalStars = productComments.value.reduce((sum, comment) => sum + comment.sosao, 0);
+  averageRating.value = totalStars / productComments.value.length;
+};
+
+const fetchComments = async () => {
+  const id_sanpham = route.query.id;
+  if (!id_sanpham) {
+    error.value = "Không tìm thấy ID sản phẩm";
+    loading.value = false;
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://localhost/duan1/backend/api/Web/GetBinhLuan.php?id_sanpham=${id_sanpham}`);
+    const data = await response.json();
+
+    if (data.status) {
+      productComments.value = data.data;
+      calculateAverageRating(); // Tính toán trung bình sao khi đã fetch bình luận
+    } else {
+      error.value = data.msg || "Không có bình luận nào cho sản phẩm này.";
+    }
+  } catch (err) {
+    console.error("Error fetching comments:", err);
+    error.value = "Lỗi khi lấy bình luận.";
+  }
+};;
+
+
+
+// Function to report a comment
+const reportComment = async (commentId) => {
+  const confirmReport = confirm("Bạn chắc chắn muốn báo cáo bình luận này?");
+  if (confirmReport) {
+    try {
+      const res = await fetch("http://localhost/duan1/backend/api/Web/ReportComment.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_binhluan: commentId })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        alert("Bình luận đã được báo cáo!");
+      } else {
+        alert("Không thể báo cáo bình luận này.");
+      }
+    } catch (err) {
+      console.error("Error reporting comment:", err);
+      alert("Có lỗi xảy ra khi báo cáo bình luận.");
+    }
+  }
 };
 
 /* POPUP TOAST */
@@ -502,6 +539,12 @@ const cleanupPopup = () => {
 };
 
 onBeforeUnmount(cleanupPopup);
+onMounted(() => {
+  fetchProductDetail().then(() => {
+    updateAvailability();
+  });
+  fetchComments();
+});
 </script>
 
 <style scoped>
@@ -1098,4 +1141,137 @@ onBeforeUnmount(cleanupPopup);
     flex: 0 0 calc(90% - 20px);
   }
 }
+.product-comments-section {
+  background-color: #fff;
+  padding: 30px 0;
+  margin: 30px 0;
+}
+
+.product-comments-section .container {
+  width: 90%;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.product-comments-section h3 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #1a1a1a;
+}
+
+.comment-form {
+  margin-bottom: 20px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: "Roboto", sans-serif;
+  font-size: 13px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.comment-form textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.btn-submit-comment {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-submit-comment:hover {
+  background-color: #0056b3;
+}
+
+.btn-submit-comment i {
+  margin-right: 5px;
+}
+
+.comment-list {
+  margin-top: 15px;
+}
+
+.no-comments {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  padding: 20px;
+  font-style: italic;
+}
+
+.comment-item {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border-left: 3px solid #007bff;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.comment-stars {
+  color: #ffc107;
+  font-size: 12px;
+}
+
+.comment-time {
+  font-size: 11px;
+  color: #999;
+}
+
+.comment-content {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btn-report {
+  background-color: #f44336;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.btn-report:hover {
+  background-color: #d32f2f;
+}
+.fas.fa-star {
+  color: gold; /* Màu vàng cho sao đầy đủ */
+}
+
+.fas.fa-star[style*="color: #ccc"] {
+  color: #ccc; /* Màu xám cho sao trống */
+}
+.report-notice {
+  color: #d32f2f; /* Màu đỏ để nổi bật */
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
 </style>

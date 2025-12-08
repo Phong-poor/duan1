@@ -70,7 +70,6 @@
             <div class="product-card" v-for="p in products" :key="p.id_sanpham">
               <img :src="`http://localhost/duan1/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
               <h3>{{ p.tenSP }}</h3>
-              <div class="stars">★★★★★</div>
               <p v-if="p.coGiamGia">
                 <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
                   {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.giaSP) }}
@@ -124,7 +123,6 @@ import { useRouter } from "vue-router";
 import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
 const router = useRouter();
-const goTo = (path) => router.push(path);
 
 import HeaderWeb from "../../Header-web.vue";
 import footerWeb from "../../footer-web.vue";
@@ -133,7 +131,6 @@ import bannerSlide1 from "../../assets/banner-slide-1.png";
 import bannerSlide2 from "../../assets/banner-slide-2.jpg";
 import bannerSlide3 from "../../assets/banner-slide-3.jpg";
 import imgSale1 from '../../assets/images (1).jpg'; // Fallback image
-
 
 
 const showMini = ref(false);
@@ -146,7 +143,6 @@ let slideTimer;
 const sortBy = ref('moi_nhat');
 const selectedSize = ref('');
 const selectedBrand = ref('');
-const sizes = ref([]);
 const brands = ref([]);
 
 
@@ -164,7 +160,6 @@ onMounted(() => {
 
   fetchCategories();
   fetchBrands();
-  fetchSizes();
   fetchProducts();
 });
 
@@ -204,11 +199,6 @@ const chooseBrand = (brand) => {
   fetchProducts();
 };
 
-const chooseSize = (size) => {
-  selectedSize.value = size;
-  currentPage.value = 1;
-  fetchProducts();
-};
 
 const chooseCategory = (cat) => {
   selectedCategory.value = cat;
@@ -448,13 +438,6 @@ container {
   font-weight: 600;
   margin: 5px 0;
 }
-
-.stars {
-  color: #ffc107;
-  margin: 3px 0;
-  font-size: 14px;
-}
-
 .product-card p {
   font-size: 16px;
   font-weight: 700;

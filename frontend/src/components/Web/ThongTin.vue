@@ -232,7 +232,9 @@
             <td>
               <button 
                 v-if="orderDetail.order.trangthai === 'Thành công'" 
-                class="btn btn-success">
+                class="btn btn-success"
+                @click="openRatingPopup(it)"
+              >
                 Đánh giá
               </button>
             </td>
@@ -244,7 +246,48 @@
       </div>
     </div>
   </div>
+  <!-- POPUP ĐÁNH GIÁ SẢN PHẨM -->
+  <div v-if="showRatingPopup" class="order-popup-overlay">
+    <div class="order-popup" style="max-width: 600px;">
 
+      <h3>Đánh giá sản phẩm</h3>
+
+      <!-- SẢN PHẨM -->
+      <div style="display:flex; gap:15px; margin-bottom:15px;">
+        <img :src="ratingItem.hinhAnhgoc" style="width:90px; height:90px; object-fit:cover; border-radius:6px;" />
+        <div>
+          <strong>{{ ratingItem.tenSP }}</strong><br>
+          <small style="color:#666;">
+            (Màu: {{ ratingItem.mauSac }} + Size: {{ ratingItem.sizeSP }})
+          </small>
+        </div>
+      </div>
+
+      <!-- CHỌN SAO -->
+      <div class="rating-stars">
+        <span
+          v-for="n in 5"
+          :key="n"
+          class="star"
+          :class="{ active: ratingStars >= n }"
+          @click="ratingStars = n"
+        >★</span>
+      </div>
+
+      <!-- COMMENT -->
+      <textarea 
+        v-model="ratingComment"
+        placeholder="Viết đánh giá của bạn..."
+        style="width:100%; height:120px; padding:10px; border:1px solid #ccc; border-radius:6px;"
+      ></textarea>
+
+      <div class="rating-actions">
+        <button class="btn-cancel" @click="showRatingPopup = false">Hủy</button>
+        <button class="btn-submit" @click="submitRating">Gửi đánh giá</button>
+      </div>
+
+    </div>
+  </div>
   <footerWeb/>
   <!-- CUSTOM POPUP -->
   <div v-if="showPopup" class="custom-popup">
@@ -543,6 +586,51 @@ const openOrderPopup = async (id) => {
 
 const closeOrderPopup = () => {
   showOrderPopup.value = false;
+};
+/* ================== DANH GIA ================== */
+const showRatingPopup = ref(false);
+const ratingItem = reactive({});
+const ratingStars = ref(0);
+const ratingComment = ref("");
+
+const openRatingPopup = (item) => {
+  Object.assign(ratingItem, item);
+  ratingStars.value = 0;
+  ratingComment.value = "";
+  showRatingPopup.value = true;
+};
+
+// Vue.js - gửi đánh giá
+// Vue.js - gửi đánh giá
+const submitRating = async () => {
+  if (ratingStars.value === 0) {
+    showCenterPopup("Vui lòng chọn số sao!");
+    return;
+  }
+  if (!ratingComment.value.trim()) {
+    showCenterPopup("Vui lòng nhập nội dung đánh giá!");
+    return;
+  }
+
+  const res = await fetch("http://localhost/duan1/backend/api/Web/BinhLuan.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_khachhang: user.id_khachhang,
+      id_sanpham: ratingItem.id_sanpham,
+      sosao: ratingStars.value,
+      noidung: ratingComment.value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.status) {
+    showCenterPopup("Đánh giá thành công!");
+    showRatingPopup.value = false;
+  } else {
+    showCenterPopup("Không thể gửi đánh giá!");
+  }
 };
 </script>
 
@@ -899,8 +987,10 @@ const closeOrderPopup = () => {
   padding: 25px;
   border-radius: 10px;
   overflow-y: auto;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
 }
+
 
 .order-popup h3 {
   margin-bottom: 20px;
@@ -950,6 +1040,94 @@ const closeOrderPopup = () => {
 
 .btn-secondary:hover {
   background: #444;
+}
+.rating-stars {
+  display: flex;
+  gap: 6px;
+  font-size: 32px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rating-stars .star {
+  color: #ccc;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.rating-stars .star.active {
+  color: gold;
+}
+
+.rating-stars .star:hover {
+  color: gold;
+  transform: scale(1.15);
+}
+/* ====== CUSTOM POPUP (thông báo) ====== */
+.custom-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+}
+
+.popup-box {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  animation: fadeIn 0.2s ease-in-out;
+  z-index: 10001; /* Đảm bảo box thông báo nổi bật hơn */
+}
+
+/* ====== FORM ĐÁNH GIÁ – BUTTON HỦY VÀ GỬI ====== */
+.rating-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+  min-width: 130px;
+}
+
+/* Nút Hủy */
+.btn-cancel {
+  background: #555;
+  color: #fff;
+}
+
+.btn-cancel:hover {
+  background: #333;
+}
+
+/* Nút Gửi đánh giá */
+.btn-submit {
+  background: #28a745;
+  color: white;
+  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
+}
+
+.btn-submit:hover {
+  background: #218838;
+  box-shadow: 0 3px 8px rgba(40, 167, 69, 0.35);
 }
 
 </style>
