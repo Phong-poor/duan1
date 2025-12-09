@@ -119,10 +119,12 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
 const router = useRouter();
+const route = useRoute();
+const goTo = (path) => router.push(path);
 
 import HeaderWeb from "../../Header-web.vue";
 import footerWeb from "../../footer-web.vue";
@@ -141,14 +143,13 @@ let slideTimer;
 
 // Filter states
 const sortBy = ref('moi_nhat');
-const selectedSize = ref('');
 const selectedBrand = ref('');
 const brands = ref([]);
 
 
 
 
-onMounted(() => {
+onMounted(async () => {
   const slides = slideContainer.value.querySelectorAll(".slide");
   let current = 0;
 
@@ -211,6 +212,22 @@ const applyFilters = () => {
   fetchProducts();
 };
 
+// Theo dõi thay đổi query params từ URL
+watch(() => route.query.id_thuonghieu, (newBrandId) => {
+  if (newBrandId) {
+    const brand = brands.value.find(b => b.id_thuonghieu == newBrandId);
+    if (brand) {
+      selectedBrand.value = brand;
+      currentPage.value = 1;
+      fetchProducts();
+    }
+  } else {
+    selectedBrand.value = null;
+    currentPage.value = 1;
+    fetchProducts();
+  }
+});
+
 /* PRODUCTS & PAGINATION */
 const products = ref([]);
 const currentPage = ref(1);
@@ -226,9 +243,6 @@ const fetchProducts = async () => {
     }
     if (selectedBrand.value) {
       url += `&id_thuonghieu=${selectedBrand.value.id_thuonghieu}`;
-    }
-    if (selectedSize.value) {
-      url += `&size=${selectedSize.value}`;
     }
     if (sortBy.value) {
       url += `&sort=${sortBy.value}`;
