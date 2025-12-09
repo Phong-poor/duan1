@@ -26,7 +26,7 @@
             <div class="row fw-semibold border-bottom pb-2 small text-uppercase text-center">
               <div class="col-2">Hình ảnh</div>
               <div class="col-4">Sản phẩm</div>
-              <div class="col-2">SL</div>
+              <div class="col-2">Số Lượng</div>
               <div class="col-2">Giá</div>
               <div class="col-1">Tổng</div>
               <div class="col-1"></div>
@@ -87,6 +87,9 @@
             <div class="d-flex justify-content-between small text-danger py-1">
               <span>Giảm giá:</span>
               <span>-10,000 VNĐ</span>
+            </div>
+            <div class="mt-3">
+              <input type="text" class="form-control" placeholder="Nhập mã voucher" />
             </div>
 
             <hr />
@@ -363,5 +366,20 @@ const deleteItem = async (item) => {
 
 .delete-x:hover {
   color: #a8001f;
+}
+
+.voucher-section {
+margin-top: 12px;
+}
+.voucher-section input {
+width: 100%;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 6px;
+font-size: 14px;
+}
+.voucher-section input:focus {
+border-color: #007bff;
+outline: none;
 }
 </style>
