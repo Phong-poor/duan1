@@ -35,11 +35,6 @@
         </div>
 
         <div class="filter-inline">
-          <label>Kích cỡ:</label>
-          <select v-model="selectedSize" @change="applyFilters">
-            <option value="">Tất cả</option>
-            <option v-for="size in sizes" :key="size.id_size" :value="size.size">{{ size.size }}</option>
-          </select>
 
           <label>Loại:</label>
           <select v-model="selectedCategory" @change="applyFilters">
@@ -126,10 +121,11 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
 const router = useRouter();
+const route = useRoute();
 const goTo = (path) => router.push(path);
 
 import HeaderWeb from "../../Header-web.vue";
@@ -150,15 +146,13 @@ let slideTimer;
 
 // Filter states
 const sortBy = ref('moi_nhat');
-const selectedSize = ref('');
 const selectedBrand = ref('');
-const sizes = ref([]);
 const brands = ref([]);
 
 
 
 
-onMounted(() => {
+onMounted(async () => {
   const slides = slideContainer.value.querySelectorAll(".slide");
   let current = 0;
 
@@ -169,8 +163,17 @@ onMounted(() => {
   }, 4000);
 
   fetchCategories();
-  fetchBrands();
-  fetchSizes();
+  await fetchBrands();
+  
+  // Kiểm tra query param từ URL
+  const brandIdFromUrl = route.query.id_thuonghieu;
+  if (brandIdFromUrl) {
+    const brand = brands.value.find(b => b.id_thuonghieu == brandIdFromUrl);
+    if (brand) {
+      selectedBrand.value = brand;
+    }
+  }
+  
   fetchProducts();
 });
 
@@ -204,17 +207,7 @@ const fetchBrands = async () => {
   }
 };
 
-const fetchSizes = async () => {
-  try {
-    const res = await fetch('http://localhost/duan1/backend/api/Web/KichCo.php');
-    const data = await res.json();
-    if (data.success) {
-      sizes.value = data.data;
-    }
-  } catch (error) {
-    console.error("Lỗi lấy kích cỡ:", error);
-  }
-};
+
 
 const chooseBrand = (brand) => {
   selectedBrand.value = brand;
@@ -222,11 +215,7 @@ const chooseBrand = (brand) => {
   fetchProducts();
 };
 
-const chooseSize = (size) => {
-  selectedSize.value = size;
-  currentPage.value = 1;
-  fetchProducts();
-};
+
 
 const chooseCategory = (cat) => {
   selectedCategory.value = cat;
@@ -238,6 +227,22 @@ const applyFilters = () => {
   currentPage.value = 1;
   fetchProducts();
 };
+
+// Theo dõi thay đổi query params từ URL
+watch(() => route.query.id_thuonghieu, (newBrandId) => {
+  if (newBrandId) {
+    const brand = brands.value.find(b => b.id_thuonghieu == newBrandId);
+    if (brand) {
+      selectedBrand.value = brand;
+      currentPage.value = 1;
+      fetchProducts();
+    }
+  } else {
+    selectedBrand.value = null;
+    currentPage.value = 1;
+    fetchProducts();
+  }
+});
 
 /* PRODUCTS & PAGINATION */
 const products = ref([]);
@@ -254,9 +259,6 @@ const fetchProducts = async () => {
     }
     if (selectedBrand.value) {
       url += `&id_thuonghieu=${selectedBrand.value.id_thuonghieu}`;
-    }
-    if (selectedSize.value) {
-      url += `&size=${selectedSize.value}`;
     }
     if (sortBy.value) {
       url += `&sort=${sortBy.value}`;

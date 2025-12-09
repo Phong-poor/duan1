@@ -12,6 +12,7 @@ const tuKhoaTimKiem = ref("");
 const ketQuaTimKiem = ref([]);
 const hienThiKetQua = ref(false);
 const currentUser = ref(null); 
+const danhSachThuongHieu = ref([]);
 let thoiGianChoTimKiem = null;
 
 const xuLyTimKiem = () => {
@@ -23,16 +24,36 @@ const xuLyTimKiem = () => {
   }
   
   thoiGianChoTimKiem = setTimeout(async () => {
-    try {
-      const response = await axios.get(`http://localhost/duan1/backend/api/Web/SanPham.php?search=${tuKhoaTimKiem.value}`);
-      if (response.data.success) {
-        ketQuaTimKiem.value = response.data.data;
-        hienThiKetQua.value = true;
-      }
-    } catch (error) {
-      console.error("Search error:", error);
+    // Tìm kiếm sản phẩm bình thường
+    const response = await axios.get(`http://localhost/duan1/backend/api/Web/SanPham.php?search=${tuKhoaTimKiem.value}`);
+    if (response.data.success) {
+      ketQuaTimKiem.value = response.data.data;
+      hienThiKetQua.value = true;
     }
   }, 300);
+};
+
+// Xử lý khi bấm Enter
+const xuLyEnter = () => {
+  const tuKhoa = tuKhoaTimKiem.value.toLowerCase().trim();
+  const thuongHieuKhop = danhSachThuongHieu.value.find(
+    th => th.tenTH.toLowerCase() === tuKhoa
+  );
+  
+  if (thuongHieuKhop) {
+    // Nếu khớp thương hiệu -> chuyển sang trang Sản phẩm với filter
+    hienThiKetQua.value = false;
+    tuKhoaTimKiem.value = "";
+    
+    // Sử dụng replace để force reload khi đang ở trang Sanpham
+    router.replace({
+      name: 'Sanpham',
+      query: { 
+        id_thuonghieu: thuongHieuKhop.id_thuonghieu,
+        _t: Date.now() // Thêm timestamp để force reload
+      }
+    });
+  }
 };
 
 const denTrangChiTiet = (product) => {
@@ -49,12 +70,21 @@ const xuLyClickBenNgoai = (event) => {
   }
 };
 
+// Lấy danh sách thương hiệu
+const layDanhSachThuongHieu = async () => {
+  const response = await axios.get('http://localhost/duan1/backend/api/Web/ThuongHieu.php');
+  if (response.data.success) {
+    danhSachThuongHieu.value = response.data.data;
+  }
+};
+
 onMounted(() => {
   document.addEventListener('click', xuLyClickBenNgoai);
   const user = localStorage.getItem("currentUser");
   if (user) {
     currentUser.value = JSON.parse(user);
   }
+  layDanhSachThuongHieu();
 });
 
 onUnmounted(() => {
@@ -105,6 +135,7 @@ const logout = () => {
               placeholder="Tìm kiếm..." 
               v-model="tuKhoaTimKiem"
               @input="xuLyTimKiem"
+              @keyup.enter="xuLyEnter"
               @focus="hienThiKetQua = true"
             />
             <button><i class="fas fa-search"></i></button>
