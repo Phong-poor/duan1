@@ -32,7 +32,9 @@
         <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
-
+        <router-link to="/Quanlybinhluan" class="menu-item" active-class="active">
+          <i class="fa-solid fa-comment"></i> Đánh giá
+        </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
@@ -149,7 +151,14 @@
               </tr>
             </tbody>
           </table>
+          <!-- Nếu trạng thái là Hủy hoặc Trả hàng thì hiển thị lý do -->
+          <div v-if="selectedOrder && (normalizedCancel(selectedOrder.trangthai))"
+              class="alert alert-danger mt-3">
 
+            <strong>Lý do {{ selectedOrder.trangthai.includes('hủy') ? 'hủy đơn' : 'trả hàng' }}:</strong><br>
+
+            {{ selectedOrder.lydo || selectedOrder.note || 'Không có lý do' }}
+          </div>
           <h5 class="text-end fw-bold mt-3">Tổng đơn hàng: {{ formatPrice(selectedOrder.tongtien || selectedOrder.total || 0) }}</h5>
         </div>
       </div>
@@ -230,6 +239,7 @@ const badgeClass = (status) => {
   if (status.includes("xác nhận") || status.includes("Xác nhận") || status === "Đã xác nhận") return "bg-primary";
   if (status.includes("Đang giao") || status === "Đang giao hàng") return "bg-info";
   if (status.includes("Thành")) return "bg-success";
+  if (status.includes("Hủy") || status.includes("Trả")) return "bg-danger";
   return "bg-secondary";
 };
 
@@ -344,6 +354,11 @@ const confirmChangeStatus = (order, status) => {
   if (confirm(`Bạn có chắc muốn đổi trạng thái đơn #${order.maDatHang} → "${status}" ?`)) {
     changeStatus(order, status);
   }
+};
+const normalizedCancel = (status) => {
+  if (!status) return false;
+  status = status.toLowerCase();
+  return status.includes("hủy") || status.includes("trả");
 };
 
 // manual refresh single order (re-fetch list)

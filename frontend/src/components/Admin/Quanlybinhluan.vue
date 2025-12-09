@@ -29,68 +29,82 @@
         <router-link to="/Quanlysize" class="menu-item" active-class="active">
           <i class="fa-solid fa-maximize"></i> Size
         </router-link>
-
-        <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
+        
+        <router-link to="Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
+
         <router-link to="/Quanlybinhluan" class="menu-item" active-class="active">
           <i class="fa-solid fa-comment"></i> Đánh giá
         </router-link>
+
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
       </ul>
     </aside>
-
     <!-- Main Content -->
     <div class="main-content flex-grow-1">
       <header class="admin-header">
-        <HeaderAdmin />
+            <HeaderAdmin />
       </header>
 
       <div class="content-section p-4">
-        <!-- Title + Button -->
+
+        <!-- Title -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="fw-bold">Quản lý khách hàng</h3>
+            <h3 class="fw-bold">Quản lý bình luận</h3>
         </div>
 
         <!-- Search -->
-        <input v-model="search" type="text" class="form-control mb-3" placeholder="🔍 Tìm theo tên hoặc email..." />
+        <input v-model="search" type="text" class="form-control mb-3" placeholder="🔍 Tìm theo nội dung hoặc email..." />
 
-        <!-- Customer Table -->
+        <!-- Comments Table -->
         <table class="table table-bordered text-center">
-          <thead class="table-secondary">
-            <tr>
-              <th>ID</th>
-              <th>Tên</th>
-              <th>Email</th>
-              <th>SĐT</th>
-              <th>Giới tính</th>
-              <th>Ngày sinh</th>
-              <th>Vai trò</th>
-              <th>Hành động</th>
-            </tr>
-          </thead>
+            <thead class="table-secondary">
+                <tr>
+                    <th>ID</th>
+                    <th>Khách hàng</th>
+                    <th>Sản phẩm</th>
+                    <th>Nội dung</th>
+                    <th>Số sao</th>
+                    <th>Thời gian</th>
+                    <th>Trạng thái</th>
+                    <th>Báo cáo</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
 
-          <tbody>
-            <tr v-for="c in paginatedItems" :key="c.id_khachhang">
-              <td>{{ c.id_khachhang }}</td>
-              <td>{{ c.tenKH }}</td>
-              <td>{{ c.email }}</td>
-              <td>{{ c.sodienthoai }}</td>
-              <td>{{ c.gioitinh || "Chưa cập nhật" }}</td>
-              <td>{{ c.ngaysinh || "Chưa cập nhật" }}</td>
-              <td>
-                <span :class="c.role === 'Admin' ? 'badge bg-primary' : 'badge bg-secondary'">
-                  {{ c.role }}
-                </span>
-              </td>
-              <td>
-                <button class="btn btn-warning btn-sm me-2" @click="selectUser(c)">Phân quyền</button>
-                <button class="btn btn-danger btn-sm" @click="deleteUser(c.id_khachhang)">Xóa</button>
-              </td>
-            </tr>
-          </tbody>
+            <tbody>
+                <tr v-for="c in paginatedItems" :key="c.id_binhluan">
+                <td>{{ c.id_binhluan }}</td>
+                <td>{{ c.tenKH }}</td>
+                <td>{{ c.tenSP }}</td>
+                <td>{{ c.noidung }}</td>
+                <td>
+                    <span v-for="i in 5" :key="i">
+                        <i 
+                        class="fa-solid fa-star"
+                        :style="{ color: i <= c.sosao ? '#ffc107' : '#ccc' }"
+                        ></i>
+                    </span>
+                </td>
+                <td>{{ c.thoigianbinhluan }}</td>
+                <td>{{ c.trangthai }}</td>
+                <td :class="c.report_status === 'Đã báo cáo' ? 'text-danger fw-bold' : ''">
+                    {{ c.report_status }}
+                </td>
+                <td>
+                    <button 
+                        v-if="c.report_status === 'Đã báo cáo'" 
+                        class="btn btn-danger btn-sm"
+                        @click="hideComment(c)"
+                    >
+                        Ẩn
+                    </button>
+                </td>
+                </tr>
+            </tbody>
         </table>
 
         <!-- Pagination -->
@@ -100,24 +114,24 @@
           <button class="btn btn-secondary btn-sm" :disabled="page === totalPages" @click="page++">Sau</button>
         </div>
 
-        <!-- Role Update Form -->
-        <div v-if="selectedUser" class="card p-4 mt-4">
-          <h4 class="fw-bold mb-3">Phân quyền tài khoản</h4>
+        <!-- Update Form -->
+        <div v-if="selectedComment" class="card p-4 mt-4">
+          <h4 class="fw-bold mb-3">Cập nhật trạng thái bình luận</h4>
 
           <div class="mb-3">
-            <label>Khách hàng:</label>
-            <input class="form-control" disabled :value="selectedUser.tenKH + ' (' + selectedUser.email + ')'" />
+            <label>Nội dung:</label>
+            <textarea class="form-control" disabled>{{ selectedComment.noidung }}</textarea>
           </div>
 
           <div class="mb-3">
-            <label>Chức năng</label>
-            <select v-model="selectedRole" class="form-select">
-              <option>user</option>
-              <option>admin</option>
+            <label>Trạng thái</label>
+            <select v-model="selectedStatus" class="form-select">
+              <option value="Hiển thị">Hiển thị</option>
+              <option value="Ẩn">Ẩn</option>
             </select>
           </div>
 
-          <button class="btn btn-primary" @click="updateRole">Cập nhật quyền</button>
+          <button class="btn btn-primary" @click="updateComment">Cập nhật</button>
         </div>
       </div>
     </div>
@@ -130,44 +144,40 @@ import HeaderAdmin from "../../Header-admin.vue";
 import logoImage from "../../assets/logo.png";
 
 const search = ref("");
-const customers = ref([]);
+const comments = ref([]);
 
-const selectedUser = ref(null);
-const selectedRole = ref("User");
+const selectedComment = ref(null);
+const selectedStatus = ref("Hiển thị");
 
 const page = ref(1);
 const perPage = 6;
 
-const loadUsers = async () => {
+/* Load comments */
+const loadComments = async () => {
   try {
-    const res = await fetch(
-      "http://localhost/duan1/backend/api/Admin/GetUser.php",
-      {
-        method: "GET",
-        credentials: "include"
-      }
-    );
+    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetComment.php");
     const data = await res.json();
 
     if (data.status === "success") {
-      customers.value = data.data;
+      comments.value = data.data;
     }
   } catch (err) {
-    console.error("Lỗi tải khách hàng:", err);
+    console.error("Lỗi tải bình luận:", err);
   }
 };
 
-onMounted(loadUsers);
+onMounted(loadComments);
 
+/* Filter */
 const filtered = computed(() =>
-  customers.value.filter(
+  comments.value.filter(
     (c) =>
-      c.tenKH.toLowerCase().includes(search.value.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.value.toLowerCase()) ||
-      (c.sodienthoai + "").includes(search.value)
+      c.noidung.toLowerCase().includes(search.value.toLowerCase()) ||
+      c.tenKH.toLowerCase().includes(search.value.toLowerCase())
   )
 );
 
+/* Pagination */
 const totalPages = computed(() => Math.ceil(filtered.value.length / perPage));
 
 const paginatedItems = computed(() => {
@@ -175,44 +185,22 @@ const paginatedItems = computed(() => {
   return filtered.value.slice(start, start + perPage);
 });
 
-const selectUser = (user) => {
-  selectedUser.value = user;
-  selectedRole.value = user.role;
-};
+/* Update Comment */
+const hideComment = async (c) => {
+  if (!confirm("Bạn có chắc muốn ẨN bình luận này không?")) return;
 
-const updateRole = async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/UpdateRoleUser.php", {
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/UpdateComment.php", {
     method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      id: selectedUser.value.id_khachhang,
-      role: selectedRole.value,
+      id: c.id_binhluan,
+      trangthai: "Ẩn"
     }),
   });
 
   const data = await res.json();
   alert(data.msg);
-  loadUsers();
-};
-
-const deleteUser = async (id) => {
-  if (!confirm("Bạn có chắc muốn xóa không?")) return;
-
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/DeleteUser.php", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ id }),
-  });
-
-  const data = await res.json();
-  alert(data.msg);
-  loadUsers();
+  loadComments();
 };
 </script>
 
