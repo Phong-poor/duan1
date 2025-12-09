@@ -26,6 +26,9 @@
         <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
+        <router-link to="/Quanlybinhluan" class="menu-item" active-class="active">
+          <i class="fa-solid fa-comment"></i> Đánh giá
+        </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
@@ -76,22 +79,26 @@
           <table class="table table-bordered text-center mt-3">
             <thead class="table-secondary">
               <tr>
+                <th>STT</th>
                 <th>Sản phẩm</th>
                 <th>Màu</th>
                 <th>Size</th>
                 <th>Số lượng</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in dashboard.low_stock" :key="item.id_bienthe">
+              <tr v-for="(item, index) in dashboard.low_stock" :key="item.id_bienthe">
+                <td class="fw-bold">{{ Number(index) + 1 }}</td>
                 <td>{{ item.tenSP }}</td>
                 <td>{{ item.mausac }}</td>
                 <td>{{ item.size }}</td>
                 <td class="text-danger fw-bold">{{ item.so_luong }}</td>
-              </tr>
-
-              <tr v-if="dashboard.low_stock.length === 0">
-                <td colspan="4" class="text-muted">Không có sản phẩm nào sắp hết hàng</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" @click="openAddStock(item)">
+                    + Thêm số lượng
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -117,6 +124,20 @@
           </table>
         </div>
 
+      </div>
+    </div>
+  </div>
+  <div v-if="showPopup" class="popup-backdrop">
+    <div class="popup-box">
+      <h5>Thêm số lượng cho: {{ selectedItem.tenSP }}</h5>
+
+      <label class="mt-2">Nhập số lượng thêm:</label>
+      <input type="number" class="form-control mt-1"
+            v-model="addQty" min="1">
+
+      <div class="d-flex justify-content-end mt-3">
+        <button class="btn btn-secondary me-2" @click="showPopup=false">Đóng</button>
+        <button class="btn btn-success" @click="submitAddStock">Xác nhận</button>
       </div>
     </div>
   </div>
@@ -205,6 +226,42 @@ function formatPrice(num) {
     currency: "VND"
   });
 }
+// ====== POPUP ADD STOCK ======
+const showPopup = ref(false);
+const selectedItem = ref({});
+const addQty = ref(1);
+
+const openAddStock = (item) => {
+  selectedItem.value = item;
+  addQty.value = 1;
+  showPopup.value = true;
+};
+
+const submitAddStock = async () => {
+  const id = selectedItem.value.id_bienthe;
+
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/updateStock.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_bienthe: id,
+      so_luong: addQty.value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("Cập nhật thành công!");
+    showPopup.value = false;
+
+    // cập nhật lại dashboard
+    const res2 = await fetch("http://localhost/duan1/backend/api/Admin/dashboard.php");
+    dashboard.value = await res2.json();
+  } else {
+    alert("Lỗi: " + data.message);
+  }
+};
 </script>
 
 <style scoped>
@@ -291,4 +348,25 @@ header.admin-header {
 .content-section {
   padding-top: 80px;
 }
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-box {
+  background: white;
+  padding: 20px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
 </style>

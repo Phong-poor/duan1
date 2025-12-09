@@ -101,3 +101,38 @@ echo json_encode([
     "low_stock" => $low_stock,
     "top_products" => $top_products
 ], JSON_UNESCAPED_UNICODE);
+$filter = $_GET['filter'] ?? 'today';
+$start = $_GET['start'] ?? null;
+$end = $_GET['end'] ?? null;
+
+switch ($filter) {
+    case "today":
+        $condition = "DATE(thoigiantao) = CURDATE()";
+        break;
+
+    case "yesterday":
+        $condition = "DATE(thoigiantao) = CURDATE() - INTERVAL 1 DAY";
+        break;
+
+    case "week":
+        $condition = "YEARWEEK(thoigiantao, 1) = YEARWEEK(CURDATE(), 1)";
+        break;
+
+    case "month":
+        $condition = "MONTH(thoigiantao)=MONTH(CURDATE())
+                      AND YEAR(thoigiantao)=YEAR(CURDATE())";
+        break;
+
+    case "year":
+        $condition = "YEAR(thoigiantao)=YEAR(CURDATE())";
+        break;
+
+    case "custom":
+        if ($start && $end) {
+            $condition = "DATE(thoigiantao) BETWEEN '$start' AND '$end'";
+        }
+        break;
+
+    default:
+        $condition = "DATE(thoigiantao) = CURDATE()";
+}
