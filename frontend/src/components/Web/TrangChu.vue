@@ -246,20 +246,20 @@ function goBuyNow(id) {
 
         <div class="timer-container-new">
           <p>Chỉ còn lại:</p>
-          <div class="sale-timer">
+              <div class="sale-timer">
 
-            <div class="timer-box">{{ days }}</div>
+                  <div class="timer-box">{{ days }}</div>
+               
+                    <span class="timer-separator">:</span>
 
-            <span class="timer-separator">:</span>
+                    <div class="timer-box">{{ hours }}</div>
+                      <span class="timer-separator">:</span>
 
-            <div class="timer-box">{{ hours }}</div>
-            <span class="timer-separator">:</span>
+                    <div class="timer-box">{{ minutes }}</div>
+                      <span class="timer-separator">:</span>
 
-            <div class="timer-box">{{ minutes }}</div>
-            <span class="timer-separator">:</span>
-
-            <div class="timer-box">{{ seconds }}</div>
-          </div>
+                    <div class="timer-box">{{ seconds }}</div>
+                </div>
 
         </div>
 

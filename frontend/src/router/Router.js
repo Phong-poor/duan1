@@ -1,4 +1,4 @@
-import {createWebHistory, createRouter} from 'vue-router'
+import { createWebHistory, createRouter } from 'vue-router';
 
 import Quanlysanpham from '../components/Admin/Quanlysanpham.vue';
 import Quanlydanhmuc from '../components/Admin/Quanlydanhmuc.vue';
@@ -10,6 +10,7 @@ import Quanlysize from '../components/Admin/Quanlysize.vue';
 import Quanlybinhluan from '../components/Admin/Quanlybinhluan.vue';
 import Quanlyvoucher from '../components/Admin/Quanlyvoucher.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
+
 import TrangChu from '../components/Web/TrangChu.vue';
 import Sanpham from '../components/Web/Sanpham.vue';
 import ChiTiet from '../components/Web/ChiTiet.vue';
@@ -19,7 +20,8 @@ import Dangnhap from '../components/Auth/Dangnhap.vue';
 import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
 import tintuc from '../components/Web/tintuc.vue';
 import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
-import Lienhe from '../components/Web/LienHe.vue'
+import LienHe from '../components/Web/LienHe.vue';
+import Baiviet from '../components/Web/Baiviet.vue';
 
 
 const routes = [
@@ -72,5 +74,7 @@ router.beforeEach((to, from, next) => {
   // nếu mọi thứ ok thì cho đi tiếp
   next();
 });
+
+
 
 export default router

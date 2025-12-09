@@ -123,6 +123,10 @@
         <button class="popup-btn" @click="popup.show = false">OK</button>
       </div>
     </div>
+
+   
+    <div id="toast" class="toast">{{ toastMessage }}</div>
+
   </div>
 </template>
 
