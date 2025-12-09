@@ -45,7 +45,7 @@ const routes = [
     { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap, meta: { isAuth: false } },
     { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
-    { path: '/Lienhe', name: 'Lienhe', component: Lienhe, meta: { isAuth: false } },
+    { path: '/LienHe', name: 'LienHe', component: LienHe, meta: { isAuth: false } },
     { path: '/tintuc', name: 'tintuc', component: tintuc, meta: { isAuth: false } },
     { path: '/chatbot',name: 'Chatbot',component: () => import('../components/Web/Chatbot.vue')},
 
