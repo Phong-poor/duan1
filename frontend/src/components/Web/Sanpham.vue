@@ -68,6 +68,9 @@
           <!-- GRID SẢN PHẨM -->
           <section class="product-grid">
             <div class="product-card" v-for="p in products" :key="p.id_sanpham">
+              <button class="heart-btn" @click="toggleWishlist(p.id_sanpham)">
+                <i :class="wishlistIds.includes(p.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
+              </button>
               <img :src="`http://localhost/duan1/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
               <h3>{{ p.tenSP }}</h3>
               <p v-if="p.coGiamGia">
@@ -124,7 +127,6 @@ import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
 const router = useRouter();
 const route = useRoute();
-const goTo = (path) => router.push(path);
 
 import HeaderWeb from "../../Header-web.vue";
 import footerWeb from "../../footer-web.vue";
@@ -143,13 +145,14 @@ let slideTimer;
 
 // Filter states
 const sortBy = ref('moi_nhat');
+const selectedSize = ref('');
 const selectedBrand = ref('');
 const brands = ref([]);
 
 
 
 
-onMounted(async () => {
+onMounted(() => {
   const slides = slideContainer.value.querySelectorAll(".slide");
   let current = 0;
 
@@ -212,22 +215,6 @@ const applyFilters = () => {
   fetchProducts();
 };
 
-// Theo dõi thay đổi query params từ URL
-watch(() => route.query.id_thuonghieu, (newBrandId) => {
-  if (newBrandId) {
-    const brand = brands.value.find(b => b.id_thuonghieu == newBrandId);
-    if (brand) {
-      selectedBrand.value = brand;
-      currentPage.value = 1;
-      fetchProducts();
-    }
-  } else {
-    selectedBrand.value = null;
-    currentPage.value = 1;
-    fetchProducts();
-  }
-});
-
 /* PRODUCTS & PAGINATION */
 const products = ref([]);
 const currentPage = ref(1);
@@ -235,28 +222,24 @@ const perPage = 8;
 const totalProducts = ref(0);
 
 const fetchProducts = async () => {
-  try {
-    let url = `http://localhost/duan1/backend/api/Web/SanPham.php?limit=${perPage}&offset=${(currentPage.value - 1) * perPage}`;
+  let url = `http://localhost/duan1/backend/api/Web/SanPham.php?limit=${perPage}&offset=${(currentPage.value - 1) * perPage}`;
 
-    if (selectedCategory.value) {
-      url += `&id_danhmuc=${selectedCategory.value.id_danhmuc}`;
-    }
-    if (selectedBrand.value) {
-      url += `&id_thuonghieu=${selectedBrand.value.id_thuonghieu}`;
-    }
-    if (sortBy.value) {
-      url += `&sort=${sortBy.value}`;
-    }
+  if (selectedCategory.value) {
+    url += `&id_danhmuc=${selectedCategory.value.id_danhmuc}`;
+  }
+  if (selectedBrand.value) {
+    url += `&id_thuonghieu=${selectedBrand.value.id_thuonghieu}`;
+  }
+  if (sortBy.value) {
+    url += `&sort=${sortBy.value}`;
+  }
 
-    const res = await fetch(url);
-    const data = await res.json();
+  const res = await fetch(url);
+  const data = await res.json();
 
-    if (data.success) {
-      products.value = data.data;
-      totalProducts.value = data.total;
-    }
-  } catch (error) {
-    console.error("Lỗi lấy sản phẩm:", error);
+  if (data.success) {
+    products.value = data.data;
+    totalProducts.value = data.total;
   }
 };
 
@@ -283,6 +266,71 @@ function goBuyNow(id) {
   miniID.value = id;
   showMini.value = true;
 }
+watch(
+  () => route.query.id_thuonghieu,
+  (newBrandId) => {
+    if (!newBrandId) return;
+
+    const brand = brands.value.find(b => b.id_thuonghieu == newBrandId);
+
+    if (brand) {
+      selectedBrand.value = brand;
+      currentPage.value = 1;
+      fetchProducts();
+    }
+  },
+  { immediate: true }
+);
+/* ============================
+   ❤️ WISHLIST FEATURE
+=============================*/
+
+// Danh sách ID sp đã yêu thích
+const wishlistIds = ref([]);
+
+// Lấy user đang đăng nhập
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+const userId = currentUser?.id_khachhang ?? null;
+
+// Load wishlist từ server
+const loadWishlist = async () => {
+  if (!userId) return;
+
+  const res = await fetch(
+    `http://localhost/duan1/backend/api/Web/Wishlist.php?user_id=${userId}`
+  );
+
+  const data = await res.json();
+  wishlistIds.value = data.map(item => item.id_sanpham);
+};
+
+// Yêu thích / Bỏ yêu thích
+const toggleWishlist = async (id_sanpham) => {
+  if (!userId) {
+    router.push("/Dangnhap");
+    return;
+  }
+
+  await fetch("http://localhost/duan1/backend/api/Web/Wishlist.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      product_id: id_sanpham
+    })
+  });
+
+  if (wishlistIds.value.includes(id_sanpham)) {
+    wishlistIds.value = wishlistIds.value.filter(id => id !== id_sanpham);
+  } else {
+    wishlistIds.value.push(id_sanpham);
+  }
+};
+
+// Gọi khi vào trang
+onMounted(() => {
+  loadWishlist();
+});
 
 </script>
 
@@ -579,4 +627,77 @@ container {
   /* Trên 40px – Dưới 40px */
   text-align: center;
 }
-</style> 
+/* ❤️ Trái tim yêu thích */
+.heart-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+  font-size: 22px;
+  color: #ccc;
+  transition: 0.2s;
+}
+.fa-heart.active {
+  color: red !important;
+}
+
+.product-card {
+  position: relative; /* ĐỂ TRÁI TIM BÁM ĐÚNG */
+}
+/* =============================== */
+/* ❤️ ICON YÊU THÍCH TRÊN SẢN PHẨM */
+/* =============================== */
+
+.product-card {
+  position: relative; /* BẮT BUỘC để đặt icon vào góc */
+}
+
+.heart-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: 2px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  transition: 0.25s ease-in-out;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Icon mặc định */
+.heart-btn i {
+  font-size: 20px;
+  color: #444;
+  transition: 0.25s;
+}
+
+
+/* Khi đã yêu thích */
+.fa-heart.active {
+  color: #ff1a1a !important;
+  font-weight: bold;
+}
+
+/* Khi active icon có độ nảy nhẹ */
+.fa-heart.active {
+  animation: pop 0.2s ease-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.7); }
+  80% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+
+</style>

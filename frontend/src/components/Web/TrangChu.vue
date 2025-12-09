@@ -2,6 +2,7 @@
 import { onMounted, ref, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
 import HeaderWeb from '../../Header-web.vue';
 import footerWeb from '../../footer-web.vue';
 import banner1 from '../../assets/banner-slide-1.png';
@@ -20,19 +21,62 @@ import imgCv2110 from '../../assets/cv-2110.jpg';
 import imgCanhan3 from '../../assets/canhan3.jpg';
 import imgCanhan1 from '../../assets/canhan1.jpg';
 
-//thanhtoanmini
 import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
+/* ============================
+   STATE
+============================ */
 
 const showMini = ref(false);
 const miniID = ref(null);
-
 
 const bestSellers = ref([]);
 const popularProducts = ref([]);
 const flashSaleProducts = ref([]);
 
-// FLASH SALE TIMER STATE
+/* ============================
+   ❤️ WISHLIST FEATURE
+============================ */
+
+const wishlistIds = ref([]);
+
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+const userId = currentUser?.id_khachhang ?? null;
+
+const loadWishlist = async () => {
+  if (!userId) return;
+
+  const res = await fetch(
+    `http://localhost/duan1/backend/api/Web/Wishlist.php?user_id=${userId}`
+  );
+
+  const data = await res.json();
+  wishlistIds.value = data.map(item => item.id_sanpham);
+};
+
+const toggleWishlist = async (productId) => {
+  if (!userId) return router.push("/Login");
+
+  await fetch("http://localhost/duan1/backend/api/Web/Wishlist.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      product_id: productId,
+    }),
+  });
+
+  if (wishlistIds.value.includes(productId)) {
+    wishlistIds.value = wishlistIds.value.filter(id => id !== productId);
+  } else {
+    wishlistIds.value.push(productId);
+  }
+};
+
+/* ============================
+   FLASH SALE TIMER
+============================ */
+
 const days = ref('00');
 const hours = ref('00');
 const minutes = ref('00');
@@ -45,17 +89,13 @@ const updateTimer = () => {
   endTime.setDate(endTime.getDate() + 4);
   endTime.setHours(endTime.getHours() + 4);
 
-  // Cập nhật ngay lập tức lần đầu
   const update = () => {
-    const now = new Date().getTime();
+    const now = Date.now();
     const distance = endTime.getTime() - now;
 
     if (distance < 0) {
-      if (timerInterval) clearInterval(timerInterval);
-      days.value = '00';
-      hours.value = '00';
-      minutes.value = '00';
-      seconds.value = '00';
+      clearInterval(timerInterval);
+      days.value = hours.value = minutes.value = seconds.value = '00';
       return;
     }
 
@@ -65,20 +105,39 @@ const updateTimer = () => {
     seconds.value = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
   };
 
-  update(); // Chạy ngay không cần đợi 1s
+  update();
   timerInterval = setInterval(update, 1000);
 };
 
+/* ============================
+   BUY NOW
+============================ */
+
+function goBuyNow(id) {
+  const user = localStorage.getItem("currentUser");
+
+  if (!user) {
+    const returnURL = `/Thanhtoanmini?id_sanpham=${id}`;
+    router.push(`/Login?return=${encodeURIComponent(returnURL)}`);
+    return;
+  }
+
+  miniID.value = id;
+  showMini.value = true;
+}
+
+/* ============================
+   ON MOUNTED
+============================ */
+
 onMounted(async () => {
+
+  // Load sản phẩm
   try {
-    // Lấy sản phẩm đang giảm giá cho Flash Sale
     const flashResponse = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?giamgia=1&limit=8');
     const flashData = await flashResponse.json();
-    if (flashData.success) {
-      flashSaleProducts.value = flashData.data;
-    }
+    if (flashData.success) flashSaleProducts.value = flashData.data;
 
-    // Lấy tất cả sản phẩm cho Bán chạy và Phổ biến
     const response = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?limit=8');
     const data = await response.json();
     if (data.success) {
@@ -86,20 +145,26 @@ onMounted(async () => {
       popularProducts.value = [...data.data].reverse();
     }
   } catch (error) {
-    console.error('Lỗi khi tải sản phẩm:', error);
+    console.error("Lỗi tải sản phẩm:", error);
   }
 
-  // 1. CAROUSEL BANNER LỚN
+  // Load wishlist ❤️
+  await loadWishlist();
+
+  // Timer
+  updateTimer();
+
+  // Slide banner
   const slideContainer = document.getElementById('slideContainer');
   const slides = document.querySelectorAll('.hero-carousel .slide');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
+
   let currentIndex = 0;
   const totalSlides = slides.length;
 
   function updateSlidePosition() {
-    const slideWidthPercentage = 100 / totalSlides;
-    const offset = -currentIndex * slideWidthPercentage;
+    const offset = -(currentIndex * (100 / totalSlides));
     slideContainer.style.transform = `translateX(${offset}%)`;
   }
 
@@ -127,86 +192,19 @@ onMounted(async () => {
     slideInterval = setInterval(goToNextSlide, 5000);
   });
 
-  // 2. FLASH SALE TIMER
-  updateTimer();
-
-  // 3. PRODUCT CAROUSEL
-  function updateProductNav(listElement, targetId) {
-    const index = targetId.slice(-1);
-    const prevButton = document.getElementById(`prevProductBtn${index}`);
-    const nextButton = document.getElementById(`nextProductBtn${index}`);
-
-    if (!listElement || !prevButton || !nextButton) return;
-
-    if (listElement.scrollLeft <= 5) {
-      prevButton.disabled = true;
-    } else {
-      prevButton.disabled = false;
-    }
-
-    if (listElement.scrollLeft + listElement.clientWidth >= listElement.scrollWidth - 5) {
-      nextButton.disabled = true;
-    } else {
-      nextButton.disabled = false;
-    }
-  }
-
-  document.querySelectorAll('.carousel-nav-btn').forEach(button => {
-    button.addEventListener('click', () => {
-      const targetId = button.getAttribute('data-target');
-      if (!targetId) return;
-      const productList = document.getElementById(targetId);
-
-      if (productList) {
-        const containerWidth = productList.parentElement?.offsetWidth ?? productList.clientWidth;
-        const scrollAmount = containerWidth - 40;
-
-        if (button.id.startsWith('next')) {
-          productList.scrollLeft += scrollAmount;
-        } else if (button.id.startsWith('prev')) {
-          productList.scrollLeft -= scrollAmount;
-        }
-
-        setTimeout(() => updateProductNav(productList, targetId), 300);
-      }
-    });
-  });
-
-  function initProductCarousels() {
-    const lists = document.querySelectorAll('.product-list');
-    lists.forEach(list => {
-      updateProductNav(list, list.id);
-      list.addEventListener('scroll', () => updateProductNav(list, list.id));
-    });
-  }
-
-  window.addEventListener('load', initProductCarousels);
-  window.addEventListener('resize', initProductCarousels);
-  initProductCarousels();
 });
+
+/* ============================
+   BEFORE UNMOUNT
+============================ */
 
 onBeforeUnmount(() => {
   if (timerInterval) clearInterval(timerInterval);
   if (slideInterval) clearInterval(slideInterval);
 });
 
-
-function goBuyNow(id) {
-  const user = localStorage.getItem("currentUser");
-
-  if (!user) {
-    const returnURL = `/Thanhtoanmini?id_sanpham=${id}`;
-    router.push(`/Login?return=${encodeURIComponent(returnURL)}`);
-    return;
-  }
-
-  miniID.value = id;      // lưu ID sp
-  showMini.value = true;  // mở modal
-}
-
-
-
 </script>
+
 
 <template>
   <HeaderWeb />
@@ -246,25 +244,30 @@ function goBuyNow(id) {
 
         <div class="timer-container-new">
           <p>Chỉ còn lại:</p>
-              <div class="sale-timer">
+          <div class="sale-timer">
 
-                  <div class="timer-box">{{ days }}</div>
-               
-                    <span class="timer-separator">:</span>
+            <div class="timer-box">{{ days }}</div>
 
-                    <div class="timer-box">{{ hours }}</div>
-                      <span class="timer-separator">:</span>
+            <span class="timer-separator">:</span>
 
-                    <div class="timer-box">{{ minutes }}</div>
-                      <span class="timer-separator">:</span>
+            <div class="timer-box">{{ hours }}</div>
+            <span class="timer-separator">:</span>
 
-                    <div class="timer-box">{{ seconds }}</div>
-                </div>
+            <div class="timer-box">{{ minutes }}</div>
+            <span class="timer-separator">:</span>
+
+            <div class="timer-box">{{ seconds }}</div>
+          </div>
 
         </div>
 
         <div class="sale-product-grid">
           <div class="sale-product-card" v-for="product in flashSaleProducts" :key="product.id_sanpham">
+            <!-- ❤️ ICON YÊU THÍCH -->
+              <button class="heart-btn" @click="toggleWishlist(product.id_sanpham)">
+              <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
+          </button>
+
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
@@ -292,6 +295,11 @@ function goBuyNow(id) {
       <div class="product-list-container">
         <div class="product-list" id="bestSellerList">
           <div class="product-card-slide" v-for="product in bestSellers" :key="product.id_sanpham">
+            <!-- ❤️ ICON YÊU THÍCH -->
+<button class="heart-btn" @click.stop="toggleWishlist(product.id_sanpham)">
+  <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
+</button>
+
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
@@ -327,6 +335,10 @@ function goBuyNow(id) {
       <div class="product-list-container">
         <div class="product-list" id="popularKicksList">
           <div class="product-card-slide" v-for="product in popularProducts" :key="product.id_sanpham">
+            <button class="heart-btn" @click.stop="toggleWishlist(product.id_sanpham)">
+  <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
+</button>
+
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
@@ -1272,4 +1284,31 @@ function goBuyNow(id) {
     padding: 20px;
   }
 }
+
+.heart-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.heart-btn i {
+  font-size: 18px;
+  color: #7a7a7a;
+}
+
+.heart-btn i.active {
+  color: red;
+}
+
 </style>
