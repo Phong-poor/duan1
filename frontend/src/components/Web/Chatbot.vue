@@ -219,17 +219,18 @@ const scrollToBottom = () => {
 <style scoped>
 .chatbot-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  bottom: 20px;
+  right: 20px;
+  background: transparent;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: auto;
+  height: auto;
+  padding: 0;
   z-index: 9999;
-  padding: 20px;
 }
+
 
 .chatbot-container {
   background: white;
