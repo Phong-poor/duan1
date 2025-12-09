@@ -37,9 +37,17 @@
 
         <p>Hoặc đăng nhập bằng</p>
         <div class="social-icons">
-          <a @click.prevent="handleGoogleLogin">
+          <!-- GOOGLE LOGIN
+          <a @click.prevent="handleGoogleLogin" class="google-btn">
             <img :src="googleIconPath" alt="Google">
-          </a> <a href="#"><img :src="facebookIconPath" alt="Facebook"></a>
+          </a> -->
+          <!-- thay thế phần google btn -->
+          <div id="google-btn-container"></div>
+
+          <!-- FACEBOOK (chưa dùng) 
+          <a href="#" class="facebook-btn">
+            <img :src="facebookIconPath" alt="Facebook">
+          </a> -->
         </div>
       </form>
     </div>
@@ -211,18 +219,18 @@ const handleLogin = async () => {
       localStorage.setItem("currentUser", JSON.stringify(data.user || {}));
 
       if (rememberPassword.value) {
-          let savedList = JSON.parse(localStorage.getItem("savedAccounts")) || [];
+        let savedList = JSON.parse(localStorage.getItem("savedAccounts")) || [];
 
-          // Xóa email cũ để tránh bị trùng
-          savedList = savedList.filter(acc => acc.email !== loginEmail.value);
+        // Xóa email cũ để tránh bị trùng
+        savedList = savedList.filter(acc => acc.email !== loginEmail.value);
 
-          // Lưu mật khẩu mới
-          savedList.push({
-            email: loginEmail.value,
-            password: loginPassword.value
-          });
+        // Lưu mật khẩu mới
+        savedList.push({
+          email: loginEmail.value,
+          password: loginPassword.value
+        });
 
-          localStorage.setItem("savedAccounts", JSON.stringify(savedList));
+        localStorage.setItem("savedAccounts", JSON.stringify(savedList));
       }
 
       setTimeout(() => {
@@ -263,47 +271,93 @@ const hideEmailList = () => {
   setTimeout(() => showEmailList.value = false, 200);
 };
 
+
 // ===== GOOGLE LOGIN =====
+
+const GOOGLE_CLIENT_ID = "715472750510-l92si2vfelssksmk16r32n7cc0f22g8j.apps.googleusercontent.com";
+
 const loadGoogleSDK = () => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.accounts) return resolve();
+
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
+
     script.onload = resolve;
+    script.onerror = () => reject("Google SDK load failed");
+
     document.head.appendChild(script);
   });
 };
 
-const handleGoogleLogin = () => {
-  google.accounts.id.initialize({
-    client_id: "YOUR_GOOGLE_CLIENT_ID",   // <-- bạn thay của bạn vào đây
-    callback: async (response) => {
-      const res = await fetch("http://localhost/duan1/backend/api/Auth/google_login.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: response.credential })
+const initGoogleButton = async () => {
+  try {
+    await loadGoogleSDK();
+
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCallback,
+      ux_mode: "popup"
+    });
+
+    const el = document.getElementById("google-btn-container");
+    if (el) {
+      el.innerHTML = "";
+      window.google.accounts.id.renderButton(el, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "continue_with",
+        shape: "rectangular",
       });
-
-      const data = await res.json();
-
-      if (data.status === "success") {
-        showPopup("Thành công", "Đăng nhập Google thành công!");
-
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
-
-        setTimeout(() => router.push("/"), 600);
-      } else {
-        showPopup("Lỗi", data.msg || "Google login thất bại!");
-      }
     }
-  });
-
-  google.accounts.id.prompt(); // mở chọn tài khoản
+  } catch (err) {
+    console.error(err);
+    showPopup("Lỗi", "Không thể tải Google Login");
+  }
 };
-onMounted(async () => {
-  await loadGoogleSDK();
+
+const handleGoogleCallback = async (response) => {
+  if (!response || !response.credential) {
+    return showPopup("Lỗi", "Không lấy được token từ Google");
+  }
+
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Auth/google_login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: response.credential })
+    });
+
+    const text = await res.text();
+    let data;
+
+    try { data = JSON.parse(text); }
+    catch {
+      console.error("Server trả HTML:", text);
+      return showPopup("Lỗi", "không hợp lệ");
+    }
+
+    if (data.status === "success") {
+      localStorage.setItem("currentUser", JSON.stringify(data.user));
+      showPopup("Thành công", "Đăng nhập Google thành công!");
+      setTimeout(() => router.push("/"), 500);
+      return;
+    }
+
+    showPopup("Lỗi", data.msg || "Google login thất bại!");
+  } catch (e) {
+    showPopup("Lỗi", "Không thể kết nối server");
+  }
+};
+
+// chạy khi mounted
+onMounted(() => {
+  initGoogleButton();
 });
+
 
 
 /* ===== REGISTER ===== */
@@ -840,5 +894,13 @@ form {
 
 .email-dropdown li:hover {
   background: #f0f0f0;
+}
+
+/*css đăng nhập gg */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
 }
 </style>
