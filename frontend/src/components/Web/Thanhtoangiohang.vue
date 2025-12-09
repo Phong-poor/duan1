@@ -24,17 +24,18 @@
         <div class="col-lg-8">
           <div class="bg-white p-3 rounded shadow-sm">
             <div class="row fw-semibold border-bottom pb-2 small text-uppercase text-center">
-              <div class="col-2">Hình</div>
+              <div class="col-2">Hình ảnh</div>
               <div class="col-4">Sản phẩm</div>
-              <div class="col-2">SL</div>
+              <div class="col-2">Số Lượng</div>
               <div class="col-2">Giá</div>
-              <div class="col-2">Tổng</div>
+              <div class="col-1">Tổng</div>
+              <div class="col-1"></div>
             </div>
-
             <div v-for="item in cart" :key="item.id_giohang"
-                 class="row align-items-center py-3 border-bottom text-center">
+              class="row align-items-center py-3 border-bottom text-center">
+
               <div class="col-2">
-                <img :src="`http://localhost/duan1/backend/${item.hinhAnhgoc}`" class="img-fluid rounded"/>
+                <img :src="`http://localhost/duan1/backend/${item.hinhAnhgoc}`" class="img-fluid rounded" />
               </div>
 
               <div class="col-4 text-start product-name">
@@ -45,16 +46,22 @@
               </div>
 
               <div class="col-2">
-                <input type="number" class="form-control text-center"
-                       v-model="item.so_luong" @change="updateQty(item)"/>
+                <input type="number" class="form-control text-center" v-model="item.so_luong"
+                  @change="updateQty(item)" />
               </div>
 
               <div class="col-2">{{ formatPrice(getPrice(item)) }}</div>
 
-              <div class="col-2 fw-bold">
+              <div class="col-1 fw-bold">
                 {{ formatPrice(item.so_luong * getPrice(item)) }}
               </div>
+
+              <div class="col-1">
+                <span class="delete-x" @click="deleteItem(item)">x</span>
+              </div>
+
             </div>
+
 
             <div v-if="cart.length === 0" class="text-center py-4">
               Giỏ hàng trống!
@@ -81,8 +88,11 @@
               <span>Giảm giá:</span>
               <span>-10,000 VNĐ</span>
             </div>
+            <div class="mt-3">
+              <input type="text" class="form-control" placeholder="Nhập mã voucher" />
+            </div>
 
-            <hr/>
+            <hr />
 
             <div class="d-flex justify-content-between fw-bold text-danger">
               <span>Tổng thanh toán:</span>
@@ -100,33 +110,33 @@
 
         <div class="row g-3">
           <div class="col-md-6">
-            <input v-model="form.ten" type="text" class="form-control" placeholder="Họ tên"/>
+            <input v-model="form.ten" type="text" class="form-control" placeholder="Họ tên" />
           </div>
           <div class="col-md-6">
-            <input v-model="form.sdt" type="text" class="form-control" placeholder="Số điện thoại"/>
+            <input v-model="form.sdt" type="text" class="form-control" placeholder="Số điện thoại" />
           </div>
           <div class="col-md-6">
-            <input v-model="form.email" type="email" class="form-control" placeholder="Email"/>
+            <input v-model="form.email" type="email" class="form-control" placeholder="Email" />
           </div>
           <div class="col-md-6">
-            <input v-model="form.tinh" type="text" class="form-control" placeholder="Tỉnh / TP"/>
+            <input v-model="form.tinh" type="text" class="form-control" placeholder="Tỉnh / TP" />
           </div>
         </div>
 
-        <input v-model="form.diachi" type="text" class="form-control mt-3" placeholder="Địa chỉ"/>
+        <input v-model="form.diachi" type="text" class="form-control mt-3" placeholder="Địa chỉ" />
         <textarea v-model="form.ghichu" class="form-control mt-3" rows="3" placeholder="Ghi chú"></textarea>
 
         <h5 class="fw-semibold mt-4 mb-2">2. Thanh Toán</h5>
 
         <div class="list-group">
           <label class="list-group-item">
-            <input v-model="form.pttt" value="COD" type="radio"/> COD
+            <input v-model="form.pttt" value="COD" type="radio" /> COD
           </label>
           <label class="list-group-item">
-            <input v-model="form.pttt" value="bank" type="radio"/> Ngân hàng
+            <input v-model="form.pttt" value="bank" type="radio" /> Ngân hàng
           </label>
           <label class="list-group-item">
-            <input v-model="form.pttt" value="momo" type="radio"/> Ví Momo
+            <input v-model="form.pttt" value="momo" type="radio" /> Ví Momo
           </label>
         </div>
 
@@ -138,7 +148,7 @@
     </div>
   </div>
 
-  <footerWeb/>
+  <footerWeb />
 </template>
 
 <script setup>
@@ -242,6 +252,33 @@ const submitOrder = async () => {
     orderStatus.value = false;
   }
 };
+
+const deleteItem = async (item) => {
+  if (!confirm("Xóa sản phẩm này?")) return;
+
+  try {
+    const res = await axios.post(
+      `${API}?action=delete`,
+      {
+        id_giohang: item.id_giohang
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    if (res.data.success) {
+      // xoá khỏi giao diện
+      cart.value = cart.value.filter(i => i.id_giohang !== item.id_giohang);
+    } else {
+      alert("Xóa không thành công!");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Lỗi kết nối server!");
+  }
+};
+
+
 </script>
 
 <style scoped>
@@ -249,7 +286,7 @@ const submitOrder = async () => {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -265,7 +302,11 @@ const submitOrder = async () => {
   animation: spin 1s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* Result Popup */
 .result-popup {
@@ -279,22 +320,66 @@ const submitOrder = async () => {
   text-align: center;
   z-index: 100000;
   animation: fadeIn .3s ease;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.result-popup.success .icon i { color: #28a745; font-size: 55px; }
-.result-popup.fail .icon i { color: #dc3545; font-size: 55px; }
+.result-popup.success .icon i {
+  color: #28a745;
+  font-size: 55px;
+}
+
+.result-popup.fail .icon i {
+  color: #dc3545;
+  font-size: 55px;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -20px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
-.bg-light { margin-top: 50px; }
+.bg-light {
+  margin-top: 50px;
+}
 
 .product-name {
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.delete-x {
+  color: #dc3545;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+  display: inline-block;
+}
+
+.delete-x:hover {
+  color: #a8001f;
+}
+
+.voucher-section {
+margin-top: 12px;
+}
+.voucher-section input {
+width: 100%;
+padding: 10px;
+border: 1px solid #ccc;
+border-radius: 6px;
+font-size: 14px;
+}
+.voucher-section input:focus {
+border-color: #007bff;
+outline: none;
 }
 </style>

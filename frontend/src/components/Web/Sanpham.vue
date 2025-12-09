@@ -35,7 +35,6 @@
         </div>
 
         <div class="filter-inline">
-
           <label>Loại:</label>
           <select v-model="selectedCategory" @change="applyFilters">
             <option :value="null">Tất cả</option>
@@ -71,7 +70,6 @@
             <div class="product-card" v-for="p in products" :key="p.id_sanpham">
               <img :src="`http://localhost/duan1/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
               <h3>{{ p.tenSP }}</h3>
-              <div class="stars">★★★★★</div>
               <p v-if="p.coGiamGia">
                 <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
                   {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.giaSP) }}
@@ -137,7 +135,6 @@ import bannerSlide3 from "../../assets/banner-slide-3.jpg";
 import imgSale1 from '../../assets/images (1).jpg'; // Fallback image
 
 
-
 const showMini = ref(false);
 const miniID = ref(null);
 
@@ -163,17 +160,7 @@ onMounted(async () => {
   }, 4000);
 
   fetchCategories();
-  await fetchBrands();
-  
-  // Kiểm tra query param từ URL
-  const brandIdFromUrl = route.query.id_thuonghieu;
-  if (brandIdFromUrl) {
-    const brand = brands.value.find(b => b.id_thuonghieu == brandIdFromUrl);
-    if (brand) {
-      selectedBrand.value = brand;
-    }
-  }
-  
+  fetchBrands();
   fetchProducts();
 });
 
@@ -207,14 +194,11 @@ const fetchBrands = async () => {
   }
 };
 
-
-
 const chooseBrand = (brand) => {
   selectedBrand.value = brand;
   currentPage.value = 1;
   fetchProducts();
 };
-
 
 
 const chooseCategory = (cat) => {
@@ -468,13 +452,6 @@ container {
   font-weight: 600;
   margin: 5px 0;
 }
-
-.stars {
-  color: #ffc107;
-  margin: 3px 0;
-  font-size: 14px;
-}
-
 .product-card p {
   font-size: 16px;
   font-weight: 700;

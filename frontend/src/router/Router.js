@@ -7,6 +7,8 @@ import Quanlykhachhang from '../components/Admin/Quanlykhachhang.vue';
 import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
 import Quanlymausac from '../components/Admin/Quanlymausac.vue';
 import Quanlysize from '../components/Admin/Quanlysize.vue';
+import Quanlybinhluan from '../components/Admin/Quanlybinhluan.vue';
+import Quanlyvoucher from '../components/Admin/Quanlyvoucher.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
 import TrangChu from '../components/Web/TrangChu.vue';
 import Sanpham from '../components/Web/Sanpham.vue';
@@ -15,7 +17,7 @@ import ThongTin from '../components/Web/ThongTin.vue';
 import Gioithieu from '../components/Web/Gioithieu.vue';
 import Dangnhap from '../components/Auth/Dangnhap.vue'; 
 import Quenmatkhau from '../components/Auth/Quenmatkhau.vue';
-// import tintuc from '../components/Web/tintuc.vue';
+import tintuc from '../components/Web/tintuc.vue';
 import Thanhtoangiohang from '../components/Web/Thanhtoangiohang.vue';
 import Lienhe from '../components/Web/LienHe.vue'
 
@@ -28,18 +30,23 @@ const routes = [
     { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
+    { path: '/Quanlybinhluan', name: 'Quanlybinhluan', component: Quanlybinhluan, meta: { isAuth: false } },
+    { path: '/Quanlyvoucher', name: 'Quanlyvoucher', component: Quanlyvoucher, meta: { isAuth: false } },
     { path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
     { path: '/Thanhtoangiohang', name: 'Thanhtoangiohang', component: Thanhtoangiohang, meta: { isAuth: false } },
-    { path: '/Sanpham', name: 'Sanpham', component: Sanpham, meta: { isAuth: false } },
-    { path: '/ChiTiet', name: 'ChiTiet', component: ChiTiet, meta: { isAuth: false } },
+    { path: '/Sanpham', name: 'Sanpham', component: Sanpham, meta: { isAuth: false, showChatbot: true } },
+    { path: '/ChiTiet', name: 'ChiTiet', component: ChiTiet, meta: { isAuth: false, showChatbot: true } },
     { path: '/ThongTin', name: 'ThongTin', component: ThongTin, meta: { isAuth: false } },
-    { path: '/', name: 'TrangChu', component: TrangChu, meta: { isAuth: false } },
+    { path: '/', name: 'TrangChu', component: TrangChu, meta: { isAuth: false, showChatbot: true } },
     { path: '/Quanlymausac', name: 'Quanlymausac', component: Quanlymausac, meta: { isAuth: false } },
     { path: '/Quanlysize', name: 'Quanlysize', component: Quanlysize, meta: { isAuth: false } },
     { path: '/Dangnhap', name: 'Dangnhap', component: Dangnhap, meta: { isAuth: false } },
     { path: '/Gioithieu', name: 'Gioithieu', component: Gioithieu, meta: { isAuth: false } },
     { path: '/Quenmatkhau', name: 'Quenmatkhau', component: Quenmatkhau, meta: { isAuth: false } },
     { path: '/Lienhe', name: 'Lienhe', component: Lienhe, meta: { isAuth: false } },
+    { path: '/tintuc', name: 'tintuc', component: tintuc, meta: { isAuth: false } },
+    { path: '/chatbot',name: 'Chatbot',component: () => import('../components/Web/Chatbot.vue')},
+
   ]
 
 const router = createRouter({
