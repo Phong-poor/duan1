@@ -8,6 +8,7 @@ import Quanlydonhang from '../components/Admin/Quanlydonhang.vue';
 import Quanlymausac from '../components/Admin/Quanlymausac.vue';
 import Quanlysize from '../components/Admin/Quanlysize.vue';
 import Quanlybinhluan from '../components/Admin/Quanlybinhluan.vue';
+import Quanlyvoucher from '../components/Admin/Quanlyvoucher.vue';
 import Dashboard from '../components/Admin/Dashboard.vue';
 import TrangChu from '../components/Web/TrangChu.vue';
 import Sanpham from '../components/Web/Sanpham.vue';
@@ -30,6 +31,7 @@ const routes = [
     { path: '/Quanlykhachhang', name: 'Quanlykhachhang', component: Quanlykhachhang, meta: { isAuth: false } },
     { path: '/Quanlydonhang', name: 'Quanlydonhang', component: Quanlydonhang, meta: { isAuth: false } },
     { path: '/Quanlybinhluan', name: 'Quanlybinhluan', component: Quanlybinhluan, meta: { isAuth: false } },
+    { path: '/Quanlyvoucher', name: 'Quanlyvoucher', component: Quanlyvoucher, meta: { isAuth: false } },
     { path: '/Dashboard', name: 'Dashboard', component: Dashboard, meta: { isAuth: false } },
     { path: '/Thanhtoangiohang', name: 'Thanhtoangiohang', component: Thanhtoangiohang, meta: { isAuth: false } },
     { path: '/Sanpham', name: 'Sanpham', component: Sanpham, meta: { isAuth: false, showChatbot: true } },
