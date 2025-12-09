@@ -36,23 +36,21 @@ const xuLyTimKiem = () => {
 // Xử lý khi bấm Enter
 const xuLyEnter = () => {
   const tuKhoa = tuKhoaTimKiem.value.toLowerCase().trim();
+  // tìm thương hiệu
   const thuongHieuKhop = danhSachThuongHieu.value.find(
     th => th.tenTH.toLowerCase() === tuKhoa
   );
-  
   if (thuongHieuKhop) {
-    // Nếu khớp thương hiệu -> chuyển sang trang Sản phẩm với filter
     hienThiKetQua.value = false;
     tuKhoaTimKiem.value = "";
-    
-    // Sử dụng replace để force reload khi đang ở trang Sanpham
-    router.replace({
+    router.push({
       name: 'Sanpham',
-      query: { 
+      query: {
         id_thuonghieu: thuongHieuKhop.id_thuonghieu,
-        _t: Date.now() // Thêm timestamp để force reload
+        _t: Date.now()   // ép reload
       }
     });
+    return;
   }
 };
 
@@ -110,8 +108,35 @@ const logout = () => {
   currentUser.value = null;
   window.location.href = "/Dangnhap";
 };
+// ================================
+// ❤️ WISHLIST DROPDOWN (HEADER)
+// ================================
+const wishlistDropdownOpen = ref(false);
+const wishlistData = ref([]);
 
+const toggleWishlistDropdown = () => {
+  wishlistDropdownOpen.value = !wishlistDropdownOpen.value;
+};
 
+const user = localStorage.getItem("currentUser");
+const userId = user ? JSON.parse(user).id_khachhang : null;
+
+// Load wishlist
+const loadWishlist = async () => {
+  if (!userId) return;
+
+  try {
+    const res = await axios.get(`http://localhost/duan1/backend/api/Web/Wishlist.php?user_id=${userId}`);
+    wishlistData.value = res.data;   // ⭐ danh sách để hiển thị
+  } catch (e) {
+    console.error("Wishlist load error:", e);
+  }
+};
+
+// Gọi load khi mount
+onMounted(() => {
+  loadWishlist();
+});
 </script>
 
 <template>
@@ -122,21 +147,11 @@ const logout = () => {
       </div>
 
       <nav class="nav-links">
-        <router-link to="/" class="menu-item" active-class="active">
-                 Trang chủ
-            </router-link>
-        <router-link to="/Sanpham" class="menu-item" active-class="active">
-                 Sản phẩm
-            </router-link>
-        <router-link to="/tintuc" class="menu-item" active-class="active">
-                 Tin tức
-            </router-link>
-        <router-link to="/Gioithieu" class="menu-item" active-class="active">
-                 Giới thiệu
-            </router-link>
-        <router-link to="/Lienhe" class="menu-item" active-class="active">
-                 Liên hệ
-            </router-link>
+        <router-link to="/" class="menu-item" active-class="active">Trang chủ</router-link>
+        <router-link to="/Sanpham" class="menu-item">Sản phẩm</router-link>
+        <router-link to="/tintuc" class="menu-item">Tin tức</router-link>
+        <router-link to="/Gioithieu" class="menu-item">Giới thiệu</router-link>
+        <router-link to="/LienHe" class="menu-item">Liên hệ</router-link>
       </nav>
 
       <div class="actions">
@@ -169,8 +184,45 @@ const logout = () => {
           </div>
         </div>
 
-        <div class="icons">
-          <a href="#" class="icon-heart"><i class="fas fa-heart"></i></a>
+        <!-- ❤️ DROPDOWN YÊU THÍCH -->
+        <div class="wishlist-wrapper">
+          <a class="icon-heart" @click="toggleWishlistDropdown">
+            <i class="fas fa-heart"></i>
+          </a>
+
+          <div v-if="wishlistDropdownOpen" class="wishlist-dropdown">
+
+            <!-- Chưa đăng nhập -->
+            <div v-if="!userId" class="empty-msg">
+              Bạn chưa đăng nhập.<br>
+              <router-link to="/Dangnhap" class="go-login">Đăng nhập ngay</router-link>
+            </div>
+
+            <!-- Không có sản phẩm -->
+            <div v-else-if="wishlistData.length === 0" class="empty-msg">
+              Chưa có sản phẩm yêu thích.
+            </div>
+
+            <!-- Có sản phẩm -->
+            <div v-else>
+              <div v-for="item in wishlistData" :key="item.id_sanpham" class="wishlist-item">
+
+                <img :src="`http://localhost/duan1/backend/${item.hinhAnhgoc}`" class="wishlist-img" />
+
+                <div class="wishlist-info">
+                  <div class="name">{{ item.tenSP }}</div>
+                  <div class="price">{{ Number(item.giaSP).toLocaleString() }}đ</div>
+
+                  <router-link :to="`/ChiTiet?id=${item.id_sanpham}`"
+                              class="detail-link">
+                    Xem chi tiết
+                  </router-link>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
           <router-link to="/Thanhtoangiohang" class="icon-shopping-cart"><i class="fas fa-shopping-cart"></i></router-link>
 
           <div class="user-dropdown-wrapper">
@@ -197,10 +249,82 @@ const logout = () => {
 
         </div>
       </div>
-    </div>
   </header>
 </template>
 <style scoped>
+  /* ❤️ WISHLIST DROPDOWN */
+.wishlist-wrapper {
+  position: relative;
+}
+
+.wishlist-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 310px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  z-index: 9999;
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+  color: #444;
+}
+
+.go-login {
+  display: inline-block;
+  margin-top: 6px;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.wishlist-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.wishlist-item:hover {
+  background: #f8f8f8;
+}
+
+.wishlist-img {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.wishlist-info {
+  flex: 1;
+}
+
+.wishlist-info .name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.wishlist-info .price {
+  font-size: 13px;
+  color: #d20505;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+.detail-link {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #007bff;
+}
+
 /* RESET MARGIN/PADDING TOÀN TRANG */
 :global(body) {
   margin: 0;
@@ -366,7 +490,6 @@ const logout = () => {
 }
 
 .icon-user i {
-  font-size: 20px;
   color: #333;
   cursor: pointer;
 }
@@ -472,4 +595,5 @@ const logout = () => {
 .search-dropdown::-webkit-scrollbar-thumb:hover {
   background: #b3b3b3;
 }
+
 </style>
