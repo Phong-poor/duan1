@@ -15,7 +15,7 @@ $search = isset($_GET['search']) ? $_GET['search'] : null;
 $size = isset($_GET['size']) ? $_GET['size'] : null;
 $giamgia = isset($_GET['giamgia']) ? $_GET['giamgia'] : null;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'moi_nhat';
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 8;
 $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
 
 $query = "SELECT 
@@ -44,8 +44,8 @@ $query = "SELECT
                 ELSE 0
             END as coGiamGia
         FROM sanpham sp
-        LEFT JOIN danhmuc dm ON sp.id_danhmuc = dm.id_danhmuc
-        LEFT JOIN thuonghieu th ON sp.id_thuonghieu = th.id_thuonghieu";
+        JOIN danhmuc dm ON sp.id_danhmuc = dm.id_danhmuc
+        JOIN thuonghieu th ON sp.id_thuonghieu = th.id_thuonghieu";
 
 if ($size) {
     $query .= " INNER JOIN bienthe bt ON sp.id_sanpham = bt.id_sanpham
@@ -112,8 +112,8 @@ $stmt->execute();
 $products = $stmt->fetchAll();
 
 $countQuery = "SELECT COUNT(DISTINCT sp.id_sanpham) as total FROM sanpham sp 
-               LEFT JOIN danhmuc dm ON sp.id_danhmuc = dm.id_danhmuc
-               LEFT JOIN thuonghieu th ON sp.id_thuonghieu = th.id_thuonghieu";
+               JOIN danhmuc dm ON sp.id_danhmuc = dm.id_danhmuc
+               JOIN thuonghieu th ON sp.id_thuonghieu = th.id_thuonghieu";
 
 if ($size) {
     $countQuery .= " INNER JOIN bienthe bt ON sp.id_sanpham = bt.id_sanpham

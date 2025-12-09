@@ -73,9 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     echo json_encode([
         "status" => $success,
         "message" => $success ? "Cập nhật thành công" : "Cập nhật thất bại"
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
     exit();
 }
 
 echo json_encode(["status" => false, "message" => "Method not allowed"]);
-?>

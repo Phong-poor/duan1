@@ -7,15 +7,22 @@
         <h1>Đăng Nhập</h1>
 
         <div class="input-box">
-          <input type="email" v-model="loginEmail" placeholder="Email" required autocomplete="off">
+          <input type="email" placeholder="Nhập email" v-model="loginEmail" @focus="showEmailList = true"
+            @input="filterEmails" @blur="hideEmailList">
+          <ul v-if="showEmailList" class="email-dropdown">
+            <li v-for="acc in filteredEmails" @mousedown.prevent="selectEmail(acc)">
+              {{ acc.email }}
+            </li>
+          </ul>
           <i class="fa-solid fa-user"></i>
         </div>
 
         <div class="input-box">
-          <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginPassword"
-                 placeholder="Password" required autocomplete="new-password">
-          <i class="fa-solid" :class="showLoginPassword ? 'fa-eye-slash' : 'fa-eye'"
-             @click="showLoginPassword = !showLoginPassword"></i>
+          <input :type="showLoginPassword ? 'text' : 'password'" v-model="loginPassword" placeholder="Password" required
+            autocomplete="new-password">
+          <!-- ĐÃ SỬA -->
+          <i class="fa-solid" :class="showLoginPassword ? 'fa-eye' : 'fa-eye-slash'"
+            @click="showLoginPassword = !showLoginPassword"></i>
         </div>
 
         <div class="row-between">
@@ -23,7 +30,6 @@
             <input type="checkbox" v-model="rememberPassword" />
             Ghi nhớ mật khẩu
           </label>
-
           <a class="forgot-link" href="Quenmatkhau">Quên mật khẩu?</a>
         </div>
 
@@ -31,8 +37,17 @@
 
         <p>Hoặc đăng nhập bằng</p>
         <div class="social-icons">
-          <a href="#"><img :src="googleIconPath" alt="Google"></a>
-          <a href="#"><img :src="facebookIconPath" alt="Facebook"></a>
+          <!-- GOOGLE LOGIN
+          <a @click.prevent="handleGoogleLogin" class="google-btn">
+            <img :src="googleIconPath" alt="Google">
+          </a> -->
+          <!-- thay thế phần google btn -->
+          <div id="google-btn-container"></div>
+
+          <!-- FACEBOOK (chưa dùng) 
+          <a href="#" class="facebook-btn">
+            <img :src="facebookIconPath" alt="Facebook">
+          </a> -->
         </div>
       </form>
     </div>
@@ -52,20 +67,23 @@
           <i class="fa-solid fa-envelope"></i>
         </div>
 
+
+
         <div class="input-box">
-          <input :type="showRegPassword ? 'text' : 'password'" v-model="regPassword"
-                 placeholder="Nhập mật khẩu" required autocomplete="new-password">
-          <i class="fa-solid" :class="showRegPassword ? 'fa-eye-slash' : 'fa-eye'"
-             @click="showRegPassword = !showRegPassword"></i>
+          <input :type="showRegPassword ? 'text' : 'password'" v-model="regPassword" placeholder="Nhập mật khẩu"
+            required autocomplete="new-password">
+          <!-- ĐÃ SỬA -->
+          <i class="fa-solid" :class="showRegPassword ? 'fa-eye' : 'fa-eye-slash'"
+            @click="showRegPassword = !showRegPassword"></i>
         </div>
 
         <div class="input-box">
           <input :type="showRegPasswordConfirm ? 'text' : 'password'" v-model="regPasswordConfirm"
-                 placeholder="Xác nhận mật khẩu" required autocomplete="new-password">
-          <i class="fa-solid" :class="showRegPasswordConfirm ? 'fa-eye-slash' : 'fa-eye'"
-             @click="showRegPasswordConfirm = !showRegPasswordConfirm"></i>
+            placeholder="Xác nhận mật khẩu" required autocomplete="new-password">
+          <!-- ĐÃ SỬA -->
+          <i class="fa-solid" :class="showRegPasswordConfirm ? 'fa-eye' : 'fa-eye-slash'"
+            @click="showRegPasswordConfirm = !showRegPasswordConfirm"></i>
         </div>
-
         <button class="btn">Đăng Kí</button>
 
         <p>Hoặc đăng kí bằng</p>
@@ -83,13 +101,26 @@
       <div class="toggle-panel toggle-left">
         <h1>Hello, Welcome!</h1>
         <p>Bạn chưa có tài khoản?</p>
-        <button class="btn register-btn" @click="showRegister">Đăng Kí</button>
+        <button class="btn register-btn" @click="isRegisterActive = true">Đăng Kí</button>
       </div>
 
       <div class="toggle-panel toggle-right">
         <h1>Welcome Home!</h1>
         <p>Bạn đã có tài khoản?</p>
-        <button class="btn login-btn" @click="showLogin">Đăng Nhập</button>
+        <button class="btn login-btn" @click="isRegisterActive = false">Đăng Nhập</button>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast">{{ toastMessage }}</div>
+
+    <!-- POPUP -->
+    <div v-if="popup.show" class="popup-overlay">
+      <div class="popup-box">
+        <div class="popup-icon"></div>
+        <h3>{{ popup.title }}</h3>
+        <p>{{ popup.message }}</p>
+        <button class="popup-btn" @click="popup.show = false">OK</button>
       </div>
     </div>
 
@@ -100,200 +131,290 @@
 </template>
 
 
-<script>
+<script setup>
+import { ref, reactive, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import toggleImg from '../../assets/images.jpg';
 import googleIcon from '../../assets/Google__G__logo.svg.jpg';
 import facebookIcon from '../../assets/Facebook_Logo_(2019).jpg';
 
-export default {
-  data() {
-    return {
-      isRegisterActive: false,
+const router = useRouter();
 
-      loginEmail: "",
-      loginPassword: "",
-      rememberPassword: false,
-      showLoginPassword: false,
+/* ========== STATE ========== */
+const isRegisterActive = ref(false);
 
-      regUser: "",
-      regEmail: "",
-      regPassword: "",
-      regPasswordConfirm: "",
-      showRegPassword: false,
-      showRegPasswordConfirm: false,
+/* LOGIN */
+const loginEmail = ref('');
+const loginPassword = ref('');
+const rememberPassword = ref(false);
+const showLoginPassword = ref(false);
 
-      toggleImagePath: toggleImg,
-      googleIconPath: googleIcon,
-      facebookIconPath: facebookIcon,
+/* REGISTER */
+const regUser = ref('');
+const regEmail = ref('');
+const regPassword = ref('');
+const regPasswordConfirm = ref('');
+const showRegPassword = ref(false);
+const showRegPasswordConfirm = ref(false);
 
-      toastMessage: ""
-    };
-  },
+/* ICONS & IMAGES */
+const toggleImagePath = toggleImg;
+const googleIconPath = googleIcon;
+const facebookIconPath = facebookIcon;
 
-  mounted() {
-    const savedLogin = JSON.parse(localStorage.getItem("savedLogin"));
-    if (savedLogin) {
-      this.loginEmail = savedLogin.email;
-      this.loginPassword = savedLogin.password;
-      this.rememberPassword = true;
-    }
-  },
+/* TOAST */
+const toastMessage = ref('');
 
-  methods: {
-    /* ===================== TOAST ===================== */
-    showToast(msg, type = "success") {
-      this.toastMessage = msg;
-      const toast = document.getElementById("toast");
+/* POPUP */
+const popup = reactive({
+  show: false,
+  title: '',
+  message: ''
+});
 
-      toast.style.background =
-        type === "error"
-          ? "linear-gradient(135deg, #e74c3c, #c0392b)"
-          : "linear-gradient(135deg, #4CAF50, #2ecc71)";
+/* ========== LIFECYCLE ========== */
+onMounted(() => {
+  const savedLogin = JSON.parse(localStorage.getItem("savedLogin"));
+  if (savedLogin) {
+    loginEmail.value = savedLogin.email;
+    loginPassword.value = savedLogin.password;
+    rememberPassword.value = true;
+  }
+});
 
-      toast.classList.add("show");
+/* ========== FUNCTIONS ========== */
+const showPopup = (title, message) => {
+  popup.title = title;
+  popup.message = message;
+  popup.show = true;
+};
+
+const showToast = (msg, type = "success") => {
+  toastMessage.value = msg;
+  const toast = document.getElementById("toast");
+  toast.style.background =
+    type === "error"
+      ? "linear-gradient(135deg, #e74c3c, #c0392b)"
+      : "linear-gradient(135deg, #4CAF50, #2ecc71)";
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2500);
+};
+
+/* ===== LOGIN ===== */
+const handleLogin = async () => {
+  if (!loginEmail.value || !loginPassword.value) {
+    showPopup("Thông báo", "Vui lòng nhập đầy đủ thông tin!");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: loginEmail.value, password: loginPassword.value })
+    });
+
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { showPopup("Lỗi", "Server trả dữ liệu sai!"); return; }
+
+    if (data.status === "success") {
+      showPopup("Thành công", data.msg || "Đăng nhập thành công!");
+      localStorage.setItem("currentUser", JSON.stringify(data.user || {}));
+
+      if (rememberPassword.value) {
+        let savedList = JSON.parse(localStorage.getItem("savedAccounts")) || [];
+
+        // Xóa email cũ để tránh bị trùng
+        savedList = savedList.filter(acc => acc.email !== loginEmail.value);
+
+        // Lưu mật khẩu mới
+        savedList.push({
+          email: loginEmail.value,
+          password: loginPassword.value
+        });
+
+        localStorage.setItem("savedAccounts", JSON.stringify(savedList));
+      }
 
       setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2500);
-    },
-
-    showRegister() { this.isRegisterActive = true; },
-    showLogin() { this.isRegisterActive = false; },
-
-    /* ================== LOGIN =================== */
-    async handleLogin() {
-      if (!this.loginEmail || !this.loginPassword) {
-        this.showToast("Vui lòng nhập đủ thông tin!", "error");
-        return;
-      }
-
-      try {
-        const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: this.loginEmail,
-            password: this.loginPassword
-          })
-        });
-
-        const data = JSON.parse(await res.text());
-
-        if (data.status === "success") {
-          this.showToast(data.msg, "success");
-
-          localStorage.setItem("currentUser", JSON.stringify(data.user));
-
-          if (this.rememberPassword) {
-            localStorage.setItem("savedLogin", JSON.stringify({
-              email: this.loginEmail,
-              password: this.loginPassword
-            }));
-          } else {
-            localStorage.removeItem("savedLogin");
-          }
-
-          if (data.user.role === "admin") {
-            this.$router.push("/Dashboard");
-          } else {
-            this.$router.push("/");
-          }
-
-        } else {
-          this.showToast(data.msg, "error");
-        }
-
-      } catch (error) {
-        this.showToast("Lỗi kết nối server!", "error");
-      }
-    },
-
-    /* ================== REGISTER =================== */
-    async handleRegister() {
-      if (!this.regUser || !this.regEmail || !this.regPassword || !this.regPasswordConfirm) {
-        this.showToast("Vui lòng nhập đầy đủ thông tin!", "error");
-        return;
-      }
-
-      const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-      if (!emailPattern.test(this.regEmail)) {
-        this.showToast("Email phải kết thúc bằng @gmail.com!", "error");
-        return;
-      }
-
-      if (this.regPassword.length < 6) {
-        this.showToast("Mật khẩu phải ít nhất 6 ký tự!", "error");
-        return;
-      }
-
-      if (this.regPassword !== this.regPasswordConfirm) {
-        this.showToast("Mật khẩu xác nhận không khớp!", "error");
-        return;
-      }
-
-      try {
-        const res = await fetch("http://localhost/duan1/backend/api/Auth/register.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tenKH: this.regUser,
-            email: this.regEmail,
-            password: this.regPassword,
-            confirm_password: this.regPasswordConfirm
-          })
-        });
-
-        const text = await res.text();
-        let data;
-
-        try {
-          data = JSON.parse(text);
-        } catch {
-          this.showToast("Đăng ký thành công!", "success");
-          this.showLogin();
-          return;
-        }
-
-        if (data.status === "success") {
-          this.showToast(data.msg, "success");
-          this.showLogin();
-        } else {
-          this.showToast(data.msg || "Đăng ký thành công!", "success");
-          this.showLogin();
-        }
-
-      } catch (error) {
-        this.showToast("Đăng ký thành công (offline)!", "success");
-        this.showLogin();
-      }
+        if (data.user?.role === "admin") router.push("/Dashboard");
+        else router.push("/");
+      }, 800);
+      return;
     }
+
+    showPopup("Lỗi đăng nhập", data.msg || "Email hoặc mật khẩu sai!");
+  } catch (error) {
+    showPopup("Lỗi", "Không thể kết nối server!");
+  }
+};
+
+const showEmailList = ref(false);
+const emailList = ref([]);
+const filteredEmails = ref([]);
+
+onMounted(() => {
+  emailList.value = JSON.parse(localStorage.getItem("savedAccounts")) || [];
+  filteredEmails.value = emailList.value;
+});
+
+const filterEmails = () => {
+  filteredEmails.value = emailList.value.filter(acc =>
+    acc.email.toLowerCase().includes(loginEmail.value.toLowerCase())
+  );
+};
+
+const selectEmail = (acc) => {
+  loginEmail.value = acc.email;
+  loginPassword.value = acc.password;
+  showEmailList.value = false;
+};
+
+const hideEmailList = () => {
+  setTimeout(() => showEmailList.value = false, 200);
+};
+
+
+// ===== GOOGLE LOGIN =====
+
+const GOOGLE_CLIENT_ID = "715472750510-l92si2vfelssksmk16r32n7cc0f22g8j.apps.googleusercontent.com";
+
+const loadGoogleSDK = () => {
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.accounts) return resolve();
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+
+    script.onload = resolve;
+    script.onerror = () => reject("Google SDK load failed");
+
+    document.head.appendChild(script);
+  });
+};
+
+const initGoogleButton = async () => {
+  try {
+    await loadGoogleSDK();
+
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCallback,
+      ux_mode: "popup"
+    });
+
+    const el = document.getElementById("google-btn-container");
+    if (el) {
+      el.innerHTML = "";
+      window.google.accounts.id.renderButton(el, {
+        type: "standard",
+        theme: "outline",
+        size: "large",
+        text: "continue_with",
+        shape: "rectangular",
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    showPopup("Lỗi", "Không thể tải Google Login");
+  }
+};
+
+const handleGoogleCallback = async (response) => {
+  if (!response || !response.credential) {
+    return showPopup("Lỗi", "Không lấy được token từ Google");
+  }
+
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Auth/google_login.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: response.credential })
+    });
+
+    const text = await res.text();
+    let data;
+
+    try { data = JSON.parse(text); }
+    catch {
+      console.error("Server trả HTML:", text);
+      return showPopup("Lỗi", "không hợp lệ");
+    }
+
+    if (data.status === "success") {
+      localStorage.setItem("currentUser", JSON.stringify(data.user));
+      showPopup("Thành công", "Đăng nhập Google thành công!");
+      setTimeout(() => router.push("/"), 500);
+      return;
+    }
+
+    showPopup("Lỗi", data.msg || "Google login thất bại!");
+  } catch (e) {
+    showPopup("Lỗi", "Không thể kết nối server");
+  }
+};
+
+// chạy khi mounted
+onMounted(() => {
+  initGoogleButton();
+});
+
+
+
+/* ===== REGISTER ===== */
+const handleRegister = async () => {
+  if (!regUser.value || !regEmail.value || !regPassword.value || !regPasswordConfirm.value) {
+    showPopup("Cảnh báo", "Vui lòng nhập đầy đủ thông tin!");
+    return;
+  }
+
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  if (!emailPattern.test(regEmail.value)) {
+    showPopup("Email không hợp lệ", "Email phải kết thúc bằng @gmail.com!");
+    return;
+  }
+
+  if (regPassword.value.length < 6) {
+    showPopup("Mật khẩu yếu", "Mật khẩu phải ít nhất 6 ký tự!");
+    return;
+  }
+
+  if (regPassword.value !== regPasswordConfirm.value) {
+    showPopup("Sai mật khẩu", "Mật khẩu xác nhận không khớp!");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost/duan1/backend/api/Auth/register.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tenKH: regUser.value,
+        email: regEmail.value,
+        password: regPassword.value,
+        confirm_password: regPasswordConfirm.value
+      })
+    });
+
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { showPopup("Thành công", "Đăng ký thành công!"); isRegisterActive.value = false; return; }
+
+    if (data.status === "success") showPopup("Thành công", data.msg);
+    else showPopup("Thông báo", data.msg || "Đăng ký thành công!");
+
+    isRegisterActive.value = false;
+  } catch {
+    showPopup("Thành công", "Đăng ký thành công (offline)!");
+    isRegisterActive.value = false;
   }
 };
 </script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <style scoped>
-/* Import Font Awesome & Google Font Poppins */
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css");
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
-
 /* Reset chung cho giao diện */
 * {
   font-family: "Poppins", sans-serif;
@@ -622,6 +743,15 @@ form {
   font-weight: 500;
 }
 
+.input-box i.fa-eye,
+.input-box i.fa-eye-slash {
+  cursor: pointer;
+  right: 18px;
+  font-size: 20px;
+  color: #555;
+  transition: 0.2s ease;
+}
+
 
 
 
@@ -630,7 +760,7 @@ form {
 .row-between {
   width: 100%;
   margin-top: 10px;
-  margin-bottom: 15px;   
+  margin-bottom: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -638,7 +768,7 @@ form {
 
 .remember-me {
   font-size: 15px;
-  margin-bottom: 30px;   
+  margin-bottom: 30px;
   color: #333;
   display: flex;
   align-items: center;
@@ -661,4 +791,120 @@ form {
   text-decoration: underline;
 }
 
+
+
+/* ================= POPUP ================= */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.25s ease;
+}
+
+.popup-box {
+  background: #fff;
+  width: 380px;
+  padding: 25px 30px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+  animation: popupShow 0.25s ease;
+}
+
+.popup-box h2 {
+  margin-bottom: 10px;
+  font-size: 26px;
+  color: #333;
+  font-weight: 600;
+}
+
+.popup-box p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.popup-btn {
+  width: 100%;
+  padding: 12px 0;
+  background: #7494ec;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.popup-btn:hover {
+  background: #5a7ae0;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popupShow {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+:deep(i[class^="fa-"]),
+:deep(i[class*=" fa-"]) {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900 !important;
+  display: inline-block;
+}
+
+.email-dropdown {
+  position: absolute;
+  top: 46px;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.email-dropdown li {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.email-dropdown li:hover {
+  background: #f0f0f0;
+}
+
+/*css đăng nhập gg */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
 </style>

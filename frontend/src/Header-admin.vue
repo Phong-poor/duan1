@@ -26,7 +26,8 @@ onMounted(() => {
 // 🔴 Logout cho trang Admin
 const logout = () => {
   localStorage.removeItem("currentUser");
-  router.push("/Dangnhap");
+  currentUser.value = null;
+  window.location.href = "/Dangnhap";
 };
 </script>
 <template>

@@ -1,8 +1,9 @@
 <template>
   <div class="app-wrapper d-flex">
-    <!-- Sidebar -->
+
+    <!-- SIDEBAR -->
     <aside class="sidebar bg-dark text-white p-3">
-      <img :src="logoImage" alt="Logo" class="logo-img" />
+      <img :src="logoImage" class="logo-img" />
       <ul class="sidebar-menu">
         <router-link to="/Dashboard" class="menu-item" active-class="active">
           <i class="fa-solid fa-chart-line"></i> Dashboard
@@ -19,21 +20,25 @@
         <router-link to="/Quanlymausac" class="menu-item" active-class="active">
           <i class="fa-solid fa-palette"></i> Màu sắc
         </router-link>
-
         <router-link to="/Quanlysize" class="menu-item" active-class="active">
           <i class="fa-solid fa-maximize"></i> Size
         </router-link>
         <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
+        <router-link to="/Quanlybinhluan" class="menu-item" active-class="active">
+          <i class="fa-solid fa-comment"></i> Đánh giá
+        </router-link>
+        <router-link to="/Quanlyvoucher" class="menu-item" active-class="active">
+          <i class="fa-solid fa-ticket"></i> Voucher
+        </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
-        
       </ul>
     </aside>
 
-    <!-- Main content -->
+    <!-- MAIN -->
     <div class="main-content flex-grow-1">
       <header class="admin-header">
         <HeaderAdmin />
@@ -41,11 +46,10 @@
 
       <div class="content-section p-4">
 
-        <!-- Title -->
         <h3 class="fw-bold mb-4">Dashboard</h3>
 
-        <!-- Revenue cards -->
-        <div class="row g-3">
+        <!-- CARDS -->
+        <div class="row g-3" v-if="dashboard">
           <div class="col-md-3" v-for="c in revenueCards" :key="c.title">
             <div class="stat-card p-3">
               <h6 class="text-muted">{{ c.title }}</h6>
@@ -54,46 +58,70 @@
           </div>
         </div>
 
-        <!-- Charts -->
-        <div class="row mt-4">
+        <!-- CHART -->
+        <div class="row mt-4" v-if="dashboard">
           <div class="col-md-6">
             <div class="chart-card p-3">
-              <h5 class="fw-bold mb-3">Biểu đồ số lượng đã mua</h5>
+              <h5 class="fw-bold mb-3">Biểu đồ số lượng mua</h5>
               <canvas id="qtyChart"></canvas>
             </div>
           </div>
 
           <div class="col-md-6">
             <div class="chart-card p-3">
-              <h5 class="fw-bold mb-3">Biểu đồ tổng tiền theo tháng</h5>
+              <h5 class="fw-bold mb-3">Biểu đồ doanh thu theo tháng</h5>
               <canvas id="moneyChart"></canvas>
             </div>
           </div>
         </div>
 
-        <!-- Low stock table -->
-        <div class="mt-5 card p-4">
+        <!-- LOW STOCK -->
+        <div class="mt-5 card p-4" v-if="dashboard">
           <h4 class="fw-bold">⚠ Sản phẩm sắp hết hàng</h4>
 
           <table class="table table-bordered text-center mt-3">
             <thead class="table-secondary">
               <tr>
+                <th>STT</th>
                 <th>Sản phẩm</th>
                 <th>Màu</th>
                 <th>Size</th>
                 <th>Số lượng</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="v in lowStock" :key="v.key">
-                <td>{{ v.product }}</td>
-                <td>{{ v.color }}</td>
-                <td>{{ v.size }}</td>
-                <td class="text-danger fw-bold">{{ v.stock }}</td>
+              <tr v-for="(item, index) in dashboard.low_stock" :key="item.id_bienthe">
+                <td class="fw-bold">{{ Number(index) + 1 }}</td>
+                <td>{{ item.tenSP }}</td>
+                <td>{{ item.mausac }}</td>
+                <td>{{ item.size }}</td>
+                <td class="text-danger fw-bold">{{ item.so_luong }}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" @click="openAddStock(item)">
+                    + Thêm số lượng
+                  </button>
+                </td>
               </tr>
+            </tbody>
+          </table>
+        </div>
 
-              <tr v-if="lowStock.length === 0">
-                <td colspan="4" class="text-muted">Không có sản phẩm nào sắp hết hàng</td>
+        <!-- TOP PRODUCTS -->
+        <div class="mt-5 card p-4" v-if="dashboard">
+          <h4 class="fw-bold">🔥 Top 5 sản phẩm bán chạy nhất</h4>
+
+          <table class="table table-striped text-center mt-3">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng bán</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="p in dashboard.top_products" :key="p.id_sanpham">
+                <td>{{ p.tenSP }}</td>
+                <td class="fw-bold">{{ p.total_qty }}</td>
               </tr>
             </tbody>
           </table>
@@ -102,186 +130,141 @@
       </div>
     </div>
   </div>
+  <div v-if="showPopup" class="popup-backdrop">
+    <div class="popup-box">
+      <h5>Thêm số lượng cho: {{ selectedItem.tenSP }}</h5>
+
+      <label class="mt-2">Nhập số lượng thêm:</label>
+      <input type="number" class="form-control mt-1"
+            v-model="addQty" min="1">
+
+      <div class="d-flex justify-content-end mt-3">
+        <button class="btn btn-secondary me-2" @click="showPopup=false">Đóng</button>
+        <button class="btn btn-success" @click="submitAddStock">Xác nhận</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted, nextTick, computed } from "vue";
 import HeaderAdmin from "../../Header-admin.vue";
 import logoImage from "../../assets/logo.png";
 import Chart from "chart.js/auto";
 
-// ------------------------
-// MOCK SAMPLE DATA
-// ------------------------
-const orders = ref([
-  {
-    id: 1,
-    status: "Thành công",
-    total: 25990000,
-    created_at: "2024-02-10",
-    items: [{ id: 1, name: "iPhone 15", qty: 1, price: 25990000 }],
-  },
-  {
-    id: 2,
-    status: "Thành công",
-    total: 44500000,
-    created_at: "2024-02-20",
-    items: [
-      { id: 2, name: "Samsung S24", qty: 1, price: 22500000 },
-      { id: 3, name: "AirPods Pro", qty: 1, price: 22000000 },
-    ],
-  },
-]);
+const dashboard = ref(null);
 
-const products = ref([
-  {
-    name: "Nike Air Force 1",
-    variants: [
-      { color: "Trắng", size: 40, stock: 5 },
-      { color: "Trắng", size: 41, stock: 20 },
-    ],
-  },
-  {
-    name: "Adidas UltraBoost",
-    variants: [
-      { color: "Đen", size: 42, stock: 3 },
-      { color: "Đen", size: 43, stock: 50 },
-    ],
-  },
-]);
+onMounted(async () => {
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/dashboard.php");
+  dashboard.value = await res.json();
 
-// ------------------------
-// REVENUE STATISTICS
-// ------------------------
-
-const now = new Date();
-
-const revenueAll = computed(() =>
-  orders.value
-    .filter((o) => o.status === "Thành công")
-    .reduce((s, o) => s + o.total, 0)
-);
-
-const revenueYear = computed(() =>
-  orders.value
-    .filter(
-      (o) => o.status === "Thành công" && new Date(o.created_at).getFullYear() === now.getFullYear()
-    )
-    .reduce((s, o) => s + o.total, 0)
-);
-
-const revenueMonth = computed(() =>
-  orders.value
-    .filter((o) => {
-      const d = new Date(o.created_at);
-      return o.status === "Thành công" && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    })
-    .reduce((s, o) => s + o.total, 0)
-);
-
-const revenueWeek = computed(() => {
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-
-  return orders.value
-    .filter((o) => {
-      const d = new Date(o.created_at);
-      return o.status === "Thành công" && d >= startOfWeek;
-    })
-    .reduce((s, o) => s + o.total, 0);
+  if (dashboard.value.status) {
+    await nextTick();
+    loadCharts();
+  }
 });
 
-const revenueCards = computed(() => [
-  { title: "Tổng doanh thu", value: revenueAll.value },
-  { title: "Doanh thu năm nay", value: revenueYear.value },
-  { title: "Doanh thu tháng này", value: revenueMonth.value },
-  { title: "Doanh thu tuần này", value: revenueWeek.value },
-]);
-
-// ------------------------
-// LOW STOCK DETECTION
-// ------------------------
-const lowStock = computed(() => {
-  const list = [];
-  products.value.forEach((p) => {
-    p.variants.forEach((v) => {
-      if (v.stock < 10) {
-        list.push({
-          key: p.name + v.color + v.size,
-          product: p.name,
-          color: v.color,
-          size: v.size,
-          stock: v.stock,
-        });
-      }
-    });
-  });
-  return list;
-});
-
-// ------------------------
-// CHARTS
-// ------------------------
-
-const qtyChart = ref(null);
-const moneyChart = ref(null);
-
-onMounted(() => {
-  loadCharts();
-});
-
-function loadCharts() {
-  const months = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
-
-  const qtyData = Array(12).fill(0);
-  const moneyData = Array(12).fill(0);
-
-  orders.value.forEach((o) => {
-    if (o.status === "Thành công") {
-      const m = new Date(o.created_at).getMonth();
-      o.items.forEach((i) => (qtyData[m] += i.qty));
-      moneyData[m] += o.total;
+// ============== FORMAT 12 THÁNG ==============
+function convertToArray12(source, field) {
+  const arr = Array(12).fill(0);
+  source.forEach(r => {
+    const month = Number(r.thang);
+    if (month >= 1 && month <= 12) {
+      arr[month - 1] = Number(r[field]);
     }
   });
+  return arr;
+}
 
-  // Line chart - qty
+// ============== LOAD CHARTS ==============
+function loadCharts() {
+  const qty = convertToArray12(dashboard.value.chart_qty, "qty");
+  const money = convertToArray12(dashboard.value.chart_money, "total");
+
   new Chart(document.getElementById("qtyChart"), {
     type: "line",
     data: {
-      labels: months,
+      labels: Array.from({ length: 12 }, (_, i) => i + 1),
       datasets: [
         {
           label: "Số lượng đã mua",
-          data: qtyData,
+          data: qty,
           borderColor: "#0d6efd",
           borderWidth: 2,
-        },
-      ],
-    },
+          tension: 0.3
+        }
+      ]
+    }
   });
 
-  // Bar chart - money
   new Chart(document.getElementById("moneyChart"), {
     type: "bar",
     data: {
-      labels: months,
+      labels: Array.from({ length: 12 }, (_, i) => i + 1),
       datasets: [
         {
-          label: "Tổng tiền bán",
-          data: moneyData,
-          backgroundColor: "#198754",
-        },
-      ],
-    },
+          label: "Doanh thu",
+          data: money,
+          backgroundColor: "#198754"
+        }
+      ]
+    }
   });
 }
 
-// ------------------------
-// UTILITY
-// ------------------------
+// ============== REVENUE CARDS ==============
+const revenueCards = computed(() => {
+  if (!dashboard.value) return [];
+  return [
+    { title: "Tổng doanh thu", value: dashboard.value.summary.total },
+    { title: "Doanh thu năm nay", value: dashboard.value.summary.year },
+    { title: "Doanh thu tháng", value: dashboard.value.summary.month },
+    { title: "Doanh thu tuần", value: dashboard.value.summary.week }
+  ];
+});
+
 function formatPrice(num) {
-  return num.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+  return Number(num).toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND"
+  });
 }
+// ====== POPUP ADD STOCK ======
+const showPopup = ref(false);
+const selectedItem = ref({});
+const addQty = ref(1);
+
+const openAddStock = (item) => {
+  selectedItem.value = item;
+  addQty.value = 1;
+  showPopup.value = true;
+};
+
+const submitAddStock = async () => {
+  const id = selectedItem.value.id_bienthe;
+
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/updateStock.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id_bienthe: id,
+      so_luong: addQty.value
+    })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    alert("Cập nhật thành công!");
+    showPopup.value = false;
+
+    // cập nhật lại dashboard
+    const res2 = await fetch("http://localhost/duan1/backend/api/Admin/dashboard.php");
+    dashboard.value = await res2.json();
+  } else {
+    alert("Lỗi: " + data.message);
+  }
+};
 </script>
 
 <style scoped>
@@ -368,4 +351,25 @@ header.admin-header {
 .content-section {
   padding-top: 80px;
 }
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-box {
+  background: white;
+  padding: 20px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
 </style>

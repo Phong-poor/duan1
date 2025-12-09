@@ -22,8 +22,14 @@
         <router-link to="/Quanlysize" class="menu-item" active-class="active">
           <i class="fa-solid fa-maximize"></i> Size
         </router-link>
-        <router-link to="Quanlydonhang" class="menu-item" active-class="active">
+        <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
+        </router-link>
+        <router-link to="/Quanlybinhluan" class="menu-item" active-class="active">
+          <i class="fa-solid fa-comment"></i> Đánh giá
+        </router-link>
+        <router-link to="/Quanlyvoucher" class="menu-item" active-class="active">
+          <i class="fa-solid fa-ticket"></i> Voucher
         </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng

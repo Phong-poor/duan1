@@ -60,22 +60,40 @@
 
         <div class="row justify-content-center mt-4 g-4">
 
-          <div class="col-md-3 team-card">
+          <div class="col-md-2 team-card">
             <div class="team-img team1-img"></div>
-            <h5 class="fw-bold mt-3">John Wick</h5>
-            <p>Trưởng nhóm thiết kế cấp cao.</p>
+            <h5 class="fw-bold mt-3">Quách Đức Thành</h5>
+            <p>Thành viên nhóm.</p>
           </div>
 
-          <div class="col-md-3 team-card">
+          <div class="col-md-2 team-card">
             <div class="team-img team2-img"></div>
-            <h5 class="fw-bold mt-3">Mr. Beats</h5>
-            <p>Giám đốc phát triển vật liệu.</p>
+            <h5 class="fw-bold mt-3">Lê Ngọc Tài</h5>
+            <p>Thành viên nhóm.</p>
           </div>
 
-          <div class="col-md-3 team-card">
+          <div class="col-md-2 team-card">
             <div class="team-img team3-img"></div>
-            <h5 class="fw-bold mt-3">Mark</h5>
-            <p>Giám đốc sáng tạo.</p>
+            <h5 class="fw-bold mt-3">Trần Quốc Phong</h5>
+            <p>Trưởng nhóm.</p>
+          </div>
+
+          <div class="col-md-2 team-card">
+            <div class="team-img team4-img"></div>
+            <h5 class="fw-bold mt-3">Y Thiết Niê</h5>
+            <p>Thành viên nhóm.</p>
+          </div>
+
+          <div class="col-md-2 team-card">
+            <div class="team-img team5-img"></div>
+            <h5 class="fw-bold mt-3">Mạnh Quân Êban</h5>
+            <p>Thành viên nhóm.</p>
+          </div>
+
+          <div class="col-md-2 team-card">
+            <div class="team-img team6-img"></div>
+            <h5 class="fw-bold mt-3">Vũ Huy Hoàng</h5>
+            <p>Thành viên nhóm.</p>
           </div>
 
         </div>
@@ -213,6 +231,18 @@ import footerWeb from '../../footer-web.vue';
 /* GIÁM ĐỐC – ĐÃ CẬP NHẬT ẢNH */
 .team3-img {
   background-image: url('https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=500&q=80');
+}
+
+.team4-img {
+  background-image: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80');
+}
+
+.team5-img {
+  background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80');
+}
+
+.team6-img {
+  background-image: url('https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=500&q=80');
 }
 
 /* HIGHLIGHT BOX */

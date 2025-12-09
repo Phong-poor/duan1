@@ -35,12 +35,6 @@
         </div>
 
         <div class="filter-inline">
-          <label>Kích cỡ:</label>
-          <select v-model="selectedSize" @change="applyFilters">
-            <option value="">Tất cả</option>
-            <option v-for="size in sizes" :key="size.id_size" :value="size.size">{{ size.size }}</option>
-          </select>
-
           <label>Loại:</label>
           <select v-model="selectedCategory" @change="applyFilters">
             <option :value="null">Tất cả</option>
@@ -76,7 +70,6 @@
             <div class="product-card" v-for="p in products" :key="p.id_sanpham">
               <img :src="`http://localhost/duan1/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
               <h3>{{ p.tenSP }}</h3>
-              <div class="stars">★★★★★</div>
               <p v-if="p.coGiamGia">
                 <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
                   {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.giaSP) }}
@@ -126,10 +119,11 @@
 
 <script setup>
 import { onBeforeUnmount, onMounted, ref, computed, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import Thanhtoanmini from "../Web/Thanhtoanmini.vue";
 
 const router = useRouter();
+const route = useRoute();
 const goTo = (path) => router.push(path);
 
 import HeaderWeb from "../../Header-web.vue";
@@ -141,7 +135,6 @@ import bannerSlide3 from "../../assets/banner-slide-3.jpg";
 import imgSale1 from '../../assets/images (1).jpg'; // Fallback image
 
 
-
 const showMini = ref(false);
 const miniID = ref(null);
 
@@ -150,15 +143,13 @@ let slideTimer;
 
 // Filter states
 const sortBy = ref('moi_nhat');
-const selectedSize = ref('');
 const selectedBrand = ref('');
-const sizes = ref([]);
 const brands = ref([]);
 
 
 
 
-onMounted(() => {
+onMounted(async () => {
   const slides = slideContainer.value.querySelectorAll(".slide");
   let current = 0;
 
@@ -170,7 +161,6 @@ onMounted(() => {
 
   fetchCategories();
   fetchBrands();
-  fetchSizes();
   fetchProducts();
 });
 
@@ -204,29 +194,12 @@ const fetchBrands = async () => {
   }
 };
 
-const fetchSizes = async () => {
-  try {
-    const res = await fetch('http://localhost/duan1/backend/api/Web/KichCo.php');
-    const data = await res.json();
-    if (data.success) {
-      sizes.value = data.data;
-    }
-  } catch (error) {
-    console.error("Lỗi lấy kích cỡ:", error);
-  }
-};
-
 const chooseBrand = (brand) => {
   selectedBrand.value = brand;
   currentPage.value = 1;
   fetchProducts();
 };
 
-const chooseSize = (size) => {
-  selectedSize.value = size;
-  currentPage.value = 1;
-  fetchProducts();
-};
 
 const chooseCategory = (cat) => {
   selectedCategory.value = cat;
@@ -238,6 +211,22 @@ const applyFilters = () => {
   currentPage.value = 1;
   fetchProducts();
 };
+
+// Theo dõi thay đổi query params từ URL
+watch(() => route.query.id_thuonghieu, (newBrandId) => {
+  if (newBrandId) {
+    const brand = brands.value.find(b => b.id_thuonghieu == newBrandId);
+    if (brand) {
+      selectedBrand.value = brand;
+      currentPage.value = 1;
+      fetchProducts();
+    }
+  } else {
+    selectedBrand.value = null;
+    currentPage.value = 1;
+    fetchProducts();
+  }
+});
 
 /* PRODUCTS & PAGINATION */
 const products = ref([]);
@@ -254,9 +243,6 @@ const fetchProducts = async () => {
     }
     if (selectedBrand.value) {
       url += `&id_thuonghieu=${selectedBrand.value.id_thuonghieu}`;
-    }
-    if (selectedSize.value) {
-      url += `&size=${selectedSize.value}`;
     }
     if (sortBy.value) {
       url += `&sort=${sortBy.value}`;
@@ -466,13 +452,6 @@ container {
   font-weight: 600;
   margin: 5px 0;
 }
-
-.stars {
-  color: #ffc107;
-  margin: 3px 0;
-  font-size: 14px;
-}
-
 .product-card p {
   font-size: 16px;
   font-weight: 700;

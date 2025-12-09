@@ -86,6 +86,11 @@
         </div>
       </div>
     </div>
+
+    <!-- POPUP MINI -->
+    <div v-if="popupVisible" class="popup-toast">
+      {{ popupMessage }}
+    </div>
   </div>
 </template>
 
@@ -98,6 +103,10 @@ const props = defineProps({
 });
 const emit = defineEmits(["close"]);
 const router = useRouter();
+
+const popupVisible = ref(false);
+const popupMessage = ref("");
+let popupTimer;
 
 const product = ref({});
 const sizes = ref([]);
@@ -114,7 +123,6 @@ const productImage = ref("");
 const formatPrice = (n) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n ?? 0);
 
-// load data khi prop thay đổi
 watch(() => props.id_sanpham, (newId) => {
   if (newId) fetchData();
 }, { immediate: true });
@@ -132,12 +140,6 @@ async function fetchData() {
 
   try {
     const id = props.id_sanpham;
-    // nếu id rỗng -> trả lỗi
-    if (!id) {
-      error.value = "Không có ID sản phẩm";
-      loading.value = false;
-      return;
-    }
 
     const res = await fetch(`http://localhost/duan1/backend/api/Web/chitiet.php?id=${encodeURIComponent(id)}`);
     const data = await res.json();
@@ -153,12 +155,10 @@ async function fetchData() {
 
     const variants = Array.isArray(product.value.variants) ? product.value.variants : [];
 
-    // sizes: dựa trên variants
     const uniqueSizes = [...new Set(variants.map(v => v.size).filter(Boolean))].map(Number);
     const allSizes = [38,39,40,41,42];
     sizes.value = allSizes.map(s => ({ value: s, disabled: !uniqueSizes.includes(Number(s)) }));
 
-    // colors: unique
     const seen = new Set();
     colors.value = variants.reduce((acc, v) => {
       if (!v || seen.has(v.id_mausac)) return acc;
@@ -171,11 +171,9 @@ async function fetchData() {
       return acc;
     }, []);
 
-    // default chọn nếu có
     selectedSize.value = uniqueSizes.length ? uniqueSizes[0] : sizes.value.find(s=>!s.disabled)?.value ?? null;
     selectedColor.value = colors.value.length ? colors.value[0] : null;
 
-    // cập nhật kho
     updateStock();
 
   } catch (e) {
@@ -183,7 +181,6 @@ async function fetchData() {
     error.value = "Lỗi server";
   } finally {
     loading.value = false;
-    // focus overlay để bắt ESC
     await nextTick();
     const overlay = document.querySelector(".modal-overlay");
     if (overlay) overlay.focus();
@@ -191,83 +188,65 @@ async function fetchData() {
 }
 
 function updateStock() {
-  const variants = Array.isArray(product.value.variants) ? product.value.variants : [];
-  if (!selectedSize.value || !selectedColor.value) {
-    // nếu chưa đủ thông tin, lấy tổng kho của size hoặc color nếu có
-    const bySize = variants.filter(v => v.size == selectedSize.value);
-    const byColor = variants.filter(v => v.id_mausac == selectedColor.value?.id);
-    if (bySize.length && !byColor.length) {
-      currentStock.value = bySize.reduce((s, v) => s + Number(v.so_luong || 0), 0);
-    } else if (byColor.length && !bySize.length) {
-      currentStock.value = byColor.reduce((s, v) => s + Number(v.so_luong || 0), 0);
-    } else {
-      currentStock.value = variants.reduce((s, v) => s + Number(v.so_luong || 0), 0);
-    }
-    return;
-  }
+  const variants = product.value.variants || [];
 
-  const vt = variants.find(v => String(v.size) == String(selectedSize.value) && String(v.id_mausac) == String(selectedColor.value?.id));
+  const vt = variants.find(v =>
+    String(v.size) == String(selectedSize.value) &&
+    String(v.id_mausac) == String(selectedColor.value?.id)
+  );
+
   currentStock.value = vt ? Number(vt.so_luong || 0) : 0;
   if (quantity.value > currentStock.value) quantity.value = Math.max(1, currentStock.value);
 }
 
-function selectSize(val) {
-  if (!val) return;
-  selectedSize.value = val;
-  updateStock();
-}
-function selectColor(c) {
-  selectedColor.value = c;
-  updateStock();
-}
+function selectSize(v) { selectedSize.value = v; updateStock(); }
+function selectColor(v) { selectedColor.value = v; updateStock(); }
 
 function changeQty(n) {
-  const next = Number(quantity.value || 0) + n;
+  const next = quantity.value + n;
   if (next < 1) quantity.value = 1;
-  else if (currentStock.value > 0 && next > currentStock.value) quantity.value = currentStock.value;
+  else if (next > currentStock.value) quantity.value = currentStock.value;
   else quantity.value = next;
 }
+
 function clampQuantity() {
-  if (!quantity.value || quantity.value < 1) quantity.value = 1;
-  if (currentStock.value > 0 && quantity.value > currentStock.value) quantity.value = currentStock.value;
+  if (quantity.value < 1) quantity.value = 1;
+  if (quantity.value > currentStock.value) quantity.value = currentStock.value;
 }
 
 async function addToCart() {
   isAdding.value = true;
-  try {
-    const user = localStorage.getItem("currentUser");
-    if (!user) {
-      router.push(`/Login?return=${encodeURIComponent(`/Thanhtoanmini?id_sanpham=${props.id_sanpham}`)}`);
-      return;
-    }
-    const u = JSON.parse(user);
 
-    const variants = Array.isArray(product.value.variants) ? product.value.variants : [];
-    const variant = variants.find(v => String(v.size) == String(selectedSize.value) && String(v.id_mausac) == String(selectedColor.value?.id));
+  try {
+    const user = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+    const variants = product.value.variants || [];
+    const variant = variants.find(
+      v => String(v.size) == String(selectedSize.value) &&
+           String(v.id_mausac) == String(selectedColor.value?.id)
+    );
 
     if (!variant) {
-      alert("Không tìm thấy biến thể phù hợp");
+      triggerPopup("❌ Không tìm thấy biến thể phù hợp");
       return;
     }
-
-    const body = {
-      id_khachhang: u.id_khachhang,
-      id_bienthe: variant.id_bienthe,
-      so_luong: Number(quantity.value)
-    };
 
     await fetch(`http://localhost/duan1/backend/api/Web/Cart.php?action=add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        id_khachhang: user.id_khachhang,
+        id_bienthe: variant.id_bienthe,
+        so_luong: quantity.value
+      })
     });
 
-    // đóng modal và chuyển
     emit("close");
-    router.push("/Thanhtoangiohang");
+    triggerPopup("✔ Đã thêm vào giỏ hàng!");
+
   } catch (e) {
     console.error(e);
-    alert("Lỗi khi thêm vào giỏ");
+    triggerPopup("❌ Lỗi khi thêm vào giỏ!");
   } finally {
     isAdding.value = false;
   }
@@ -276,6 +255,13 @@ async function addToCart() {
 function goDetail() {
   router.push(`/ChiTiet?id=${props.id_sanpham}`);
   emit("close");
+}
+
+function triggerPopup(msg) {
+  popupMessage.value = msg;
+  popupVisible.value = true;
+  if (popupTimer) clearTimeout(popupTimer);
+  popupTimer = setTimeout(() => popupVisible.value = false, 1500);
 }
 </script>
 
@@ -305,6 +291,25 @@ function goDetail() {
 @keyframes scaleIn {
   from { transform: scale(.96); opacity:0 }
   to { transform: scale(1); opacity:1 }
+}
+
+.popup-toast {
+  position: fixed;
+  top: 20px;
+  right: 25px;
+  background: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  z-index: 999999;
+  animation: popupIn .3s ease;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 .mini-box { display:flex; gap:20px; }
