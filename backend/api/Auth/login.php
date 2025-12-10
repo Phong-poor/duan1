@@ -1,5 +1,12 @@
 <?php
-session_start();
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => 'localhost',
+    'secure' => false,
+    'httponly' => false,
+    'samesite' => 'None'
+]);
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -8,17 +15,10 @@ require_once "../../config/db_utils.php";
 
 $db_util = new DB_UTILS();
 
-/* ===================== CORS ===================== */
-$allowedOrigins = ['http://localhost:5173']; // Origin của Vue
-if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)) {
-    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
-} else {
-    header("Access-Control-Allow-Origin: *");
-}
-
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 
 // Preflight
 if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
