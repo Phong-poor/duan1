@@ -1,8 +1,10 @@
 <template>
   <div class="app-wrapper d-flex">
+
     <!-- Sidebar -->
     <aside class="sidebar bg-dark text-white p-3">
-      <img :src="logoImage" alt="Logo" class="logo-img">
+      <img :src="logoImage" alt="Logo" class="logo-img" />
+
       <ul class="sidebar-menu">
         <router-link to="/Dashboard" class="menu-item" active-class="active">
           <i class="fa-solid fa-chart-line"></i> Dashboard
@@ -19,6 +21,7 @@
         <router-link to="/Quanlythuonghieu" class="menu-item" active-class="active">
           <i class="fa-solid fa-bookmark"></i> Thương hiệu
         </router-link>
+
         <router-link to="/Quanlymausac" class="menu-item" active-class="active">
           <i class="fa-solid fa-palette"></i> Màu sắc
         </router-link>
@@ -26,10 +29,11 @@
         <router-link to="/Quanlysize" class="menu-item" active-class="active">
           <i class="fa-solid fa-maximize"></i> Size
         </router-link>
-
-        <router-link to="/Quanlydonhang" class="menu-item" active-class="active">
+        
+        <router-link to="Quanlydonhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-cart-shopping"></i> Đơn hàng
         </router-link>
+
         <router-link to="/Quanlybinhluan" class="menu-item" active-class="active">
           <i class="fa-solid fa-comment"></i> Đánh giá
         </router-link>
@@ -44,39 +48,61 @@
         </router-link>
       </ul>
     </aside>
-
     <!-- Main Content -->
     <div class="main-content flex-grow-1">
       <header class="admin-header">
-        <HeaderAdmin />
+            <HeaderAdmin />
       </header>
 
       <div class="content-section p-4">
-        <!-- Page Header -->
+
+        <!-- Title -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h3 class="fw-bold">Quản lý thương hiệu</h3>
-          <button class="btn btn-primary" @click="scrollToForm">Thêm thương hiệu</button>
+            <h3 class="fw-bold">Quản lý liên hệ</h3>
         </div>
 
         <!-- Search -->
-        <input v-model="search" type="text" class="form-control mb-3" placeholder="🔍 Tìm thương hiệu..." />
+        <input v-model="search" type="text" class="form-control mb-3" placeholder="🔍 Tìm theo nội dung hoặc email..." />
 
-        <!-- Brand Table -->
+        <!-- Comments Table -->
+        <!-- TABLE -->
         <table class="table table-bordered text-center">
           <thead class="table-secondary">
             <tr>
-              <th>Mã TH</th>
-              <th>Size</th>
+              <th>ID</th>
+              <th>Tên KH</th>
+              <th>Email</th>
+              <th>Chủ đề</th>
+              <th>Nội dung</th>
+              <th>Ngày tạo</th>
+              <th>Trạng thái</th>
+              <th>Trả lời</th>
+              <th>Ngày phản hồi</th>
               <th>Hành động</th>
             </tr>
           </thead>
+
           <tbody>
-            <tr v-for="sz in paginatedSizes" :key="sz.id_size">
-              <td>{{ sz.id_size }}</td>
-              <td>{{ sz.size }}</td>
+            <tr v-for="c in paginatedItems" :key="c.id_lienhe">
+              <td>{{ c.id_lienhe }}</td>
+              <td>{{ c.ten_khachhang }}</td>
+              <td>{{ c.email }}</td>
+              <td>{{ c.chu_de }}</td>
+              <td>{{ c.noi_dung }}</td>
+              <td>{{ c.ngay_tao }}</td>
+              <td :class="c.trang_thai === 'Chưa phản hồi' ? 'text-danger' : 'text-success'">
+                {{ c.trang_thai }}
+              </td>
+              <td>{{ c.tra_loi || "—" }}</td>
+              <td>{{ c.ngay_phan_hoi || "—" }}</td>
+
               <td>
-                <button class="btn btn-warning btn-sm" @click="editSize(sz)">Sửa</button>
-                <button class="btn btn-danger btn-sm ms-2" @click="deleteSize(sz.id_size)">Xóa</button>
+                <button 
+                  class="btn btn-primary btn-sm"
+                  @click="openReply(c)"
+                >
+                  Trả lời
+                </button>
               </td>
             </tr>
           </tbody>
@@ -89,134 +115,95 @@
           <button class="btn btn-secondary btn-sm" :disabled="page === totalPages" @click="page++">Sau</button>
         </div>
 
-        <!-- Brand Form -->
-        <div class="card p-4 mt-4" id="add-form">
-          <h4 class="fw-bold mb-3">
-            {{ isEdit ? "Cập nhật size" : "Thêm size" }}
-          </h4>
+        <!-- MODAL TRẢ LỜI -->
+        <div v-if="selected" class="card p-4 mt-4">
+          <h4 class="fw-bold">Trả lời liên hệ</h4>
 
           <div class="mb-3">
-            <label class="fw-semibold">Size</label>
-            <input
-              v-model="form.size"
-              type="number"
-              class="form-control"
-              placeholder="Nhập size..."
-            />
-            <p v-if="errors.size" class="text-danger mt-1">{{ errors.size }}</p>
+            <label>Nội dung khách gửi:</label>
+            <textarea class="form-control" disabled>{{ selected.noi_dung }}</textarea>
           </div>
 
-          <button class="btn btn-success" @click="saveSize">
-            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+          <div class="mb-3">
+            <label>Trả lời</label>
+            <textarea v-model="replyText" rows="4" class="form-control"></textarea>
+          </div>
+
+          <button class="btn btn-success" @click="sendReply">
+            Gửi phản hồi
           </button>
         </div>
-
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import logoImage from "../../assets/logo.png";
+import { ref, onMounted, computed } from "vue";
 import HeaderAdmin from "../../Header-admin.vue";
+import logoImage from "../../assets/logo.png";
 
-/* STATE */
-const sizes = ref([]);
+// DATA
+const listLienHe = ref([]);
+const selected = ref(null);
+const replyText = ref("");
 const search = ref("");
 const page = ref(1);
 const perPage = 5;
+// Load danh sách liên hệ
+const loadLienHe = async () => {
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/GetLienHe.php");
+  const data = await res.json();
 
-const form = ref({
-  id_size: null,
-  size: ""
-});
-const errors = ref({});
-const isEdit = ref(false);
-
-/* LOAD SIZE */
-const loadSizes = async () => {
-  try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetSize.php");
-    sizes.value = await res.json();
-  } 
-  catch (e) {
-    console.error("Lỗi load size:", e);
+  if (data.status === "success") {
+    listLienHe.value = data.data;
   }
 };
 
-/* SAVE (ADD/UPDATE) */
-const saveSize = async () => {
-  errors.value = {};
+onMounted(loadLienHe);
 
-  if (!form.value.size) {
-    errors.value.size = "Size không được để trống!";
-    return;
-  }
+// MỞ FORM TRẢ LỜI
+const openReply = (item) => {
+  selected.value = item;
+  replyText.value = item.tra_loi || "";
+};
 
-  const url = isEdit.value
-    ? "http://localhost/duan1/backend/api/Admin/UpdateSize.php"
-    : "http://localhost/duan1/backend/api/Admin/AddSize.php";
-
-  await fetch(url, {
+// GỬI TRẢ LỜI
+const sendReply = async () => {
+  const res = await fetch("http://localhost/duan1/backend/api/Admin/ReplyLienHe.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(form.value)
+    body: JSON.stringify({
+      id_lienhe: selected.value.id_lienhe,
+      tra_loi: replyText.value
+    })
   });
 
-  resetForm();
-  loadSizes();
-};
+  const data = await res.json();
 
-/* DELETE */
-const deleteSize = async (id) => {
-  if (!confirm("Bạn có chắc chắn muốn xóa không?")) return;
-  await fetch(`http://localhost/duan1/backend/api/Admin/DeleteSize.php?id=${id}`);
-  loadSizes();
+  alert(data.msg);
+  selected.value = null;
+  loadLienHe();
 };
-
-/* EDIT */
-const editSize = (sz) => {
-  form.value = {
-    id_size: sz.id_size,
-    size: sz.size
-  };
-  isEdit.value = true;
-  scrollToForm();
-};
-
-/* RESET */
-const resetForm = () => {
-  form.value = { id_size: null, size: "" };
-  errors.value = {};
-  isEdit.value = false;
-};
-
-/* SEARCH + PAGINATION */
-const filteredSizes = computed(() =>
-  sizes.value.filter((s) =>
-    s.size.toString().includes(search.value)
+const filtered = computed(() =>
+  listLienHe.value.filter((c) =>
+    c.noi_dung.toLowerCase().includes(search.value.toLowerCase()) ||
+    c.email.toLowerCase().includes(search.value.toLowerCase())
   )
 );
 
 const totalPages = computed(() =>
-  Math.ceil(filteredSizes.value.length / perPage) || 1
+  Math.ceil(filtered.value.length / perPage) || 1
 );
 
-const paginatedSizes = computed(() => {
+const paginatedItems = computed(() => {
   const start = (page.value - 1) * perPage;
-  return filteredSizes.value.slice(start, start + perPage);
+  return filtered.value.slice(start, start + perPage);
 });
 
-/* SCROLL */
-const scrollToForm = () => {
-  const formDom = document.getElementById("add-form");
-  if (formDom) formDom.scrollIntoView({ behavior: "smooth" });
-};
-
-/* INIT */
-loadSizes();
 </script>
+
+
 
 <style scoped>
 .logo-img {

@@ -39,7 +39,9 @@
         <router-link to="/Quanlyvoucher" class="menu-item" active-class="active">
           <i class="fa-solid fa-ticket"></i> Voucher
         </router-link>
-
+        <router-link to="/Quanlylienhe" class="menu-item" active-class="active">
+          <i class="fa-solid fa-message"></i> Liên hệ
+        </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
