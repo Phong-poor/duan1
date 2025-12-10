@@ -145,7 +145,6 @@ let slideTimer;
 
 // Filter states
 const sortBy = ref('moi_nhat');
-const selectedSize = ref('');
 const selectedBrand = ref('');
 const brands = ref([]);
 
@@ -268,8 +267,13 @@ function goBuyNow(id) {
 }
 watch(
   () => route.query.id_thuonghieu,
-  (newBrandId) => {
+  async (newBrandId) => {
     if (!newBrandId) return;
+
+    // Đợi brands load xong
+    if (brands.value.length === 0) {
+      await fetchBrands();
+    }
 
     const brand = brands.value.find(b => b.id_thuonghieu == newBrandId);
 
