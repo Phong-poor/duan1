@@ -19,13 +19,14 @@
             <a :class="{active: activeTab === 'orders'}" @click="activeTab = 'orders'">
               Quản lý đơn hàng
             </a>
-            
-      
+            <a :class="{active: activeTab === 'voucher'}" @click="activeTab = 'voucher'">
+              Voucher
+            </a>
           </div>
         </aside>
 
         <!-- MAIN CONTENT -->
-        <section class="profile-content">
+        <section class="profile-content" v-if="activeTab === 'info'">
           <h2 class="section-title-profile">Thông Tin Cá Nhân</h2>
 
           <div class="card">
@@ -53,6 +54,10 @@
                 <span>{{ formatDate(user.ngaysinh) }}</span>
               </div>
 
+              <div class="info-row">
+                <span>Giới tính:</span>
+                <span>{{ user.gioitinh || "Chưa cập nhật" }}</span>
+              </div>
               <button class="edit-btn" @click="startEdit">Chỉnh sửa thông tin</button>
             </div>
 
@@ -80,6 +85,18 @@
                 <span>Ngày Sinh:</span>
                 <input type="date" v-model="editUser.ngaysinh" class="edit-input" />
                 <p class="error-msg" v-if="errors.ngaysinh">{{ errors.ngaysinh }}</p>
+              </div>
+
+              <div class="info-row column">
+                <span>Giới tính:</span>
+
+                <select v-model="editUser.gioitinh" class="edit-input">
+                  <option value="">-- Chọn giới tính --</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
+                </select>
+
+                <p class="error-msg" v-if="errors.gioitinh">{{ errors.gioitinh }}</p>
               </div>
 
               <div class="button-row">
@@ -171,6 +188,54 @@
                 Sau ›
               </button>
             </div>
+          </div>
+        </section>
+        <!-- =================== SECTION: VOUCHER =================== -->
+        <section class="voucher-section" v-if="activeTab === 'voucher'">
+          <h2 class="section-title-profile">Voucher của tôi</h2>
+
+          <div class="card">
+            <table class="order-table">
+              <thead>
+                <tr>
+                  <th>Mã Voucher</th>
+                  <th>Giảm giá</th>
+                  <th>Mô tả</th>
+                  <th>Ngày nhận</th>
+                  <th>Ngày hết hạn</th>
+                  <th>Trạng thái</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr v-for="v in vouchers" :key="v.id_voucher">
+                  <td>#{{ v.ma_voucher }}</td>
+                  <td>
+                    <span v-if="v.loai_giam === 'VND'">
+                      {{ formatMoney(v.gia_tri) }}đ
+                    </span>
+
+                    <span v-else-if="v.loai_giam === '%'">
+                      {{ v.gia_tri }}%
+                    </span>
+                  </td>
+                  <td>{{ v.mo_ta }}</td>
+                  <td>{{ formatDate(v.ngay_nhan) }}</td>
+                  <td>{{ formatDate(v.ngay_het_han) }}</td>
+                  <td>
+                    <span :class="voucherStatusClass(v.trang_thai)">
+                      {{ formatVoucherStatus(v.trang_thai) }}
+                    </span>
+                  </td>
+                </tr>
+
+                <tr v-if="vouchers.length === 0">
+                  <td colspan="5" style="text-align:center; padding:15px; color:#777;">
+                    Bạn chưa nhận voucher nào.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
       </div>
@@ -341,6 +406,7 @@ const editUser = reactive({
   email: "",
   sodienthoai: "",
   ngaysinh: "",
+  gioitinh: "",
 });
 const errors = reactive({
   tenKH: "",
@@ -497,6 +563,7 @@ const submitReason = async () => {
 
 onMounted(() => {
   loadOrders();
+  loadVoucher();
 });
 
 // ======= FORMAT TIỀN =======
@@ -630,6 +697,46 @@ const submitRating = async () => {
     showRatingPopup.value = false;
   } else {
     showCenterPopup("Không thể gửi đánh giá!");
+  }
+};
+const vouchers = ref([]);
+const API_VOUCHER = "http://localhost/duan1/backend/api/Web/getVoucherUser.php";
+
+const loadVoucher = async () => {
+  if (!user.id_khachhang) return;
+
+  const res = await fetch(`${API_VOUCHER}?user_id=${user.id_khachhang}`);
+  const data = await res.json();
+
+  if (data.status) {
+    vouchers.value = data.data;
+  }
+};
+const voucherStatusClass = (st) => {
+  if (!st) return "status-default";
+
+  const s = st.toLowerCase();
+
+  if (s.includes("hieu") || s.includes("hiệu")) return "status-success";   // Xanh
+  if (s.includes("het") || s.includes("hết")) return "status-danger";     // Đỏ
+  if (s.includes("dung") || s.includes("dùng")) return "status-warning";  // Cam
+
+  return "status-default";
+};
+const formatVoucherStatus = (st) => {
+  if (!st) return "Không rõ";
+
+  switch (st) {
+    case "Hieu_luc":
+      return "Hiệu lực";
+    case "Het_han":
+      return "Hết hạn";
+    case "Da_dung":
+      return "Đã dùng";
+    case "Chua_dung":
+      return "Chưa dùng";
+    default:
+      return st;
   }
 };
 </script>

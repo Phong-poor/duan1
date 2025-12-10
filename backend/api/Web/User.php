@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
     $stmt = $db->prepare("
         UPDATE khachhang 
-        SET tenKH = ?, email = ?, sodienthoai = ?, ngaysinh = ?
+        SET tenKH = ?, email = ?, sodienthoai = ?, ngaysinh = ?, gioitinh = ?
         WHERE id_khachhang = ?
     ");
 
@@ -67,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $body["email"],
         $body["sodienthoai"],
         $body["ngaysinh"],
+        $body["gioitinh"],
         $id
     ]);
 

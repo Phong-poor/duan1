@@ -355,7 +355,7 @@ container {
 
 /* BANNER */
 .brand-banner {
-  width: 100vw;
+  width: 99.05vw;
   /* kéo full chiều ngang màn hình */
   margin-left: 50%;
   /* căn giữa khi dùng 100vw */
