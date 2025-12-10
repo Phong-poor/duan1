@@ -118,7 +118,19 @@
         </div>
       </div>
     </div>
+    <!-- POPUP THÔNG BÁO -->
+    <div v-if="showPopup" class="popup-overlay">
+      <div class="popup-box">
+        <div class="popup-icon" :class="popupType">
+          <i v-if="popupType === 'success'" class="fa-solid fa-circle-check"></i>
+          <i v-else class="fa-solid fa-circle-xmark"></i>
+        </div>
 
+        <p class="popup-message">{{ popupMessage }}</p>
+
+        <button class="popup-btn" @click="showPopup = false">OK</button>
+      </div>
+    </div>
     <footerWeb />
   </div>
 </template>
@@ -158,7 +170,7 @@ onMounted(() => {
 // ======== GỬI LIÊN HỆ =========
 const guiLienHe = async () => {
   if (!chuDe.value || !noiDung.value) {
-    alert("Vui lòng nhập đầy đủ thông tin!");
+    openPopup("⚠️ Vui lòng nhập đầy đủ thông tin!", "error");
     return;
   }
 
@@ -178,16 +190,32 @@ const guiLienHe = async () => {
     const data = await response.json();
 
     if (data.status === "success") {
-      alert("Gửi yêu cầu thành công! Bộ phận Mirae sẽ phản hồi sớm nhất.");
+      openPopup("🎉 Gửi yêu cầu thành công! Mirae sẽ phản hồi sớm nhất.", "success");
+
       chuDe.value = "";
       noiDung.value = "";
     } else {
-      alert("Lỗi gửi yêu cầu!");
+      openPopup("❌ Lỗi gửi yêu cầu!", "error");
     }
   } catch (err) {
     console.error(err);
-    alert("Không thể gửi yêu cầu. Vui lòng thử lại.");
+    openPopup("⚠️ Không thể kết nối máy chủ!", "error");
   }
+};
+// ===== POPUP THÔNG BÁO =====
+const showPopup = ref(false);
+const popupMessage = ref("");
+const popupType = ref("success"); // success | error
+
+const openPopup = (msg, type = "success") => {
+  popupMessage.value = msg;
+  popupType.value = type;
+  showPopup.value = true;
+
+  // Tự động tắt sau 2.5 giây
+  setTimeout(() => {
+    showPopup.value = false;
+  }, 2500);
 };
 </script>
 
@@ -443,6 +471,83 @@ details ul {
 
   .map {
     height: 220px;
+  }
+}
+/* POPUP OVERLAY (mờ nền) */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+/* POPUP BOX */
+.popup-box {
+  background: #fff;
+  width: 320px;
+  padding: 22px;
+  border-radius: 12px;
+  text-align: center;
+  animation: scaleIn 0.25s ease;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.popup-icon {
+  font-size: 55px;
+  margin-bottom: 10px;
+}
+
+.popup-icon.success {
+  color: #28a745;
+}
+
+.popup-icon.error {
+  color: #dc3545;
+}
+
+.popup-message {
+  font-size: 16px;
+  margin: 10px 0 18px;
+  font-weight: 500;
+}
+
+.popup-btn {
+  background: #0a84ff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  width: 120px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.popup-btn:hover {
+  background: #066fd6;
+}
+
+/* Hiệu ứng */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 </style>
