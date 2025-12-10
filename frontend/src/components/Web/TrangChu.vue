@@ -33,7 +33,7 @@ const miniID = ref(null);
 const bestSellers = ref([]);
 const popularProducts = ref([]);
 const flashSaleProducts = ref([]);
-
+const flashSaleEndTime = ref(null); 
 /* ============================
    ❤️ WISHLIST FEATURE
 ============================ */
@@ -84,30 +84,31 @@ const seconds = ref('00');
 let timerInterval = null;
 let slideInterval = null;
 
-const updateTimer = () => {
-  const endTime = new Date();
-  endTime.setDate(endTime.getDate() + 4);
-  endTime.setHours(endTime.getHours() + 4);
+function startFlashSaleCountdown() {
+  if (!flashSaleEndTime.value) return;
 
   const update = () => {
-    const now = Date.now();
-    const distance = endTime.getTime() - now;
+    const now = new Date();
+    const distance = flashSaleEndTime.value - now;
 
-    if (distance < 0) {
+    if (distance <= 0) {
       clearInterval(timerInterval);
-      days.value = hours.value = minutes.value = seconds.value = '00';
+      days.value = hours.value = minutes.value = seconds.value = "00";
+
+      // Flash sale kết thúc → ẩn luôn section
+      flashSaleProducts.value = [];
       return;
     }
 
-    days.value = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, '0');
-    hours.value = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-    minutes.value = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-    seconds.value = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, '0');
+    days.value = String(Math.floor(distance / (1000 * 60 * 60 * 24))).padStart(2, "0");
+    hours.value = String(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+    minutes.value = String(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+    seconds.value = String(Math.floor((distance % (1000 * 60)) / 1000)).padStart(2, "0");
   };
 
   update();
   timerInterval = setInterval(update, 1000);
-};
+}
 
 /* ============================
    BUY NOW
@@ -134,9 +135,25 @@ onMounted(async () => {
 
   // Load sản phẩm
   try {
-    const flashResponse = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?giamgia=1&limit=8');
+    // LOAD FLASH SALE
+    const flashResponse = await fetch(
+      "http://localhost/duan1/backend/api/Web/SanPham.php?giamgia=1&limit=50"
+    );
+
     const flashData = await flashResponse.json();
-    if (flashData.success) flashSaleProducts.value = flashData.data;
+
+    if (flashData.success && flashData.data.length > 0) {
+      flashSaleProducts.value = flashData.data;
+
+      // Lấy giamgia_end lớn nhất (kéo dài nhất)
+      const maxEnd = flashData.data
+        .map(p => new Date(p.giamgia_end))
+        .sort((a, b) => b - a)[0];
+
+      flashSaleEndTime.value = maxEnd;
+
+      startFlashSaleCountdown();
+    }
 
     const response = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?limit=8');
     const data = await response.json();
@@ -150,9 +167,6 @@ onMounted(async () => {
 
   // Load wishlist ❤️
   await loadWishlist();
-
-  // Timer
-  updateTimer();
 
   // Slide banner
   const slideContainer = document.getElementById('slideContainer');
@@ -192,6 +206,47 @@ onMounted(async () => {
     slideInterval = setInterval(goToNextSlide, 5000);
   });
 
+});
+const vouchers = ref([]);
+const currentUserVoucher = JSON.parse(localStorage.getItem("currentUser"));
+const userIdVoucher = currentUserVoucher?.id_khachhang ?? 0;
+
+const loadVouchers = async () => {
+  const res = await fetch(`http://localhost/duan1/backend/api/Web/GetVoucherForUser.php?user_id=${userIdVoucher}`);
+  const data = await res.json();
+  vouchers.value = data.data ?? [];
+};
+
+const claimVoucher = async (voucherId) => {
+  if (!userIdVoucher) return alert("Vui lòng đăng nhập!");
+
+  const res = await fetch("http://localhost/duan1/backend/api/Web/ClaimVoucher.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userIdVoucher,
+      voucher_id: voucherId
+    })
+  });
+
+  const data = await res.json();
+  alert(data.msg);
+
+  if (data.status) {
+    const index = vouchers.value.findIndex(v => v.id_voucher === voucherId);
+    if (index !== -1) {
+      // thêm hiệu ứng biến mất
+      vouchers.value[index].removing = true;
+      // xoá sau 500ms
+      setTimeout(() => {
+        vouchers.value.splice(index, 1);
+      }, 500);
+    }
+  }
+};
+
+onMounted(() => {
+  loadVouchers();
 });
 
 /* ============================
@@ -236,7 +291,7 @@ onBeforeUnmount(() => {
     </section>
 
     <!-- FLASH SALE -->
-    <section class="flash-sale-hour">
+    <section v-if="flashSaleProducts.length > 0" class="flash-sale-hour">
       <div class="container">
         <div class="sale-header">
           <h2 style="color: white; font-size: 30px;">⚡️ FLASH SALE KHUNG GIỜ VÀNG ⚡️</h2>
@@ -296,9 +351,9 @@ onBeforeUnmount(() => {
         <div class="product-list" id="bestSellerList">
           <div class="product-card-slide" v-for="product in bestSellers" :key="product.id_sanpham">
             <!-- ❤️ ICON YÊU THÍCH -->
-<button class="heart-btn" @click.stop="toggleWishlist(product.id_sanpham)">
-  <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
-</button>
+            <button class="heart-btn" @click.stop="toggleWishlist(product.id_sanpham)">
+              <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
+            </button>
 
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
@@ -336,8 +391,8 @@ onBeforeUnmount(() => {
         <div class="product-list" id="popularKicksList">
           <div class="product-card-slide" v-for="product in popularProducts" :key="product.id_sanpham">
             <button class="heart-btn" @click.stop="toggleWishlist(product.id_sanpham)">
-  <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
-</button>
+              <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
+            </button>
 
             <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
@@ -365,6 +420,36 @@ onBeforeUnmount(() => {
       </div>
       <button class="carousel-nav-btn" id="prevProductBtn2" data-target="popularKicksList">❮</button>
       <button class="carousel-nav-btn" id="nextProductBtn2" data-target="popularKicksList">❯</button>
+    </section>
+    <section class="voucher-section" v-if="vouchers.length > 0">
+      <h2 class="section-title">🎁 ƯU ĐÃI VOUCHER DÀNH CHO BẠN</h2>
+
+      <div class="voucher-list">
+        <div 
+          class="voucher-card"
+          :class="{ removing: v.removing }"
+          v-for="v in vouchers"
+          :key="v.id_voucher"
+        > 
+          <div class="voucher-info">
+            <h3>{{ v.ma_voucher }}</h3>
+            <p>Loại giảm: <strong>{{ v.loai_giam }}</strong></p>
+            <p>Giá trị: <strong>{{ v.gia_tri }}</strong></p>
+            <p>Đơn tối thiểu: {{ v.dieu_kien.toLocaleString() }}₫</p>
+            <p class="voucher-desc">{{ v.mo_ta }}</p>
+            <p>Hạn: {{ v.ngay_het_han }}</p>
+          </div>
+
+          <button 
+            class="btn-claim"
+            :disabled="v.da_nhan > 0"
+            @click="claimVoucher(v.id_voucher)"
+          >
+            {{ v.da_nhan > 0 ? "ĐÃ NHẬN" : "NHẬN" }}
+          </button>
+
+        </div>
+      </div>
     </section>
 
     <!-- GIỚI THIỆU XSHOP -->
@@ -510,7 +595,7 @@ onBeforeUnmount(() => {
 
 /* --- SLIDE BANNER LỚN --- */
 .hero-carousel {
-  width: 100vw;
+  width: 99.05vw;
   /* thêm */
   margin-left: 50%;
   /* thêm */
@@ -1310,5 +1395,55 @@ onBeforeUnmount(() => {
 .heart-btn i.active {
   color: red;
 }
+.voucher-section {
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff7e6;
+  border: 1px solid #ffd27f;
+  border-radius: 10px;
+}
 
+.voucher-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.voucher-card {
+  width: 360px;
+  padding: 15px;
+  background: white;
+  border-left: 6px solid #ff7f00;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+}
+
+.voucher-info h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #ff7f00;
+}
+
+.btn-claim {
+  background: #ff7f00;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  height: 40px;
+}
+
+.btn-claim:disabled {
+  background: gray;
+  font-size: 11px;
+  cursor: not-allowed;
+}
+.voucher-card.removing {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: 0.5s ease;
+}
 </style>

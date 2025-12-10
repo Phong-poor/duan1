@@ -86,17 +86,40 @@
 
             <div class="d-flex justify-content-between small text-danger py-1">
               <span>Giảm giá:</span>
-              <span>-10,000 VNĐ</span>
+              <span>-{{ formatPrice(totalDiscount) }} VNĐ</span>
             </div>
             <div class="mt-3">
-              <input type="text" class="form-control" placeholder="Nhập mã voucher" />
-            </div>
+              <label class="fw-semibold mb-1">Chọn voucher của bạn:</label>
 
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <select v-model="selectedVoucher" class="form-control">
+                  <option value="" selected>-- Không dùng voucher --</option>
+
+                  <option 
+                    v-for="v in userVoucher" 
+                    :key="v.id_voucher"
+                    :value="v"
+                  >
+                    {{ v.ma_voucher }} - Giảm 
+                    {{ v.loai_giam === 'VND' ? formatPrice(v.gia_tri) + 'đ' : v.gia_tri + '%' }}
+                  </option>
+                </select>
+
+                <button class="btn btn-primary apdung" @click="applySelectedVoucher">
+                  Áp dụng
+                </button>
+              </div>
+
+              <p v-if="selectedVoucher" class="text-success small mt-1">
+                {{ selectedVoucher.mo_ta }}
+                (HSD: {{ selectedVoucher.ngay_het_han }})
+              </p>
+            </div>
             <hr />
 
             <div class="d-flex justify-content-between fw-bold text-danger">
               <span>Tổng thanh toán:</span>
-              <span>{{ formatPrice(totalPrice + 30000 - 10000) }} VNĐ</span>
+              <span>{{ formatPrice(finalTotal) }} VNĐ</span>
             </div>
           </div>
         </div>
@@ -169,6 +192,7 @@ const API = "http://localhost/duan1/backend/api/Web/Cart.php";
 const user = JSON.parse(localStorage.getItem("currentUser") || "{}");
 const cart = ref([]);
 
+/* FORM */
 const form = ref({
   ten: "",
   sdt: "",
@@ -179,16 +203,24 @@ const form = ref({
   pttt: "COD",
 });
 
-/* AUTO-FILL USER INFO WHEN OPEN PAGE */
+/* ==============================
+   LOAD INITIAL DATA
+================================= */
 onMounted(() => {
-  if (user && user.id_khachhang) {
+  if (user.id_khachhang) {
     form.value.ten = user.tenKH || "";
     form.value.sdt = user.sodienthoai || "";
     form.value.email = user.email || "";
   }
 
+  loadUserVoucher();
   loadCart();
+  restoreAppliedVouchers();
 });
+
+/* ==============================
+   CART
+================================= */
 
 const getPrice = (item) => (item.giamgiaSP > 0 ? item.giamgiaSP : item.giaSP);
 const formatPrice = (n) => new Intl.NumberFormat("vi-VN").format(n);
@@ -213,7 +245,98 @@ const totalPrice = computed(() =>
   cart.value.reduce((sum, item) => sum + item.so_luong * getPrice(item), 0)
 );
 
-/* SUBMIT ORDER */
+/* ==============================
+   VOUCHER
+================================= */
+
+const userVoucher = ref([]);
+const selectedVoucher = ref(null);
+
+const appliedVouchers = ref([]);     // ⭐ chứa danh sách voucher đã áp dụng
+const totalDiscount = ref(0);      // ⭐ tổng giảm giá nhiều voucher
+
+/** Lấy danh sách voucher user sở hữu */
+const loadUserVoucher = async () => {
+  if (!user.id_khachhang) return;
+
+  const res = await axios.get(
+    `http://localhost/duan1/backend/api/Web/getVoucherUser.php?user_id=${user.id_khachhang}`
+  );
+
+  userVoucher.value = (res.data.data || []).filter(v => v.trang_thai !== "Da_dung");
+};
+
+/** ⭐ Restore voucher khi reload trang */
+const restoreAppliedVouchers = () => {
+  const saved = JSON.parse(localStorage.getItem("applied_vouchers") || "[]");
+
+  if (saved.length > 0) {
+    appliedVouchers.value = saved;
+    totalDiscount.value = saved.reduce((t, v) => t + Number(v.discount), 0);
+  }
+};
+
+/** ⭐ Lưu vào localStorage */
+const saveVoucherState = () => {
+  localStorage.setItem("applied_vouchers", JSON.stringify(appliedVouchers.value));
+};
+
+/* ==============================
+   APPLY VOUCHER
+================================= */
+
+const applySelectedVoucher = async () => {
+  if (!selectedVoucher.value) return alert("Hãy chọn voucher!");
+
+  // Nếu voucher này đã dùng → không dùng lại
+  if (appliedVouchers.value.some(v => v.id_voucher === selectedVoucher.value.id_voucher)) {
+    return alert("Voucher này đã được áp dụng!");
+  }
+
+  try {
+    const res = await axios.post(
+      "http://localhost/duan1/backend/api/Web/applyVoucher.php",
+      {
+        user_id: user.id_khachhang,
+        voucher_id: selectedVoucher.value.id_voucher,
+        order_total: totalPrice.value - totalDiscount.value // ⭐ TÍNH ĐÚNG TỔNG SAU KHI GIẢM
+      }
+    );
+
+    if (!res.data.success) return alert(res.data.msg);
+
+    // Lưu voucher vào danh sách
+    appliedVouchers.value.push({
+      id_voucher: selectedVoucher.value.id_voucher,
+      discount: Number(res.data.discount)   // ÉP KIỂU SỐ
+    });
+
+    // Cập nhật tổng giảm giá
+    totalDiscount.value = appliedVouchers.value.reduce(
+      (t, v) => t + Number(v.discount),
+      0
+    );
+
+    saveVoucherState();
+
+    alert("Áp dụng voucher thành công!");
+
+  } catch (err) {
+    console.error(err);
+    alert("Lỗi API!");
+  }
+};
+
+/* ==============================
+   FINAL TOTAL
+================================= */
+const finalTotal = computed(() => {
+  return totalPrice.value + 30000 - totalDiscount.value;
+});
+
+/* ==============================
+   ĐẶT HÀNG
+================================= */
 const submitOrder = async () => {
   if (!user.id_khachhang) {
     orderStatus.value = false;
@@ -235,6 +358,10 @@ const submitOrder = async () => {
       diachi: form.value.diachi,
       ghichu: form.value.ghichu,
       pttt: form.value.pttt,
+
+      // ⭐ Gửi danh sách voucher + tổng giảm giá
+      voucher_list: appliedVouchers.value,
+      total_discount: totalDiscount.value
     });
 
     loadingOrder.value = false;
@@ -242,6 +369,9 @@ const submitOrder = async () => {
     if (res.data.success) {
       orderStatus.value = true;
       cart.value = [];
+
+      // ⭐ Xóa lưu tạm
+      localStorage.removeItem("applied_vouchers");
 
       setTimeout(() => router.push("/"), 2000);
     } else {
@@ -252,34 +382,9 @@ const submitOrder = async () => {
     orderStatus.value = false;
   }
 };
-
-const deleteItem = async (item) => {
-  if (!confirm("Xóa sản phẩm này?")) return;
-
-  try {
-    const res = await axios.post(
-      `${API}?action=delete`,
-      {
-        id_giohang: item.id_giohang
-      },
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-    if (res.data.success) {
-      // xoá khỏi giao diện
-      cart.value = cart.value.filter(i => i.id_giohang !== item.id_giohang);
-    } else {
-      alert("Xóa không thành công!");
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("Lỗi kết nối server!");
-  }
-};
-
-
 </script>
+
+
 
 <style scoped>
 /* Overlay Loading */
@@ -381,5 +486,8 @@ font-size: 14px;
 .voucher-section input:focus {
 border-color: #007bff;
 outline: none;
+}
+.apdung{
+  width: 110px;
 }
 </style>

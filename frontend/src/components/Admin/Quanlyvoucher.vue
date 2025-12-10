@@ -90,6 +90,7 @@
               <th>Điều kiện</th>
               <th>Thời gian</th>
               <th>Trạng thái</th>
+              <th>Hành động</th>
             </tr>
           </thead>
 
@@ -100,7 +101,7 @@
               <td class="fw-bold">{{ v.ma_voucher }}</td>
 
               <td>
-                <span v-if="v.loai_giam === 'money'">
+                <span v-if="v.loai_giam === 'VND'">
                   {{ formatMoney(v.gia_tri) }}
                 </span>
                 <span v-else>
@@ -120,6 +121,11 @@
               <td :class="v.trang_thai === 'Hoạt động' ? 'text-success' : 'text-danger fw-bold'">
                 {{ v.trang_thai }}
               </td>
+              <td>
+                <button class="btn btn-warning btn-sm" @click="selectVoucher(v)">
+                  Sửa
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -130,99 +136,73 @@
           <span>Trang {{ page }} / {{ totalPages }}</span>
           <button class="btn btn-secondary btn-sm" :disabled="page === totalPages" @click="page++">Sau</button>
         </div>
+      </div>
+      <!-- FORM THÊM / SỬA VOUCHER -->
+      <div v-if="showForm" class="card p-4 mt-4">
+        <h4 class="fw-bold mb-3">
+          {{ isEdit ? "Cập nhật voucher" : "Thêm voucher mới" }}
+        </h4>
 
-        <!-- Update Form -->
-        <div v-if="selectedVoucher" class="card p-4 mt-4">
-          <h4 class="fw-bold mb-3">Cập nhật voucher</h4>
-
-          <div class="mb-3">
-            <label>Mã voucher:</label>
-            <input class="form-control" v-model="selectedVoucher.ma_voucher" />
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Mã voucher</label>
+            <input v-model="form.ma_voucher" class="form-control" :readonly="isEdit" />
           </div>
 
-          <div class="mb-3">
-            <label>Giá trị giảm</label>
-            <input class="form-control" v-model="selectedVoucher.gia_tri" />
-          </div>
-
-          <div class="mb-3">
-            <label>Điều kiện</label>
-            <input class="form-control" v-model="selectedVoucher.dieu_kien" />
-          </div>
-
-          <div class="mb-3">
-            <label>Trạng thái</label>
-            <select v-model="selectedVoucher.trang_thai" class="form-select">
-              <option value="Hoạt động">Hoạt động</option>
-              <option value="Ẩn">Ẩn</option>
+          <div class="col-md-6 mb-3">
+            <label>Loại giảm</label>
+            <select v-model="form.loai_giam" class="form-select">
+              <option value="VND">Giảm tiền</option>
+              <option value="%">Giảm phần trăm</option>
             </select>
           </div>
 
-          <button class="btn btn-primary" @click="updateVoucher">Cập nhật</button>
+          <div class="col-md-6 mb-3">
+            <label>Giá trị</label>
+            <input v-model="form.gia_tri" type="number" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3" v-if="form.loai_giam === '%'">
+            <label>Tối đa</label>
+            <input v-model="form.toi_da" type="number" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Điều kiện loại</label>
+            <select v-model="form.dieu_kien_loai" class="form-select">
+              <option value=">=">Tổng đơn ≥ điều kiện</option>
+              <option value="<=">Tổng đơn ≤ điều kiện</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Điều kiện giá trị</label>
+            <input v-model="form.dieu_kien" type="number" class="form-control" />
+          </div>
+
+          <div class="col-md-12 mb-3">
+            <label>Mô tả</label>
+            <textarea v-model="form.mo_ta" class="form-control"></textarea>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Ngày bắt đầu</label>
+            <input v-model="form.ngay_bat_dau" type="date" class="form-control" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Ngày hết hạn</label>
+            <input v-model="form.ngay_het_han" type="date" class="form-control" />
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-2">
+          <button class="btn btn-secondary me-2" @click="closeForm">Hủy</button>
+          <button class="btn btn-success" @click="saveForm">
+            {{ isEdit ? "Cập nhật" : "Thêm mới" }}
+          </button>
         </div>
       </div>
-      <!-- CREATE FORM -->
-        <div v-if="showCreate" class="card p-4 mt-4">
-            <h4 class="fw-bold mb-3">Thêm voucher mới</h4>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label>Mã voucher</label>
-                    <input v-model="newVoucher.ma_voucher" class="form-control" readonly />
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label>Loại giảm</label>
-                    <select v-model="newVoucher.loai_giam" class="form-select">
-                        <option value="money">Giảm tiền</option>
-                        <option value="percent">Giảm phần trăm</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label>Giá trị</label>
-                    <input v-model="newVoucher.gia_tri" type="number" class="form-control" />
-                </div>
-
-                <div class="col-md-6 mb-3" v-if="newVoucher.loai_giam === 'percent'">
-                    <label>Giảm tối đa</label>
-                    <input v-model="newVoucher.toi_da" type="number" class="form-control" />
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label>Điều kiện loại</label>
-                    <select v-model="newVoucher.dieu_kien_loai" class="form-select">
-                        <option value=">">Tổng đơn > điều kiện</option>
-                        <option value="<">Tổng đơn < điều kiện</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label>Điều kiện giá trị</label>
-                    <input v-model="newVoucher.dieu_kien" type="number" class="form-control" />
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label>Mô tả</label>
-                    <textarea v-model="newVoucher.mo_ta" class="form-control"></textarea>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label>Ngày bắt đầu</label>
-                    <input v-model="newVoucher.ngay_bat_dau" type="date" class="form-control" />
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label>Ngày hết hạn</label>
-                    <input v-model="newVoucher.ngay_het_han" type="date" class="form-control" />
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-end mt-2">
-                <button class="btn btn-secondary me-2" @click="showCreate = false">Hủy</button>
-                <button class="btn btn-success" @click="createVoucher">Thêm mới</button>
-            </div>
-        </div>
     </div>
   </div>
 
@@ -236,98 +216,134 @@ import logoImage from "../../assets/logo.png";
 const search = ref("");
 const vouchers = ref([]);
 
-const selectedVoucher = ref(null);
-
 const page = ref(1);
 const perPage = 6;
 
-// Load voucher list
+// =============================
+// LOAD VOUCHER
+// =============================
 const loadVoucher = async () => {
   const res = await fetch("http://localhost/duan1/backend/api/Admin/GetVoucher.php");
   const data = await res.json();
-  if (data.status === "success") {
-    vouchers.value = data.data;
-  }
+  if (data.status === "success") vouchers.value = data.data;
 };
 
 onMounted(loadVoucher);
-// Popup tạo voucher
-const showCreate = ref(false);
 
-const newVoucher = ref({
+// =============================
+// FORM GỘP
+// =============================
+const showForm = ref(false);
+const isEdit = ref(false);
+
+const form = ref({
+  id_voucher: "",
   ma_voucher: "",
-  loai_giam: "money",
+  loai_giam: "",
   gia_tri: "",
   toi_da: "",
-  dieu_kien_loai: ">",
+  dieu_kien_loai: "",
   dieu_kien: "",
   mo_ta: "",
   ngay_bat_dau: "",
   ngay_het_han: "",
 });
+
+// Tạo mã voucher
 const generateCode = () => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let code = "";
-  for (let i = 0; i < 8; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return "VC-" + code; // Ví dụ: VC-92KD7FPA
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return "VC-" + code;
 };
-// mở form
-const openCreate = () => {
-  showCreate.value = true;
 
-  // reset form
-  newVoucher.value = {
+// =============================
+//  MỞ FORM THÊM
+// =============================
+const openCreate = () => {
+  isEdit.value = false;
+  showForm.value = true;
+
+  form.value = {
+    id_voucher: "",
     ma_voucher: generateCode(),
-    loai_giam: "money",
+    loai_giam: "",
     gia_tri: "",
     toi_da: "",
-    dieu_kien_loai: ">",
+    dieu_kien_loai: "",
     dieu_kien: "",
     mo_ta: "",
     ngay_bat_dau: "",
     ngay_het_han: "",
   };
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
-const createVoucher = async () => {
-  // validate đơn giản
-  if (!newVoucher.value.ma_voucher || !newVoucher.value.gia_tri) {
-    alert("Mã và giá trị voucher không được để trống!");
+
+// =============================
+//  MỞ FORM SỬA
+// =============================
+const selectVoucher = (v) => {
+  isEdit.value = true;
+  showForm.value = true;
+
+  form.value = { ...v };
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+// =============================
+//  LƯU FORM (THÊM + SỬA)
+// =============================
+const saveForm = async () => {
+  if (!form.value.ma_voucher || !form.value.gia_tri) {
+    alert("Không được để trống mã và giá trị voucher!");
     return;
   }
 
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/CreateVoucher.php", {
+  let url = "";
+  if (isEdit.value) {
+    url = "http://localhost/duan1/backend/api/Admin/UpdateVoucher.php";
+  } else {
+    url = "http://localhost/duan1/backend/api/Admin/CreateVoucher.php";
+  }
+
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newVoucher.value),
+    body: JSON.stringify(form.value),
   });
 
   const data = await res.json();
-
   alert(data.msg);
 
   if (data.status === "success") {
-    showCreate.value = false;
-    loadVoucher(); // load danh sách lại
+    showForm.value = false;
+    loadVoucher();
   }
 };
+
+const closeForm = () => {
+  showForm.value = false;
+};
+
+// =============================
+// LỌC & PHÂN TRANG
+// =============================
 const filterStatus = ref("");
-// Filter
+
 const filtered = computed(() =>
   vouchers.value.filter((v) => {
     const matchSearch =
       v.ma_voucher.toLowerCase().includes(search.value.toLowerCase()) ||
       v.mo_ta.toLowerCase().includes(search.value.toLowerCase());
 
-    const matchStatus =
-      filterStatus.value === "" || v.trang_thai === filterStatus.value;
+    const matchStatus = filterStatus.value === "" || v.trang_thai === filterStatus.value;
 
     return matchSearch && matchStatus;
   })
 );
 
-// Pagination
 const totalPages = computed(() => Math.ceil(filtered.value.length / perPage));
 
 const paginatedItems = computed(() => {
@@ -335,27 +351,9 @@ const paginatedItems = computed(() => {
   return filtered.value.slice(start, start + perPage);
 });
 
-// Format money
+// Format tiền
 const formatMoney = (n) =>
   Number(n).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
-
-// chọn voucher để sửa
-const selectVoucher = (v) => {
-  selectedVoucher.value = { ...v };
-};
-
-// cập nhật voucher
-const updateVoucher = () => {
-  alert("Chưa viết API update — bạn bảo mình làm tiếp nhé!");
-};
-
-// ẩn / hiện voucher
-const toggleStatus = async (v) => {
-  alert("Chưa viết API toggle — bạn yêu cầu mình làm tiếp nhé!");
-};
-
-
-
 
 </script>
 

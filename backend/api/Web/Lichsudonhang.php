@@ -2,18 +2,14 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
-header("Content-Type: application/json");
+header("Content-Type: application/json; charset=UTF-8");
 
-// Preflight
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
     exit();
 }
 
-// ⭐ Load DB Utils
 require_once "../../config/db_utils.php";
-
-// Tạo kết nối DB thông qua lớp DB_UTILS
 $db = new DB_UTILS();
 
 $user_id = isset($_GET["user_id"]) ? intval($_GET["user_id"]) : 0;
@@ -26,17 +22,20 @@ if ($user_id <= 0) {
     exit();
 }
 
-// ⭐ Query lịch sử đơn hàng
 $sql = "
     SELECT 
         dh.id_donhang,
         dh.maDatHang,
         dh.thoigiantao,
-        dh.tongtien,
+
+        -- ⭐ TỔNG TIỀN SAU GIẢM (được lưu trong DB)
+        CAST(dh.tongtien AS UNSIGNED) AS tongtien,
+
         dh.trangthai,
+
         (
-            SELECT COUNT(*) 
-            FROM hoadonchitiet ct 
+            SELECT COUNT(*)
+            FROM hoadonchitiet ct
             WHERE ct.id_donhang = dh.id_donhang
         ) AS total_items
     FROM donhang dh
@@ -44,7 +43,6 @@ $sql = "
     ORDER BY dh.thoigiantao DESC
 ";
 
-// Lấy dữ liệu bằng PDO
 $orders = $db->getAll($sql, [$user_id]);
 
 echo json_encode([
