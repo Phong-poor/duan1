@@ -44,18 +44,18 @@
               <div class="row">
                 <div class="col">
                   <label>Họ và tên</label>
-                  <input />
+                  <input v-model="name" disabled />
                 </div>
                 <div class="col">
                   <label>Email</label>
-                  <input />
+                  <input v-model="email" disabled />
                 </div>
               </div>
 
               <label>Chọn chủ đề liên hệ</label>
               <!-- DROPDOWN ĐẸP -->
               <div class="select-wrapper">
-                <select>
+                <select v-model="chuDe">
                   <option value="" disabled selected>-- Chọn chủ đề liên hệ --</option>
                   <option value="order">Vấn đề về đơn hàng</option>
                   <option value="warranty">Bảo hành & đổi trả</option>
@@ -66,9 +66,9 @@
               </div>
 
               <label>Nội dung chi tiết</label>
-              <textarea rows="4"></textarea>
+              <textarea rows="4" v-model="noiDung"></textarea>
 
-              <button class="submit-btn">📨 Gửi yêu cầu</button>
+              <button class="submit-btn" @click.prevent="guiLienHe">📨 Gửi yêu cầu</button>
             </form>
 
             <div class="section-title">BÀI VIẾT HỖ TRỢ VÀ CHÍNH SÁCH</div>
@@ -124,8 +124,71 @@
 </template>
 
 <script setup>
-import HeaderWeb from '../../Header-web.vue'
-import footerWeb from '../../footer-web.vue'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import HeaderWeb from "../../Header-web.vue";
+import footerWeb from "../../footer-web.vue";
+
+const router = useRouter();
+
+// ======== STATE FORM =========
+const user = ref(null);
+const name = ref("");
+const email = ref("");
+const chuDe = ref("");
+const noiDung = ref("");
+
+// ======== KIỂM TRA ĐĂNG NHẬP =========
+onMounted(() => {
+  const savedUser = localStorage.getItem("currentUser");
+
+  if (!savedUser) {
+    alert("Bạn cần đăng nhập để gửi liên hệ!");
+    router.push("/Dangnhap");
+    return;
+  }
+
+  user.value = JSON.parse(savedUser);
+
+  // TỰ ĐỘNG ĐỔ THÔNG TIN
+  name.value = user.value.tenKH || "";
+  email.value = user.value.email || "";
+});
+
+// ======== GỬI LIÊN HỆ =========
+const guiLienHe = async () => {
+  if (!chuDe.value || !noiDung.value) {
+    alert("Vui lòng nhập đầy đủ thông tin!");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost/duan1/backend/api/Web/LienHe.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_khachhang: user.value.id_khachhang,
+        ten_khachhang: name.value,
+        email: email.value,
+        chu_de: chuDe.value,
+        noi_dung: noiDung.value
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      alert("Gửi yêu cầu thành công! Bộ phận Mirae sẽ phản hồi sớm nhất.");
+      chuDe.value = "";
+      noiDung.value = "";
+    } else {
+      alert("Lỗi gửi yêu cầu!");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Không thể gửi yêu cầu. Vui lòng thử lại.");
+  }
+};
 </script>
 
 <style scoped>
