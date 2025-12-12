@@ -24,14 +24,18 @@ $ma = $data["ma_voucher"];
 $gia_tri = $data["gia_tri"];
 $dieu_kien = $data["dieu_kien"];
 $trang_thai = $data["trang_thai"];
-$toi_da = $data["toi_da"] ?? null; // percent mới có
+$toi_da = $data["toi_da"] ?? null;
+$ngay_bat_dau = $data["ngay_bat_dau"] ?? null;
+$ngay_het_han = $data["ngay_het_han"] ?? null; // percent mới có
 
 $sql = "UPDATE voucher SET 
             ma_voucher = ?, 
             gia_tri = ?, 
             dieu_kien = ?, 
             trang_thai = ?, 
-            toi_da = ?
+            toi_da = ?,
+            ngay_bat_dau = ?,
+            ngay_het_han = ?
         WHERE id_voucher = ?";
 
 $stmt = $conn->prepare($sql);
@@ -42,6 +46,8 @@ $success = $stmt->execute([
     $dieu_kien,
     $trang_thai,
     $toi_da,
+    $ngay_bat_dau,
+    $ngay_het_han,
     $id
 ]);
 
