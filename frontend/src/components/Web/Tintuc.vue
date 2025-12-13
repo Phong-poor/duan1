@@ -12,49 +12,71 @@
 
         <!-- LEFT CONTENT -->
         <div class="main-posts">
+          <div class="featured-wrapper">
+            <transition name="fade-slide" mode="out-in">
+              <article 
+                v-if="hotPosts[currentSlide]" 
+                :key="hotPosts[currentSlide].id_baiviet"
+                class="featured-post"
+              >
+                <img
+                  :src="'http://localhost/duan1/backend/uploads/Baiviet/' + hotPosts[currentSlide].thumbnail"
+                />
+                <div class="featured-post-info">
+                  <span class="category">🔥 Tin hot</span>
+                  <h2>{{ hotPosts[currentSlide].title }}</h2>
+                  <p v-html="hotPosts[currentSlide].seo_description"></p>
+                  <router-link
+                    class="read-more"
+                    :to="`/tintuc/${hotPosts[currentSlide].slug_danhmuc}/${hotPosts[currentSlide].slug}`"
+                  >
+                    Đọc thêm →
+                  </router-link>
+                  <p class="post-meta">
+                    <i class="far fa-calendar-alt"></i>
+                    {{ hotPosts[currentSlide].created_at }}
+                  </p>
+                </div>
+              </article>
+            </transition>
 
-          <!-- FEATURED POST -->
-          <article class="featured-post">
-            <img
-              src="../../assets/banner-slide-3.jpg"alt="Jordan 1 Hero"
-            />
-            <div class="featured-post-info">
-              <span class="category">Jordan</span>
-              <h2>Lịch Sử Của Jordan 1: Tại Sao Nó Vẫn Là Huyền Thoại?</h2>
-              <p>
-                Một góc nhìn khác, mở ra thế giới rộng lớn về lịch sử và ý nghĩa
-                đằng sau đôi giày mang tính biểu tượng...
-              </p>
-              <a class="read-more">Đọc thêm →</a>
-              <p class="post-meta">
-                <i class="far fa-calendar-alt"></i> 03/11/2023 |
-                <i class="far fa-user"></i> Fashion / Sneaker |
-                <i class="far fa-comment"></i> 5 bình luận
-              </p>
-            </div>
-          </article>
+            <!-- NÚT TRÁI -->
+            <button class="slide-btn prev" @click="prevSlide">
+              <i class="fas fa-chevron-left"></i>
+            </button>
 
+            <!-- NÚT PHẢI -->
+            <button class="slide-btn next" @click="nextSlide">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+
+          </div>
           <!-- ARTICLES GRID -->
           <div class="post-grid">
-            <article
+            <router-link
+              v-for="it in filteredNews"
+              :key="it.id_baiviet"
+              :to="`/tintuc/${it.slug_danhmuc}/${it.slug}`"
               class="post-card"
-              v-for="(it, i) in filteredNews"
-              :key="i"
             >
-
-              <img
-              src="../../assets/banner-slide-2.jpg"alt="Jordan 1 Hero"
-            />
-
-              <div class="post-card-info">
-                <span class="category">Tin tức</span>
-                <h3>{{ it.title }}</h3>
-                <p class="excerpt">{{ it.desc }}</p>
-                <p class="post-meta">
-                  <i class="far fa-calendar-alt"></i> {{ it.date }}
-                </p>
-              </div>
-            </article>
+              <article
+                class="post-card"
+                v-for="it in filteredNews"
+                :key="it.id_baiviet"
+              >
+                <img
+                  :src="'http://localhost/duan1/backend/uploads/Baiviet/' + it.thumbnail"
+                />
+                <div class="post-card-info">
+                  <span class="category">Tin tức</span>
+                  <h3>{{ it.title }}</h3>
+                  <p class="excerpt" v-html="it.seo_description"></p>
+                  <p class="post-meta">
+                    <i class="far fa-calendar-alt"></i> {{ it.created_at }}
+                  </p>
+                </div>
+              </article>
+            </router-link>
           </div>
 
           <!-- PAGINATION -->
@@ -91,12 +113,21 @@
 
           <!-- CATEGORIES -->
           <div class="sidebar-widget">
-            <h4><i class="fas fa-tags"></i> Danh mục phổ biến</h4>
+            <h4><i class="fas fa-tags"></i> Danh mục</h4>
             <ul>
-              <li><a href="#"><i class="fas fa-angle-right"></i> Tin tức phát hành</a></li>
-              <li><a href="#"><i class="fas fa-angle-right"></i> Đánh giá sản phẩm</a></li>
-              <li><a href="#"><i class="fas fa-angle-right"></i> Hướng dẫn phối đồ</a></li>
-              <li><a href="#"><i class="fas fa-angle-right"></i> Lịch sử thương hiệu</a></li>
+              <li
+                v-for="c in categories"
+                :key="c.id_danhmuc"
+              >
+                <a
+                  href="#"
+                  @click.prevent="selectCategory(c.slug)"
+                  :class="{ active: selectedCategory === c.slug }"
+                >
+                  <i class="fas fa-angle-right"></i>
+                  {{ c.tenDM }} ({{ c.total }})
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -118,50 +149,110 @@
         </div>
       </div>
     </main>
-
-    <footerWeb />
   </div>
+  <footerWeb />
 </template>
 
 <script setup>
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import HeaderWeb from '../../Header-web.vue'
 import footerWeb from '../../footer-web.vue'
 
-import { ref, computed } from 'vue'
-import bannerSlide1 from "../../assets/banner-slide-2.jpg";
-
-
-
+/* ================= STATE ================= */
+const news = ref([])
+const recent = ref([])
 const search = ref('')
 const page = ref(1)
 const perPage = 4
+const currentSlide = ref(0)
 
-const news = ref([
-  { img: 'https://pos.nvncdn.com/be5dfe-25943/art/artCT/20210131_wrxwc5KJjvZeWXlUfn4vUVkI.jpg', title: 'Nike Review', desc: 'Air Max Day 2026: Những Phiên Bản Đáng Chờ Đợi', date: '07/11/2023' },
-  { img: 'https://pos.nvncdn.com/3c8244-211061/pc/20241111_8mYgtbqm.gif?v=1731308362', title: 'Jordan Story', desc: 'Câu Chuyện Đằng Sau Air Jordan', date: '08/11/2023' },
-  { img: 'https://images.unsplash.com/photo-1528701800489-20beebc1c1d5?q=80&w=1200&auto=format&fit=crop', title: 'Adidas New Drop', desc: 'UltraBoost 24 Chính Thức Ra Mắt', date: '05/11/2023' },
-  { img: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop', title: 'Puma Trend', desc: 'BST Puma 2025 Cực Cháy', date: '09/11/2023' },
-  { img: 'https://images.unsplash.com/photo-1606813903189-2d4c7d2b4f27?q=80&w=1200&auto=format&fit=crop', title: 'Retro Drop', desc: 'Phong cách retro quay trở lại', date: '12/10/2023' },
-  { img: 'https://images.unsplash.com/photo-1512412046878-87e2f1b7f4f6?q=80&w=1200&auto=format&fit=crop', title: 'Sneaker Care', desc: 'Cách vệ sinh giày trắng đúng cách', date: '20/10/2023' },
-  { img: 'https://images.unsplash.com/photo-1611851250534-43cc9893a5b6?q=80&w=1200&auto=format&fit=crop', title: 'Limited Release', desc: 'Những phiên bản giới hạn 2024', date: '02/09/2023' },
-  { img: 'https://images.unsplash.com/photo-1519744792095-2f2205e87b6f?q=80&w=1200&auto=format&fit=crop', title: 'Street Style', desc: 'Phối đồ sneaker cho mùa hè', date: '15/08/2023' }
-])
+let slideTimer = null
 
-const recent = [
-  { img: 'https://i.imgur.com/qUVq3uL.jpg', title: '1000+ mẫu giày hot', cat: 'Tin tức / Sneaker' },
-  { img: 'https://i.imgur.com/6X2bH6s.jpg', title: 'Top phối đồ 2024', cat: 'Phong cách' },
-  { img: 'https://i.imgur.com/3ZQ3Z9K.jpg', title: 'Bảo quản giày đúng cách', cat: 'Tips' }
-]
+/* ================= LOAD DATA ================= */
+onMounted(async () => {
+  const res = await fetch('http://localhost/duan1/backend/api/Web/BaiViet.php')
+  const json = await res.json()
 
-const filtered = computed(() => {
-  if (!search.value) return news.value
-  const s = search.value.toLowerCase()
-  return news.value.filter(n =>
-    n.title.toLowerCase().includes(s) ||
-    n.desc.toLowerCase().includes(s)
-  )
+  // 🔥 API trả { hot: [], normal: [] }
+  const hot = Array.isArray(json.hot) ? json.hot : []
+  const normal = Array.isArray(json.normal) ? json.normal : []
+
+  // gộp lại cho pagination + search
+  news.value = [...hot, ...normal]
+
+  // sidebar recent
+  recent.value = normal.slice(0, 5).map(p => ({
+    title: p.title
+  }))
+
+  slideTimer = setInterval(() => {
+    if (hotPosts.value.length === 0) return
+    currentSlide.value =
+      (currentSlide.value + 1) % hotPosts.value.length
+  }, 5000)
 })
 
+
+onUnmounted(() => {
+  if (slideTimer) clearInterval(slideTimer)
+})
+
+/* ================= COMPUTED ================= */
+const hotPosts = computed(() =>
+  news.value.filter(p => Number(p.hot) === 1)
+)
+
+const normalPosts = computed(() =>
+  news.value.filter(p => Number(p.hot) === 0)
+)
+
+const filtered = computed(() => {
+  let list = normalPosts.value
+
+  // lọc theo danh mục
+  if (selectedCategory.value) {
+    list = list.filter(
+      p => p.slug_danhmuc === selectedCategory.value
+    )
+  }
+
+  // lọc theo từ khóa
+  if (search.value) {
+    const s = search.value.toLowerCase()
+    list = list.filter(p =>
+      p.title.toLowerCase().includes(s)
+    )
+  }
+
+  return list
+})
+
+function resetSlideTimer() {
+  if (slideTimer) clearInterval(slideTimer)
+
+  slideTimer = setInterval(() => {
+    if (hotPosts.value.length === 0) return
+    currentSlide.value =
+      (currentSlide.value + 1) % hotPosts.value.length
+  }, 5000)
+}
+function prevSlide() {
+  if (hotPosts.value.length === 0) return
+
+  currentSlide.value =
+    (currentSlide.value - 1 + hotPosts.value.length) % hotPosts.value.length
+
+  resetSlideTimer() // ⭐ BONUS
+}
+
+function nextSlide() {
+  if (hotPosts.value.length === 0) return
+
+  currentSlide.value =
+    (currentSlide.value + 1) % hotPosts.value.length
+
+  resetSlideTimer() // ⭐ BONUS
+}
 const totalPages = computed(() =>
   Math.max(1, Math.ceil(filtered.value.length / perPage))
 )
@@ -171,8 +262,15 @@ const filteredNews = computed(() => {
   return filtered.value.slice(start, start + perPage)
 })
 
+/* ================= WATCH ================= */
+watch(search, () => {
+  page.value = 1
+})
+
+/* ================= METHODS ================= */
 function onSearch() {
   page.value = 1
+  selectedCategory.value = null
 }
 function prevPage() {
   if (page.value > 1) page.value--
@@ -183,7 +281,42 @@ function nextPage() {
 function goPage(p) {
   page.value = p
 }
+const categories = ref([])
+const selectedCategory = ref(null)
+
+const loadCategories = async () => {
+  const res = await fetch(
+    'http://localhost/duan1/backend/api/Web/DanhMucBaiViet.php'
+  )
+  categories.value = await res.json()
+}
+
+onMounted(async () => {
+  // load bài viết (code cũ của bạn)
+  const res = await fetch('http://localhost/duan1/backend/api/Web/BaiViet.php')
+  const json = await res.json()
+
+  const hot = Array.isArray(json.hot) ? json.hot : []
+  const normal = Array.isArray(json.normal) ? json.normal : []
+
+  news.value = [...hot, ...normal]
+
+  recent.value = normal.slice(0, 5).map(p => ({ title: p.title }))
+
+  loadCategories()
+
+  slideTimer = setInterval(() => {
+    if (hotPosts.value.length === 0) return
+    currentSlide.value =
+      (currentSlide.value + 1) % hotPosts.value.length
+  }, 5000)
+})
+function selectCategory(slug) {
+  selectedCategory.value = slug
+  page.value = 1
+}
 </script>
+
 
 <style scoped>
 /* Shared layout */
@@ -355,6 +488,8 @@ padding-top: 100px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   overflow: hidden;
+  color: black;
+  text-decoration: none;
 }
 
 .post-card img {
@@ -406,4 +541,67 @@ padding-top: 100px;
   color: #fff;
   border-color: #007bff;
 }
+/* ===== HOT SLIDER ANIMATION ===== */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.6s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+/* ===== FEATURED SLIDER CONTROLS ===== */
+.featured-wrapper {
+  position: relative;
+}
+
+/* Nút trái phải */
+.slide-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  opacity: 0;
+}
+
+/* Hover mới hiện */
+.featured-wrapper:hover .slide-btn {
+  opacity: 1;
+}
+
+.slide-btn:hover {
+  background: rgba(0,0,0,0.7);
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* vị trí */
+.slide-btn.prev {
+  left: 14px;
+}
+
+.slide-btn.next {
+  right: 14px;
+}
+.sidebar-widget ul li a.active {
+  color: #007bff;
+  font-weight: 600;
+}
+
 </style>

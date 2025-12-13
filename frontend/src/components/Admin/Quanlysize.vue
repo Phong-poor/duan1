@@ -39,6 +39,9 @@
         <router-link to="/Quanlylienhe" class="menu-item" active-class="active">
           <i class="fa-solid fa-message"></i> Liên hệ
         </router-link>
+        <router-link to="/Quanlybaiviet" class="menu-item" active-class="active">
+          <i class="fa-solid fa-newspaper"></i> Bài viết
+        </router-link>
         <router-link to="/Quanlykhachhang" class="menu-item" active-class="active">
           <i class="fa-solid fa-users"></i> Khách hàng
         </router-link>
