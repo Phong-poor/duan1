@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Content-Type: application/json; charset=UTF-8");
 
 // Include config PDO

@@ -1,9 +1,14 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json");
+
+if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
+    http_response_code(200);
+    exit;
+}
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -12,17 +17,24 @@ if (!isset($data["id_bienthe"]) || !isset($data["so_luong"])) {
     exit;
 }
 
-$id = $data["id_bienthe"];
-$qty = $data["so_luong"];
+$id  = (int)$data["id_bienthe"];
+$qty = (int)$data["so_luong"];
 
 require_once "../../config/database.php";
-$db = new mysqli("localhost", "root", "", "duan1");
+$pdo = (new Database())->getConnection();
 
-$sql = "UPDATE bienthe SET so_luong = so_luong + ? WHERE id_bienthe = ?";
-$stmt = $db->prepare($sql);
-$stmt->bind_param("ii", $qty, $id);
+$sql = "UPDATE bienthe 
+        SET so_luong = so_luong + :qty 
+        WHERE id_bienthe = :id";
 
-if ($stmt->execute()) {
+$stmt = $pdo->prepare($sql);
+
+$ok = $stmt->execute([
+    ":qty" => $qty,
+    ":id"  => $id
+]);
+
+if ($ok) {
     echo json_encode(["success" => true]);
 } else {
     echo json_encode(["success" => false, "message" => "Không thể cập nhật"]);

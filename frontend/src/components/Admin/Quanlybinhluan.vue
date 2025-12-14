@@ -163,7 +163,7 @@ const perPage = 6;
 /* Load comments */
 const loadComments = async () => {
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetComment.php");
+    const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetComment.php");
     const data = await res.json();
 
     if (data.status === "success") {
@@ -197,7 +197,7 @@ const paginatedItems = computed(() => {
 const hideComment = async (c) => {
   if (!confirm("Bạn có chắc muốn ẨN bình luận này không?")) return;
 
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/UpdateComment.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/UpdateComment.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

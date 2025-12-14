@@ -228,7 +228,7 @@ const perPage = 6;
 // LOAD VOUCHER
 // =============================
 const loadVoucher = async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/GetVoucher.php");
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetVoucher.php");
   const data = await res.json();
   if (data.status === "success") vouchers.value = data.data;
 };
@@ -308,9 +308,9 @@ const saveForm = async () => {
 
   let url = "";
   if (isEdit.value) {
-    url = "http://localhost/duan1/backend/api/Admin/UpdateVoucher.php";
+    url = "https://miraeshoes.shop/backend/api/Admin/UpdateVoucher.php";
   } else {
-    url = "http://localhost/duan1/backend/api/Admin/CreateVoucher.php";
+    url = "https://miraeshoes.shop/backend/api/Admin/CreateVoucher.php";
   }
 
   const res = await fetch(url, {

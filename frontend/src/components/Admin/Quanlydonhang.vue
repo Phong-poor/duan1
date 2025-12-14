@@ -185,7 +185,7 @@ const orders = ref([]);
 const loading = ref(false);
 const error = ref(null);
 const page = ref(1);
-const perPage = ref(10);
+const perPage = ref(5);
 const search = ref("");
 const selectedOrder = ref(null);
 
@@ -194,7 +194,7 @@ const fetchOrders = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const res = await fetch(`http://localhost/duan1/backend/api/Admin/getOrders.php`);
+    const res = await fetch(`https://miraeshoes.shop/backend/api/Admin/getOrders.php`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     // data expected to be array of order rows from donhang
@@ -301,7 +301,7 @@ const viewDetails = async (order) => {
       selectedOrder.value.items = [];
       return;
     }
-    const res = await fetch(`http://localhost/duan1/backend/api/Admin/getOrderDetail.php?id=${encodeURIComponent(id)}`);
+    const res = await fetch(`http://miraeshoes.shop/backend/api/Admin/getOrderDetail.php?id=${encodeURIComponent(id)}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     // data expected items with fields: id_hoadonchitiet, id_sanpham, tenSP, gia, soLuongMua
@@ -318,7 +318,7 @@ const viewDetails = async (order) => {
 // ---------- Update status ----------
 const updateStatusApi = async (id, status) => {
   try {
-    const res = await fetch(`http://localhost/duan1/backend/api/Admin/updateStatus.php`, {
+    const res = await fetch(`http://miraeshoes.shop/backend/api/Admin/updateStatus.php`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

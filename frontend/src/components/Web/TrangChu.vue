@@ -47,7 +47,7 @@ const loadWishlist = async () => {
   if (!userId) return;
 
   const res = await fetch(
-    `http://localhost/duan1/backend/api/Web/Wishlist.php?user_id=${userId}`
+    `https://miraeshoes.shop/backend/api/Web/Wishlist.php?user_id=${userId}`
   );
 
   const data = await res.json();
@@ -57,7 +57,7 @@ const loadWishlist = async () => {
 const toggleWishlist = async (productId) => {
   if (!userId) return router.push("/Login");
 
-  await fetch("http://localhost/duan1/backend/api/Web/Wishlist.php", {
+  await fetch("https://miraeshoes.shop/backend/api/Web/Wishlist.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -137,7 +137,7 @@ onMounted(async () => {
   try {
     // LOAD FLASH SALE
     const flashResponse = await fetch(
-      "http://localhost/duan1/backend/api/Web/SanPham.php?giamgia=1&limit=50"
+      "https://miraeshoes.shop/backend/api/Web/SanPham.php?giamgia=1&limit=50"
     );
 
     const flashData = await flashResponse.json();
@@ -155,7 +155,7 @@ onMounted(async () => {
       startFlashSaleCountdown();
     }
 
-    const response = await fetch('http://localhost/duan1/backend/api/Web/SanPham.php?limit=8');
+    const response = await fetch('https://miraeshoes.shop/backend/api/Web/SanPham.php?limit=8');
     const data = await response.json();
     if (data.success) {
       bestSellers.value = data.data;
@@ -212,7 +212,7 @@ const currentUserVoucher = JSON.parse(localStorage.getItem("currentUser"));
 const userIdVoucher = currentUserVoucher?.id_khachhang ?? 0;
 
 const loadVouchers = async () => {
-  const res = await fetch(`http://localhost/duan1/backend/api/Web/GetVoucherForUser.php?user_id=${userIdVoucher}`);
+  const res = await fetch(`https://miraeshoes.shop/backend/api/Web/GetVoucherForUser.php?user_id=${userIdVoucher}`);
   const data = await res.json();
   vouchers.value = data.data ?? [];
 };
@@ -220,7 +220,7 @@ const loadVouchers = async () => {
 const claimVoucher = async (voucherId) => {
   if (!userIdVoucher) return alert("Vui lòng đăng nhập!");
 
-  const res = await fetch("http://localhost/duan1/backend/api/Web/ClaimVoucher.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Web/ClaimVoucher.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -323,7 +323,7 @@ onBeforeUnmount(() => {
               <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
           </button>
 
-            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
+            <img :src="`https://miraeshoes.shop/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
             <p class="original-price">{{ new Intl.NumberFormat('vi-VN', {
@@ -355,7 +355,7 @@ onBeforeUnmount(() => {
               <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
             </button>
 
-            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
+            <img :src="`https://miraeshoes.shop/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
             
@@ -394,7 +394,7 @@ onBeforeUnmount(() => {
               <i :class="wishlistIds.includes(product.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
             </button>
 
-            <img :src="`http://localhost/duan1/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
+            <img :src="`https://miraeshoes.shop/backend/${product.hinhAnhgoc}`" :alt="product.tenSP"
               @error="$event.target.src = imgSale1" />
             <h3>{{ product.tenSP }}</h3>
             <p v-if="product.coGiamGia">

@@ -1,8 +1,8 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header("Content-Type: application/json");
+header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] === "OPTIONS") {
     http_response_code(200);
@@ -22,7 +22,10 @@ require_once "../../config/db_utils.php";
 $db_util = new DB_UTILS();
 
 if ($_SERVER['REQUEST_METHOD'] !== "POST") {
-    echo json_encode(["status" => "error", "msg" => "Phương thức không hợp lệ"]);
+    echo json_encode([
+        "status" => "error",
+        "msg" => "Phương thức không hợp lệ"
+    ], JSON_UNESCAPED_UNICODE);
     exit();
 }
 
@@ -93,7 +96,7 @@ if ($insert_result) {
     $newUserId = $db_util->getLastInsertId();
 
     // Lấy thông tin user
-    $newUser = $db_util->getOne("SELECT id, tenKH, email, role FROM khachhang WHERE id = ?", [$newUserId]);
+    $newUser = $db_util->getOne("SELECT id_khachhang, tenKH, email, role FROM khachhang WHERE id_khachhang = ?", [$newUserId]);
 
     // Lưu session
     $_SESSION['user'] = $newUser;
@@ -102,7 +105,6 @@ if ($insert_result) {
     $subject = "Thông báo đăng ký thành công";
     $body = "Cảm ơn bạn đã đăng ký tài khoản với email: $email";
     MailService::send($email, USERNAME_EMAIL, $subject, $body);
-
     echo json_encode([
         "status" => "success",
         "msg" => "Đăng ký thành công!",

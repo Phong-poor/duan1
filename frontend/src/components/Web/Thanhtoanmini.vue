@@ -141,7 +141,7 @@ async function fetchData() {
   try {
     const id = props.id_sanpham;
 
-    const res = await fetch(`http://localhost/duan1/backend/api/Web/chitiet.php?id=${encodeURIComponent(id)}`);
+    const res = await fetch(`https://miraeshoes.shop/backend/api/Web/chitiet.php?id=${encodeURIComponent(id)}`);
     const data = await res.json();
 
     if (!data || !data.success) {
@@ -151,7 +151,7 @@ async function fetchData() {
     }
 
     product.value = data.data || {};
-    productImage.value = `http://localhost/duan1/backend/${product.value.hinhAnhgoc ?? ""}`;
+    productImage.value = `https://miraeshoes.shop/backend/${product.value.hinhAnhgoc ?? ""}`;
 
     const variants = Array.isArray(product.value.variants) ? product.value.variants : [];
 
@@ -231,7 +231,7 @@ async function addToCart() {
       return;
     }
 
-    await fetch(`http://localhost/duan1/backend/api/Web/Cart.php?action=add`, {
+    await fetch(`https://miraeshoes.shop/backend/api/Web/Cart.php?action=add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

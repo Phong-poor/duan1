@@ -20,7 +20,7 @@
                 class="featured-post"
               >
                 <img
-                  :src="'http://localhost/duan1/backend/uploads/Baiviet/' + hotPosts[currentSlide].thumbnail"
+                  :src="'https://miraeshoes.shop/backend/uploads/Baiviet/' + hotPosts[currentSlide].thumbnail"
                 />
                 <div class="featured-post-info">
                   <span class="category">🔥 Tin hot</span>
@@ -59,23 +59,18 @@
               :to="`/tintuc/${it.slug_danhmuc}/${it.slug}`"
               class="post-card"
             >
-              <article
-                class="post-card"
-                v-for="it in filteredNews"
-                :key="it.id_baiviet"
-              >
-                <img
-                  :src="'http://localhost/duan1/backend/uploads/Baiviet/' + it.thumbnail"
-                />
-                <div class="post-card-info">
-                  <span class="category">Tin tức</span>
-                  <h3>{{ it.title }}</h3>
-                  <p class="excerpt" v-html="it.seo_description"></p>
-                  <p class="post-meta">
-                    <i class="far fa-calendar-alt"></i> {{ it.created_at }}
-                  </p>
-                </div>
-              </article>
+              <img
+                :src="'https://miraeshoes.shop/backend/uploads/Baiviet/' + it.thumbnail"
+              />
+
+              <div class="post-card-info">
+                <span class="category">Tin tức</span>
+                <h3>{{ it.title }}</h3>
+                <p class="excerpt" v-html="it.seo_description"></p>
+                <p class="post-meta">
+                  <i class="far fa-calendar-alt"></i> {{ it.created_at }}
+                </p>
+              </div>
             </router-link>
           </div>
 
@@ -170,7 +165,7 @@ let slideTimer = null
 
 /* ================= LOAD DATA ================= */
 onMounted(async () => {
-  const res = await fetch('http://localhost/duan1/backend/api/Web/BaiViet.php')
+  const res = await fetch('https://miraeshoes.shop/backend/api/Web/BaiViet.php')
   const json = await res.json()
 
   // 🔥 API trả { hot: [], normal: [] }
@@ -286,14 +281,14 @@ const selectedCategory = ref(null)
 
 const loadCategories = async () => {
   const res = await fetch(
-    'http://localhost/duan1/backend/api/Web/DanhMucBaiViet.php'
+    'https://miraeshoes.shop/backend/api/Web/DanhMucBaiViet.php'
   )
   categories.value = await res.json()
 }
 
 onMounted(async () => {
   // load bài viết (code cũ của bạn)
-  const res = await fetch('http://localhost/duan1/backend/api/Web/BaiViet.php')
+  const res = await fetch('https://miraeshoes.shop/backend/api/Web/BaiViet.php')
   const json = await res.json()
 
   const hot = Array.isArray(json.hot) ? json.hot : []

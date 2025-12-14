@@ -140,7 +140,7 @@ const isEdit = ref(false);
 /* LOAD SIZE */
 const loadSizes = async () => {
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetSize.php");
+    const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetSize.php");
     sizes.value = await res.json();
   } 
   catch (e) {
@@ -158,8 +158,8 @@ const saveSize = async () => {
   }
 
   const url = isEdit.value
-    ? "http://localhost/duan1/backend/api/Admin/UpdateSize.php"
-    : "http://localhost/duan1/backend/api/Admin/AddSize.php";
+    ? "https://miraeshoes.shop/backend/api/Admin/UpdateSize.php"
+    : "https://miraeshoes.shop/backend/api/Admin/AddSize.php";
 
   await fetch(url, {
     method: "POST",
@@ -174,7 +174,7 @@ const saveSize = async () => {
 /* DELETE */
 const deleteSize = async (id) => {
   if (!confirm("Bạn có chắc chắn muốn xóa không?")) return;
-  await fetch(`http://localhost/duan1/backend/api/Admin/DeleteSize.php?id=${id}`);
+  await fetch(`https://miraeshoes.shop/backend/api/Admin/DeleteSize.php?id=${id}`);
   loadSizes();
 };
 

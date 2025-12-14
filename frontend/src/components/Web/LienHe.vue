@@ -175,7 +175,7 @@ const guiLienHe = async () => {
   }
 
   try {
-    const response = await fetch("http://localhost/duan1/backend/api/Web/LienHe.php", {
+    const response = await fetch("https://miraeshoes.shop/backend/api/Web/LienHe.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

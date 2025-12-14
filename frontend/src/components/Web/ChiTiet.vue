@@ -197,7 +197,7 @@
               :key="prod.id_sanpham"
               class="product-card"
             >
-              <img :src="`http://localhost/duan1/backend/${prod.hinhAnhgoc}`" :alt="prod.tenSP" />
+              <img :src="`https://miraeshoes.shop/backend/${prod.hinhAnhgoc}`" :alt="prod.tenSP" />
               <h3>{{ prod.tenSP }}</h3>
               <p v-if="prod.coGiamGia" class="original-price-small">
                 {{ new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(prod.giaSP) }}
@@ -281,14 +281,14 @@ const fetchProductDetail = async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost/duan1/backend/api/Web/chitiet.php?id=${id}`);
+    const response = await fetch(`https://miraeshoes.shop/backend/api/Web/chitiet.php?id=${id}`);
     const data = await response.json();
 
     if (data.success) {
       product.value = data.data;
       
       // Update image
-      const baseUrl = 'http://localhost/duan1/backend/';
+      const baseUrl = 'https://miraeshoes.shop/backend/';
       const mainImg = `${baseUrl}${data.data.hinhAnhgoc}`;
       
       // Setup gallery
@@ -422,7 +422,7 @@ const fetchComments = async () => {
   }
 
   try {
-    const response = await fetch(`http://localhost/duan1/backend/api/Web/GetBinhLuan.php?id_sanpham=${id_sanpham}`);
+    const response = await fetch(`https://miraeshoes.shop/backend/api/Web/GetBinhLuan.php?id_sanpham=${id_sanpham}`);
     const data = await response.json();
 
     if (data.status) {
@@ -444,7 +444,7 @@ const reportComment = async (commentId) => {
   const confirmReport = confirm("Bạn chắc chắn muốn báo cáo bình luận này?");
   if (confirmReport) {
     try {
-      const res = await fetch("http://localhost/duan1/backend/api/Web/ReportComment.php", {
+      const res = await fetch("https://miraeshoes.shop/backend/api/Web/ReportComment.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_binhluan: commentId })
@@ -496,7 +496,7 @@ const handleAddToCart = async () => {
   }
 
   await fetch(
-    "http://localhost/duan1/backend/api/Web/Cart.php?action=add",
+    "https://miraeshoes.shop/backend/api/Web/Cart.php?action=add",
     {
       method: "POST",
       body: JSON.stringify({

@@ -150,7 +150,7 @@ const perPage = 6;
 const loadUsers = async () => {
   try {
     const res = await fetch(
-      "http://localhost/duan1/backend/api/Admin/GetUser.php",
+      "https://miraeshoes.shop/backend/api/Admin/GetUser.php",
       {
         method: "GET",
         credentials: "include"
@@ -190,7 +190,7 @@ const selectUser = (user) => {
 };
 
 const updateRole = async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/UpdateRoleUser.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/UpdateRoleUser.php", {
     method: "POST",
     credentials: "include",
     headers: {
@@ -210,7 +210,7 @@ const updateRole = async () => {
 const deleteUser = async (id) => {
   if (!confirm("Bạn có chắc muốn xóa không?")) return;
 
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/DeleteUser.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/DeleteUser.php", {
     method: "POST",
     credentials: "include",
     headers: {

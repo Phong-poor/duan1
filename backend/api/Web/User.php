@@ -1,11 +1,14 @@
 <?php
 require_once "../../config/database.php";
 
-// CORS
-header("Access-Control-Allow-Origin: http://localhost:5173");
+/* =============================
+   CORS
+============================= */
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Content-Type: application/json; charset=utf-8");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
@@ -15,9 +18,19 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 $db = (new Database())->getConnection();
 
 /* =============================
+   XÁC ĐỊNH METHOD (FIX PUT)
+============================= */
+$method = $_SERVER['REQUEST_METHOD'];
+$body = json_decode(file_get_contents("php://input"), true);
+
+if (isset($body['_method'])) {
+    $method = strtoupper($body['_method']);
+}
+
+/* =============================
       GET USER BY ID
 ============================= */
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+if ($method === 'GET') {
 
     if (empty($_GET['id'])) {
         echo json_encode(["status" => false, "message" => "Missing user id"]);
@@ -26,8 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $id = intval($_GET['id']);
 
-    $stmt = $db->prepare("SELECT * FROM khachhang WHERE id_khachhang = ?");
+    $stmt = $db->prepare("
+        SELECT id_khachhang, tenKH, email, sodienthoai, ngaysinh, gioitinh, role
+        FROM khachhang
+        WHERE id_khachhang = ?
+    ");
     $stmt->execute([$id]);
+
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
     echo json_encode([
@@ -37,24 +55,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit();
 }
 
-
 /* =============================
-      UPDATE USER (PUT)
+      UPDATE USER (POST + PUT)
 ============================= */
-if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+if ($method === 'PUT') {
 
     if (empty($_GET['id'])) {
         echo json_encode(["status" => false, "message" => "Missing user id"]);
         exit();
     }
 
-    $id = intval($_GET['id']);
-    $body = json_decode(file_get_contents("php://input"), true);
-
     if (!$body) {
         echo json_encode(["status" => false, "message" => "Invalid JSON"]);
         exit();
     }
+
+    $id = intval($_GET['id']);
 
     $stmt = $db->prepare("
         UPDATE khachhang 
@@ -63,11 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     ");
 
     $success = $stmt->execute([
-        $body["tenKH"],
-        $body["email"],
-        $body["sodienthoai"],
-        $body["ngaysinh"],
-        $body["gioitinh"],
+        $body["tenKH"] ?? "",
+        $body["email"] ?? "",
+        $body["sodienthoai"] ?? null,
+        $body["ngaysinh"] ?? null,
+        $body["gioitinh"] ?? null,
         $id
     ]);
 
@@ -78,4 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     exit();
 }
 
-echo json_encode(["status" => false, "message" => "Method not allowed"]);
+/* =============================
+      METHOD KHÔNG HỖ TRỢ
+============================= */
+echo json_encode([
+    "status" => false,
+    "message" => "Method not allowed"
+]);

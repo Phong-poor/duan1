@@ -155,7 +155,7 @@ const page = ref(1);
 const perPage = 5;
 // Load danh sách liên hệ
 const loadLienHe = async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/GetLienHe.php");
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetLienHe.php");
   const data = await res.json();
 
   if (data.status === "success") {
@@ -173,7 +173,7 @@ const openReply = (item) => {
 
 // GỬI TRẢ LỜI
 const sendReply = async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/ReplyLienHe.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/ReplyLienHe.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

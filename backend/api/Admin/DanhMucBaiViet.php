@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json");
@@ -34,21 +34,39 @@ if ($method === "GET") {
 -------------------------------------- */
 if ($method === "POST") {
 
-    $data = json_decode(file_get_contents("php://input"), true);
-    $created = date("Y-m-d H:i:s");
+    try {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $created = date("Y-m-d H:i:s");
 
-    $sql = "INSERT INTO baiviet_danhmuc (tenDM, slug, mota, created_at) 
-            VALUES (?, ?, ?, ?)";
-    $stmt = $pdo->prepare($sql);
+        // CHECK SLUG TRÙNG
+        $check = $pdo->prepare("SELECT COUNT(*) FROM baiviet_danhmuc WHERE slug = ?");
+        $check->execute([$data["slug"]]);
 
-    $ok = $stmt->execute([
-        $data["tenDM"],
-        $data["slug"],
-        $data["mota"],
-        $created
-    ]);
+        if ($check->fetchColumn() > 0) {
+            echo json_encode([
+                "success" => false,
+                "message" => "Slug đã tồn tại, vui lòng đổi tên danh mục"
+            ]);
+            exit;
+        }
 
-    echo json_encode(["success" => $ok]);
+        $sql = "INSERT INTO baiviet_danhmuc (tenDM, slug, mota, created_at)
+                VALUES (?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $data["tenDM"],
+            $data["slug"],
+            $data["mota"],
+            $created
+        ]);
+
+        echo json_encode(["success" => true]);
+    } catch (Exception $e) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Lỗi server"
+        ]);
+    }
     exit();
 }
 
@@ -59,21 +77,46 @@ if ($method === "PUT") {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $sql = "UPDATE baiviet_danhmuc 
-            SET tenDM=?, slug=?, mota=? 
-            WHERE id_danhmuc=?";
-    $stmt = $pdo->prepare($sql);
+    // ✅ ID ĐÚNG
+    $id = $data["id_danhmuc"];
 
-    $ok = $stmt->execute([
+    // 🔴 CHECK slug trùng nhưng loại trừ chính nó
+    $check = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM baiviet_danhmuc 
+        WHERE slug = ? AND id_danhmuc != ?
+    ");
+    $check->execute([
+        $data["slug"],
+        $id
+    ]);
+
+    if ($check->fetchColumn() > 0) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Slug đã tồn tại, vui lòng đổi tên danh mục"
+        ]);
+        exit();
+    }
+
+    // ✅ UPDATE
+    $stmt = $pdo->prepare("
+        UPDATE baiviet_danhmuc
+        SET tenDM=?, slug=?, mota=?
+        WHERE id_danhmuc=?
+    ");
+
+    $stmt->execute([
         $data["tenDM"],
         $data["slug"],
         $data["mota"],
-        $data["id"]
+        $id
     ]);
 
-    echo json_encode(["success" => $ok]);
+    echo json_encode(["success" => true]);
     exit();
 }
+
 
 /* -------------------------------------
    XÓA DANH MỤC (DELETE)

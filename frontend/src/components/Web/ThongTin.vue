@@ -369,9 +369,9 @@ import HeaderWeb from "../../Header-web.vue";
 import footerWeb from "../../footer-web.vue";
 
 // 🔥 ĐƯỜNG DẪN ĐÚNG
-const API_URL = "http://localhost/duan1/backend/api/Web/user.php";
+const API_URL = "https://miraeshoes.shop/backend/api/Web/User.php";
 const activeTab = ref("info");
-const API_ORDER_ACTION = "http://localhost/duan1/backend/api/Web/OrderAction.php";
+const API_ORDER_ACTION = "https://miraeshoes.shop/backend/api/Web/OrderAction.php";
 /* USER DATA */
 const user = reactive({
   id_khachhang: "",
@@ -438,30 +438,42 @@ const startEdit = () => {
 const saveInfo = async () => {
   if (!validate()) return;
 
-  const res = await fetch(`${API_URL}?id=${user.id_khachhang}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(editUser),
-  });
+  try {
+    const res = await fetch(`${API_URL}?id=${user.id_khachhang}`, {
+      method: "POST", // 🔥 KHÔNG DÙNG PUT
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _method: "PUT", // 🔥 GIẢ PUT
+        tenKH: editUser.tenKH,
+        email: editUser.email,
+        sodienthoai: editUser.sodienthoai,
+        ngaysinh: editUser.ngaysinh,
+        gioitinh: editUser.gioitinh
+      })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data.status) {
+    if (data.status) {
+      Object.assign(user, editUser);
 
-    // Cập nhật giao diện
-    Object.assign(user, editUser);
+      // 🔥 cập nhật localStorage
+      localStorage.setItem("currentUser", JSON.stringify(user));
 
-    // 🔥 Lưu lại vào localStorage
-    localStorage.setItem("currentUser", JSON.stringify(user));
+      showCenterPopup("Cập nhật thông tin thành công!");
+      isEditing.value = false;
+    } else {
+      showCenterPopup(data.message || "Cập nhật thất bại!");
+    }
 
-   showCenterPopup(`Cập nhật thành công! Xin chào ${user.tenKH}!`);
-
-    isEditing.value = false;
-
-  } else {
-    alert("Cập nhật thất bại!");
+  } catch (err) {
+    console.error(err);
+    showCenterPopup("Lỗi kết nối server!");
   }
 };
+
 
 /* CANCEL */
 const cancelEdit = () => {
@@ -507,7 +519,7 @@ const changePage = (p) => {
 };
 // ======= API LẤY LỊCH SỬ ĐƠN HÀNG =======
 const orders = ref([]);
-const API_ORDER = "http://localhost/duan1/backend/api/Web/Lichsudonhang.php";
+const API_ORDER = "https://miraeshoes.shop/backend/api/Web/Lichsudonhang.php";
 
 const loadOrders = async () => {
   if (!user.id_khachhang) return;
@@ -639,7 +651,7 @@ const orderDetail = reactive({
 });
 /* ================== XEM CHI TIET DON HANG ================== */
 const openOrderPopup = async (id) => {
-  const res = await fetch(`http://localhost/duan1/backend/api/Web/Chitietdonhang.php?id=${id}`);
+  const res = await fetch(`https://miraeshoes.shop/backend/api/Web/Chitietdonhang.php?id=${id}`);
   const data = await res.json();
 
   if (data.status) {
@@ -679,7 +691,7 @@ const submitRating = async () => {
     return;
   }
 
-  const res = await fetch("http://localhost/duan1/backend/api/Web/BinhLuan.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Web/BinhLuan.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -700,7 +712,7 @@ const submitRating = async () => {
   }
 };
 const vouchers = ref([]);
-const API_VOUCHER = "http://localhost/duan1/backend/api/Web/getVoucherUser.php";
+const API_VOUCHER = "https://miraeshoes.shop/backend/api/Web/getVoucherUser.php";
 
 const loadVoucher = async () => {
   if (!user.id_khachhang) return;

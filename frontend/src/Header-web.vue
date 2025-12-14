@@ -25,7 +25,7 @@ const xuLyTimKiem = () => {
   
   thoiGianChoTimKiem = setTimeout(async () => {
     // Tìm kiếm sản phẩm bình thường
-    const response = await axios.get(`http://localhost/duan1/backend/api/Web/SanPham.php?search=${tuKhoaTimKiem.value}`);
+    const response = await axios.get(`http:/miraeshoes.shop/backend/api/Web/SanPham.php?search=${tuKhoaTimKiem.value}`);
     if (response.data.success) {
       ketQuaTimKiem.value = response.data.data;
       hienThiKetQua.value = true;
@@ -70,7 +70,7 @@ const xuLyClickBenNgoai = (event) => {
 
 // Lấy danh sách thương hiệu
 const layDanhSachThuongHieu = async () => {
-  const response = await axios.get('http://localhost/duan1/backend/api/Web/ThuongHieu.php');
+  const response = await axios.get('http://miraeshoes.shop/backend/api/Web/ThuongHieu.php');
   if (response.data.success) {
     danhSachThuongHieu.value = response.data.data;
   }
@@ -126,7 +126,7 @@ const loadWishlist = async () => {
   if (!userId) return;
 
   try {
-    const res = await axios.get(`http://localhost/duan1/backend/api/Web/Wishlist.php?user_id=${userId}`);
+    const res = await axios.get(`http://miraeshoes.shop/backend/api/Web/Wishlist.php?user_id=${userId}`);
     wishlistData.value = res.data;   // ⭐ danh sách để hiển thị
   } catch (e) {
     console.error("Wishlist load error:", e);
@@ -207,7 +207,7 @@ onMounted(() => {
             <div v-else>
               <div v-for="item in wishlistData" :key="item.id_sanpham" class="wishlist-item">
 
-                <img :src="`http://localhost/duan1/backend/${item.hinhAnhgoc}`" class="wishlist-img" />
+                <img :src="`http://miraeshoes.shop/backend/${item.hinhAnhgoc}`" class="wishlist-img" />
 
                 <div class="wishlist-info">
                   <div class="name">{{ item.tenSP }}</div>

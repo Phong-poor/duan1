@@ -35,7 +35,7 @@
               class="row align-items-center py-3 border-bottom text-center">
 
               <div class="col-2">
-                <img :src="`http://localhost/duan1/backend/${item.hinhAnhgoc}`" class="img-fluid rounded" />
+                <img :src="`https://miraeshoes.shop/backend/${item.hinhAnhgoc}`" class="img-fluid rounded" />
               </div>
 
               <div class="col-4 text-start product-name">
@@ -188,7 +188,7 @@ const loadingOrder = ref(false);
 const orderStatus = ref(null);
 
 /* USER + CART */
-const API = "http://localhost/duan1/backend/api/Web/Cart.php";
+const API = "https://miraeshoes.shop/backend/api/Web/Cart.php";
 const user = JSON.parse(localStorage.getItem("currentUser") || "{}");
 const cart = ref([]);
 
@@ -260,7 +260,7 @@ const loadUserVoucher = async () => {
   if (!user.id_khachhang) return;
 
   const res = await axios.get(
-    `http://localhost/duan1/backend/api/Web/getVoucherUser.php?user_id=${user.id_khachhang}`
+    `https://miraeshoes.shop/backend/api/Web/getVoucherUser.php?user_id=${user.id_khachhang}`
   );
 
   userVoucher.value = (res.data.data || []).filter(v => v.trang_thai !== "Da_dung");
@@ -295,7 +295,7 @@ const applySelectedVoucher = async () => {
 
   try {
     const res = await axios.post(
-      "http://localhost/duan1/backend/api/Web/applyVoucher.php",
+      "https://miraeshoes.shop/backend/api/Web/applyVoucher.php",
       {
         user_id: user.id_khachhang,
         voucher_id: selectedVoucher.value.id_voucher,
@@ -351,7 +351,7 @@ const submitOrder = async () => {
   loadingOrder.value = true;
 
   try {
-    const res = await axios.post("http://localhost/duan1/backend/api/Web/Checkout.php", {
+    const res = await axios.post("https://miraeshoes.shop/backend/api/Web/Checkout.php", {
       id_khachhang: user.id_khachhang,
       tenKH: form.value.ten,
       sodienthoai: form.value.sdt,

@@ -1,5 +1,5 @@
     <?php
-    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Origin: https://miraeshoes.shop");
     header("Access-Control-Allow-Headers: *");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
     header("Content-Type: application/json; charset=UTF-8");
@@ -14,11 +14,7 @@
     $pdo = $database->getConnection();
     $method = $_SERVER["REQUEST_METHOD"];
 
-    /* ======================================================
-    THƯ MỤC LƯU ẢNH
-    ====================================================== */
-    $frontendDir = "C:/xampp/htdocs/DUAN1/frontend/src/assets/";
-    $backendDir  = "C:/xampp/htdocs/DUAN1/backend/uploads/Baiviet/";
+    $backendDir = $_SERVER["DOCUMENT_ROOT"] . "/backend/uploads/Baiviet/";
     /* ======================================================
     TOGGLE HOT / BÌNH THƯỜNG
     ====================================================== */
@@ -74,55 +70,53 @@
     /* ======================================================
         HÀM LƯU ẢNH BASE64 → 2 THƯ MỤC
     ====================================================== */
-    function saveBase64Image($base64, $frontendDir, $backendDir)
+    function saveBase64Image($base64, $backendDir)
     {
         if (!str_contains($base64, "base64,")) return null;
 
         $parts = explode(";base64,", $base64);
-        $ext = explode("image/", $parts[0])[1];
-        $data = base64_decode($parts[1]);
+        $mime  = $parts[0];
+        $data  = base64_decode($parts[1]);
 
-        $filename = time() . "_" . uniqid() . "." . $ext;
+        if (!preg_match('/image\/(png|jpg|jpeg|webp|gif)/i', $mime, $m)) {
+            return null;
+        }
 
-        if (!is_dir($frontendDir)) mkdir($frontendDir, 0777, true);
-        if (!is_dir($backendDir)) mkdir($backendDir, 0777, true);
+        $ext = $m[1];
+        $hash = sha1($data);
+        $filename = $hash . "." . $ext;
 
-        file_put_contents($frontendDir . $filename, $data);
-        copy($frontendDir . $filename, $backendDir . $filename);
+        if (!is_dir($backendDir)) {
+            mkdir($backendDir, 0777, true);
+        }
 
-        return $filename;
+        $path = $backendDir . $filename;
+
+        // ✅ CHECK TRÙNG
+        if (!file_exists($path)) {
+            file_put_contents($path, $data);
+        }
+
+        // URL public
+        return "/backend/uploads/Baiviet/" . $filename;
     }
 
     /* ======================================================
         XỬ LÝ ẢNH NỘI DUNG (SEO + LƯU 2 NƠI)
     ====================================================== */
-    function processContentImages($html, $frontendDir, $backendDir, $postTitle)
+    function processContentImages($html, $backendDir, $postTitle)
     {
         preg_match_all('/<img[^>]+src="([^">]+)"/', $html, $matches);
-
         foreach ($matches[1] as $src) {
-
             if (str_contains($src, "data:image")) {
-
-                $newFile = saveBase64Image($src, $frontendDir, $backendDir);
-
-                if ($newFile) {
-
-                    $newUrl = "/src/assets/" . $newFile;
-
-                    // SEO ALT + TITLE
-                    $alt = htmlspecialchars("Ảnh - $postTitle", ENT_QUOTES);
+                $newUrl = saveBase64Image($src, $backendDir);
+                if ($newUrl) {
+                    $alt   = htmlspecialchars("Ảnh - $postTitle", ENT_QUOTES);
                     $title = htmlspecialchars("Hình ảnh trong bài viết: $postTitle", ENT_QUOTES);
-
-                    // FULL <img> SEO tag
-                    $newTag = '<img src="' . $newUrl . '" alt="' . $alt . '" title="' . $title . '">';
-
-                    // Replace nội dung
                     $html = str_replace($src, $newUrl, $html);
                 }
             }
         }
-
         return $html;
     }
 
@@ -171,7 +165,7 @@
     $hot = isset($input["hot"]) ? (int)$input["hot"] : 0;
     if ($method === "POST" && !isset($_FILES["thumbnailFile"])) {
 
-        $content = processContentImages($input["content"], $frontendDir, $backendDir, $input["title"]);
+        $content = processContentImages($input["content"], $backendDir, $input["title"]);
 
         $stmt = $pdo->prepare("
             INSERT INTO baiviet 
@@ -327,7 +321,7 @@
             /* ================================
             3️⃣ TÌM ẢNH TRONG CONTENT
             ================================= */
-            preg_match_all('/src="\/src\/assets\/([^"]+)"/', $post["content"], $matches);
+            preg_match_all('/src="\/backend\/uploads\/Baiviet\/([^"]+)"/', $post["content"], $matches);
 
             if (!empty($matches[1])) {
 

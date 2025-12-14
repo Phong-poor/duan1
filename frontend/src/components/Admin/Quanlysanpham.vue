@@ -332,7 +332,7 @@ import logoImage from "../../assets/logo.png";
 import HeaderAdmin from "../../Header-admin.vue";
 
 /* --------- CONST --------- */
-const backendBase = "http://localhost/duan1/backend/";
+const backendBase = "https://miraeshoes.shop/backend/";
 
 /* --------- STATE --------- */
 const search = ref("");
@@ -410,7 +410,7 @@ const applyDiscount = async () => {
     giamgia_end: discountForm.value.end
   };
 
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/ApplyDiscount.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/ApplyDiscount.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
@@ -429,10 +429,10 @@ const applyDiscount = async () => {
 /* --------- LOAD OPTIONS --------- */
 const loadOptions = async () => {
   const [dm, th, ms, sz] = await Promise.all([
-    fetch("http://localhost/duan1/backend/api/Admin/GetCategory.php"),
-    fetch("http://localhost/duan1/backend/api/Admin/GetBrand.php"),
-    fetch("http://localhost/duan1/backend/api/Admin/GetColor.php"),
-    fetch("http://localhost/duan1/backend/api/Admin/GetSize.php")
+    fetch("https://miraeshoes.shop/backend/api/Admin/GetCategory.php"),
+    fetch("https://miraeshoes.shop/backend/api/Admin/GetBrand.php"),
+    fetch("https://miraeshoes.shop/backend/api/Admin/GetColor.php"),
+    fetch("https://miraeshoes.shop/backend/api/Admin/GetSize.php")
   ]);
 
   categories.value = await dm.json();
@@ -493,7 +493,7 @@ const removeVariant = (index) => {
 /* --------- LOAD PRODUCTS (list) --------- */
 const loadProducts = async () => {
   const res = await fetch(
-    "http://localhost/duan1/backend/api/Admin/GetProducts.php"
+    "https://miraeshoes.shop/backend/api/Admin/GetProducts.php"
   );
   const data = await res.json();
 
@@ -521,7 +521,7 @@ const startEdit = async (sp) => {
 
   try {
     const res = await fetch(
-      "http://localhost/duan1/backend/api/Admin/GetProductDetail.php?id=" + sp.id
+      "https://miraeshoes.shop/backend/api/Admin/GetProductDetail.php?id=" + sp.id
     );
     const data = await res.json();
 
@@ -580,7 +580,7 @@ const startEdit = async (sp) => {
 const deleteProduct = async (id) => {
   if (!confirm("Bạn có chắc muốn xóa sản phẩm này không?")) return;
 
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/DeleteProduct.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/DeleteProduct.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id_sanpham: id })
@@ -649,8 +649,8 @@ const submitProduct = async () => {
   };
 
   const url = isEditing.value
-    ? "http://localhost/duan1/backend/api/Admin/UpdateProduct.php"
-    : "http://localhost/duan1/backend/api/Admin/AddProduct.php";
+    ? "https://miraeshoes.shop/backend/api/Admin/UpdateProduct.php"
+    : "https://miraeshoes.shop/backend/api/Admin/AddProduct.php";
 
   if (isEditing.value) {
     payload.id_sanpham = editingId.value;

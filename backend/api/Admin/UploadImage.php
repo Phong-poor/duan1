@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Content-Type: application/json; charset=UTF-8");
@@ -15,50 +15,33 @@ if (!isset($_FILES["file"])) {
 }
 
 /* =====================================================
-   1️⃣ Thư mục lưu vào frontend (giữ nguyên như bạn đang dùng)
-===================================================== */
-$frontendDir = "C:/xampp/htdocs/DUAN1/frontend/src/assets/";
-
-/* =====================================================
    2️⃣ Thêm thư mục mới lưu vào backend
 ===================================================== */
-$backendDir = "C:/xampp/htdocs/DUAN1/backend/uploads/Baiviet/";
+$backendDir = $_SERVER["DOCUMENT_ROOT"] . "/backend/uploads/Baiviet/";
 
 // Tạo thư mục nếu chưa có
-if (!is_dir($frontendDir)) mkdir($frontendDir, 0777, true);
 if (!is_dir($backendDir)) mkdir($backendDir, 0777, true);
 
 $fileTmp = $_FILES["file"]["tmp_name"];
-$fileNameOriginal = $_FILES["file"]["name"];
+$ext = strtolower(pathinfo($_FILES["file"]["name"], PATHINFO_EXTENSION));
 
-$ext = strtolower(pathinfo($fileNameOriginal, PATHINFO_EXTENSION));
-
-$allowed = ["jpg", "jpeg", "png", "webp", "gif"];
+$allowed = ["jpg","jpeg","png","webp","gif"];
 if (!in_array($ext, $allowed)) {
-    echo json_encode(["success" => false, "message" => "Chỉ cho phép file ảnh"]);
+    echo json_encode(["success" => false, "message" => "File không hợp lệ"]);
     exit;
 }
 
-$fileName = time() . "_" . uniqid() . "." . $ext;
+$hash = sha1_file($fileTmp);
+$fileName = $hash . "." . $ext;
+$path = $backendDir . $fileName;
 
-$pathFrontend = $frontendDir . $fileName;
-$pathBackend = $backendDir . $fileName;
-
-/* =====================================================
-   3️⃣ Upload vào frontend
-===================================================== */
-if (move_uploaded_file($fileTmp, $pathFrontend)) {
-
-    // Sao chép sang backend
-    copy($pathFrontend, $pathBackend);
-
-    echo json_encode([
-        "success" => true,
-        "fileName" => $fileName,
-        "url" => "/src/assets/" . $fileName   // Giữ nguyên URL cũ
-    ]);
-
-} else {
-    echo json_encode(["success" => false, "message" => "Upload thất bại"]);
+if (!file_exists($path)) {
+    move_uploaded_file($fileTmp, $path);
 }
+
+echo json_encode([
+    "success" => true,
+    "fileName" => $fileName,
+    "url" => "/backend/uploads/Baiviet/" . $fileName
+]);
 ?>

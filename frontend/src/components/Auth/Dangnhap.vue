@@ -208,7 +208,7 @@ const handleLogin = async () => {
   }
 
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Auth/login.php", {
+    const res = await fetch("https://miraeshoes.shop/backend/api/Auth/login.php", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -330,7 +330,7 @@ const handleGoogleCallback = async (response) => {
   }
 
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Auth/google_login.php", {
+    const res = await fetch("https://miraeshoes.shop/backend/api/Auth/google_login.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: response.credential })
@@ -389,7 +389,7 @@ const handleRegister = async () => {
   }
 
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Auth/register.php", {
+    const res = await fetch("https://miraeshoes.shop/backend/api/Auth/Register.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -400,17 +400,18 @@ const handleRegister = async () => {
       })
     });
 
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch { showPopup("Thành công", "Đăng ký thành công!"); isRegisterActive.value = false; return; }
+    const data = await res.json();
 
-    if (data.status === "success") showPopup("Thành công", data.msg);
-    else showPopup("Thông báo", data.msg || "Đăng ký thành công!");
+    if (data.status === "success") {
+      showPopup("Thành công", data.msg);
+      isRegisterActive.value = false;
+    } else {
+      showPopup("Lỗi đăng ký", data.msg);
+    }
 
-    isRegisterActive.value = false;
-  } catch {
-    showPopup("Thành công", "Đăng ký thành công (offline)!");
-    isRegisterActive.value = false;
+  } catch (err) {
+    console.error(err);
+    showPopup("Lỗi", "Không thể kết nối server");
   }
 };
 </script>
