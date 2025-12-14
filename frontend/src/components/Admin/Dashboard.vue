@@ -86,7 +86,7 @@
           <h4 class="fw-bold">⚠ Sản phẩm sắp hết hàng</h4>
 
           <table class="table table-bordered text-center mt-3">
-            <thead class="table-secondary">
+            <thead class="table-secondary"> 
               <tr>
                 <th>STT</th>
                 <th>Sản phẩm</th>
@@ -161,7 +161,7 @@ import Chart from "chart.js/auto";
 const dashboard = ref(null);
 
 onMounted(async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/dashboard.php");
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/dashboard.php");
   dashboard.value = await res.json();
 
   if (dashboard.value.status) {
@@ -249,7 +249,7 @@ const openAddStock = (item) => {
 const submitAddStock = async () => {
   const id = selectedItem.value.id_bienthe;
 
-  const res = await fetch("http://localhost/duan1/backend/api/Admin/updateStock.php", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Admin/updateStock.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -265,7 +265,7 @@ const submitAddStock = async () => {
     showPopup.value = false;
 
     // cập nhật lại dashboard
-    const res2 = await fetch("http://localhost/duan1/backend/api/Admin/dashboard.php");
+    const res2 = await fetch("https://miraeshoes.shop/backend/api/Admin/dashboard.php");
     dashboard.value = await res2.json();
   } else {
     alert("Lỗi: " + data.message);

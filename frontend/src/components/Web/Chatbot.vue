@@ -152,7 +152,7 @@ const handleSendMessage = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost/duan1/backend/api/Web/Chatbot.php",
+      "https://miraeshoes.shop/backend/api/Web/Chatbot.php",
       {
         method: "POST",
         headers: { "Content-Type": "application/json; charset=UTF-8" },
@@ -161,19 +161,30 @@ const handleSendMessage = async () => {
     );
 
     const text = await response.text();
-    let data = JSON.parse(text);
+
+    // ✅ DEBUG AN TOÀN (nếu cần)
+    // console.log("RAW RESPONSE:", text);
+
+    // ❌ Nếu backend trả HTML hoặc rỗng
+    if (!text || text.trim().startsWith("<")) {
+      throw new Error("Server không trả JSON");
+    }
+
+    const data = JSON.parse(text);
 
     if (data.error) {
       addBotMessage("❌ Lỗi: " + data.error);
     } else {
-      addBotMessage(data.message, data.products);
+      addBotMessage(data.message || "🤖 Mình đã tìm xong nè!", data.products || []);
     }
   } catch (err) {
+    console.error("Chatbot error:", err);
     addBotMessage("❌ Không thể kết nối đến server");
   } finally {
     isLoading.value = false;
   }
 };
+
 
 // ==========================
 // CLICK "XEM CHI TIẾT"

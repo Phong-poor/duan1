@@ -35,7 +35,7 @@
       <img
         v-if="post.thumbnail"
         class="post-thumbnail"
-        :src="`http://localhost/duan1/backend/uploads/Baiviet/${post.thumbnail}`"
+        :src="`https://miraeshoes.shop/backend/uploads/Baiviet/${post.thumbnail}`"
         :alt="post.title"
       />
 
@@ -118,7 +118,7 @@ async function loadPost() {
   if (!slugBaiViet) return
 
   const res = await fetch(
-    `http://localhost/duan1/backend/api/Web/BaiVietChiTiet.php?slug=${slugBaiViet}`
+    `https://miraeshoes.shop/backend/api/Web/BaiVietChiTiet.php?slug=${slugBaiViet}`
   )
   const json = await res.json()
   post.value = json
@@ -140,7 +140,7 @@ async function loadPost() {
   setProperty('og:url', canonicalUrl)
   setProperty(
     'og:image',
-    `https://yourdomain.com/backend/uploads/Baiviet/${json.thumbnail}`
+    `https://miraeshoes.shop/backend/uploads/Baiviet/${json.thumbnail}`
   )
 
   /* ===== JSON-LD ARTICLE ===== */
@@ -149,7 +149,7 @@ async function loadPost() {
     "@type": "Article",
     "headline": json.title,
     "description": json.seo_description,
-    "image": `https://yourdomain.com/backend/uploads/Baiviet/${json.thumbnail}`,
+    "image": `https://miraeshoes.shop/backend/uploads/Baiviet/${json.thumbnail}`,
     "author": {
       "@type": "Person",
       "name": json.creator || "MIRAE"

@@ -127,7 +127,7 @@ const isEdit = ref(false);
 /* --- LOAD CATEGORY --- */
 const loadCategories = async () => {
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetCategory.php");
+    const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetCategory.php");
     categories.value = await res.json();
   } catch (err) {
     console.error("Lỗi load danh mục:", err);
@@ -144,8 +144,8 @@ const saveCategory = async () => {
   }
 
   const url = isEdit.value
-      ? "http://localhost/duan1/backend/api/Admin/UpdateCategory.php"
-      : "http://localhost/duan1/backend/api/Admin/AddCategory.php";
+      ? "https://miraeshoes.shop/backend/api/Admin/UpdateCategory.php"
+      : "https://miraeshoes.shop/backend/api/Admin/AddCategory.php";
 
   await fetch(url, {
       method: "POST",
@@ -162,7 +162,7 @@ const deleteCategory = async (id) => {
   if (!confirm("Bạn có chắc chắn muốn xóa không?")) return;
 
   await fetch(
-    `http://localhost/duan1/backend/api/Admin/DeleteCategory.php?id=${id}`
+    `https://miraeshoes.shop/backend/api/Admin/DeleteCategory.php?id=${id}`
   );
 
   loadCategories();

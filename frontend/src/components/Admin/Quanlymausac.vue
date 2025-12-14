@@ -140,7 +140,7 @@ const isEdit = ref(false);
 /* LOAD COLORS */
 const loadColors = async () => {
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetColor.php");
+    const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetColor.php");
     colors.value = await res.json();
   } catch (e) {
     console.error("Lỗi load màu sắc:", e);
@@ -157,8 +157,8 @@ const saveColor = async () => {
   }
 
   const url = isEdit.value
-    ? "http://localhost/duan1/backend/api/Admin/UpdateColor.php"
-    : "http://localhost/duan1/backend/api/Admin/AddColor.php";
+    ? "https://miraeshoes.shop/backend/api/Admin/UpdateColor.php"
+    : "https://miraeshoes.shop/backend/api/Admin/AddColor.php";
 
   await fetch(url, {
     method: "POST",
@@ -173,7 +173,7 @@ const saveColor = async () => {
 /* DELETE */
 const deleteColor = async (id) => {
   if (!confirm("Bạn có chắc chắn muốn xóa không?")) return;
-  await fetch(`http://localhost/duan1/backend/api/Admin/DeleteColor.php?id=${id}`);
+  await fetch(`https://miraeshoes.shop/backend/api/Admin/DeleteColor.php?id=${id}`);
   loadColors();
 };
 

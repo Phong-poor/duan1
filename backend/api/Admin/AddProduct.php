@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -26,7 +26,7 @@ $tenSP         = $input["tenSP"] ?? "";
 $id_danhmuc    = $input["id_danhmuc"] ?? null;
 $id_thuonghieu = $input["id_thuonghieu"] ?? null;
 $giaSP         = $input["giaSP"] ?? 0;
-$imageUrl      = $input["imageUrl"] ?? null;
+$imageUrl = saveImageFromUrlToPublic($input["imageUrl"] ?? null);
 $extraImages   = $input["extraImages"] ?? [];
 $variants      = $input["variants"] ?? [];
 
@@ -37,7 +37,42 @@ if ($tenSP === "" || !$id_danhmuc || !$id_thuonghieu || $giaSP <= 0) {
     ]);
     exit;
 }
+function saveImageFromUrlToPublic($imageUrl)
+{
+    if (!$imageUrl) return null;
 
+    // Nếu KHÔNG phải link mạng → giữ nguyên (ảnh đã có trong server)
+    if (!str_starts_with($imageUrl, "http")) {
+        return ltrim($imageUrl, "/");
+    }
+
+    $imageData = @file_get_contents($imageUrl);
+    if ($imageData === false) return null;
+
+    // 🔑 HASH để check trùng
+    $hash = sha1($imageData);
+
+    $ext = pathinfo(parse_url($imageUrl, PHP_URL_PATH), PATHINFO_EXTENSION);
+    $ext = strtolower($ext ?: "jpg");
+
+    $saveDir = rtrim($_SERVER['DOCUMENT_ROOT'], "/") . "/backend/uploads/Product/";
+    if (!is_dir($saveDir)) mkdir($saveDir, 0777, true);
+
+    // 🔍 CHECK TRÙNG
+    foreach (["jpg","jpeg","png","webp","gif",$ext] as $e) {
+        $existFile = $saveDir . $hash . "." . $e;
+        if (file_exists($existFile) && filesize($existFile) > 0) {
+            // Đã tồn tại → dùng lại
+            return "backend/uploads/Product/" . $hash . "." . $e;
+        }
+    }
+
+    // ❌ Chưa có → lưu mới
+    $filename = $hash . "." . $ext;
+    file_put_contents($saveDir . $filename, $imageData);
+
+    return "backend/uploads/Product/" . $filename;
+}
 function generateMaSP($pdo)
 {
     $stmt = $pdo->query("SELECT maSP FROM sanpham ORDER BY id_sanpham DESC LIMIT 1");
@@ -71,6 +106,8 @@ $idSP = $pdo->lastInsertId();
 foreach ($extraImages as $i => $url) {
     if (!$url) continue;
 
+    $url = saveImageFromUrlToPublic($url);
+
     $stmt = $pdo->prepare("
         INSERT INTO sanpham_hinhanhphu (id_sanpham, link_anh, thu_tu)
         VALUES (?, ?, ?)
@@ -83,7 +120,7 @@ foreach ($variants as $v) {
     $color = $v["color"] ?? null;
     $size  = $v["size"] ?? null;
     $qty   = $v["quantity"] ?? 0;
-    $img   = $v["imageUrl"] ?? null;
+    $img = saveImageFromUrlToPublic($v["imageUrl"] ?? null);
 
     if (!$color || !$size || $qty <= 0) continue;
 

@@ -128,7 +128,7 @@
                     <!-- Thumbnail -->
                     <td>
                         <img 
-                            :src="'http://localhost/duan1/backend/uploads/Baiviet/' + bv.thumbnail" 
+                            :src="'https://miraeshoes.shop/backend/uploads/Baiviet/' + bv.thumbnail" 
                             v-if="bv.thumbnail" 
                             class="thumb"
                             style="width:60px;height:60px;object-fit:cover;"
@@ -521,7 +521,7 @@ const form = ref({
 
 /* ---------- Form Danh Mục ---------- */
 const cateForm = ref({
-  id: "",
+  id_danhmuc: "",
   tenDM: "",
   slug: "",
   mota: "",
@@ -529,7 +529,7 @@ const cateForm = ref({
 
 /* ---------- Form Tag ---------- */
 const tagForm = ref({
-  id: "",
+  id_tag: "",
   tag: "",
   slug: "",
 });
@@ -537,9 +537,9 @@ const tagForm = ref({
 const thumbPreview = ref("");
 
 /* ------------------ API ------------------ */
-const API_DM = "http://localhost/duan1/backend/api/Admin/DanhMucBaiViet.php";
-const API_TAG = "http://localhost/duan1/backend/api/Admin/TagsBaiViet.php";
-const API_BAIVIET = "http://localhost/duan1/backend/api/Admin/BaiViet.php";
+const API_DM = "https://miraeshoes.shop/backend/api/Admin/DanhMucBaiViet.php";
+const API_TAG = "https://miraeshoes.shop/backend/api/Admin/TagsBaiViet.php";
+const API_BAIVIET = "https://miraeshoes.shop/backend/api/Admin/BaiViet.php";
 
 /* ------------------ LOAD API ------------------ */
 async function loadDanhMuc() {
@@ -634,7 +634,7 @@ function editBaiViet(bv) {
   };
 
   thumbPreview.value =
-    "http://localhost/duan1/backend/uploads/Baiviet/" + bv.thumbnail;
+    "https://miraeshoes.shop/backend/uploads/Baiviet/" + bv.thumbnail;
 
   initQuill(bv.content);
 }
@@ -649,7 +649,7 @@ async function deleteBaiViet(id) {
 }
 
 /* ------------------ UPLOAD THUMBNAIL ------------------ */
-const API_UPLOAD = "http://localhost/duan1/backend/api/Admin/UploadImage.php";
+const API_UPLOAD = "https://miraeshoes.shop/backend/api/Admin/UploadImage.php";
 async function onThumbChange(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -666,7 +666,7 @@ async function onThumbChange(e) {
 
     if (data.success) {
         form.value.thumbnail = data.fileName;
-        thumbPreview.value = "http://localhost/duan1/backend/uploads/Baiviet/" + data.fileName;
+        thumbPreview.value = "https://miraeshoes.shop/backend/uploads/Baiviet/" + data.fileName;
     }
 }
 
@@ -674,13 +674,20 @@ async function onThumbChange(e) {
 async function saveDanhMuc() {
   cateForm.value.slug = slugify(cateForm.value.tenDM);
 
-  const method = cateForm.value.id ? "PUT" : "POST";
+  const method = cateForm.value.id_danhmuc ? "PUT" : "POST";
 
-  await fetch(API_DM, {
+  const res = await fetch(API_DM, {
     method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(cateForm.value),
   });
+
+  const data = await res.json();
+
+  if (!data.success) {
+    alert(data.message || "Lỗi khi lưu danh mục");
+    return;
+  }
 
   alert("Lưu danh mục thành công!");
   await loadDanhMuc();
@@ -704,7 +711,7 @@ function editDanhMuc(dm) {
 async function saveTag() {
   tagForm.value.slug = slugify(tagForm.value.tag);
 
-  const method = tagForm.value.id ? "PUT" : "POST";
+  const method = tagForm.value.id_tag ? "PUT" : "POST";
 
   await fetch(API_TAG, {
     method,

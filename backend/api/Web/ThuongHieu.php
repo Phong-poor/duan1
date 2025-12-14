@@ -1,7 +1,7 @@
 <?php
 require_once '../../config/database.php';
 
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 

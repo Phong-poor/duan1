@@ -136,7 +136,7 @@ const isEdit = ref(false);
 /* --- LOAD BRAND --- */
 const loadBrands = async () => {
   try {
-    const res = await fetch("http://localhost/duan1/backend/api/Admin/GetBrand.php");
+    const res = await fetch("https://miraeshoes.shop/backend/api/Admin/GetBrand.php");
     brands.value = await res.json();
   } catch (e) {
     console.log("Lỗi load thương hiệu", e);
@@ -153,8 +153,8 @@ const saveBrand = async () => {
   }
 
   const url = isEdit.value
-    ? "http://localhost/duan1/backend/api/Admin/UpdateBrand.php"
-    : "http://localhost/duan1/backend/api/Admin/AddBrand.php";
+    ? "https://miraeshoes.shop/backend/api/Admin/UpdateBrand.php"
+    : "https://miraeshoes.shop/backend/api/Admin/AddBrand.php";
 
   await fetch(url, {
     method: "POST",
@@ -170,7 +170,7 @@ const saveBrand = async () => {
 const deleteBrand = async (id) => {
   if (!confirm("Bạn có chắc muốn xóa không?")) return;
 
-  await fetch(`http://localhost/duan1/backend/api/Admin/DeleteBrand.php?id=${id}`);
+  await fetch(`https://miraeshoes.shop/backend/api/Admin/DeleteBrand.php?id=${id}`);
 
   loadBrands();
 };

@@ -88,7 +88,7 @@ const sendOTP = async () => {
   if (!email.value)
     return showPopup("Thông báo", "Vui lòng nhập email");
 
-  const res = await fetch("http://localhost/duan1/backend/api/Auth/forgotPassword.php?action=sendOTP", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Auth/forgotPassword.php?action=sendOTP", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: email.value })
@@ -108,7 +108,7 @@ const verifyOTP = async () => {
   if (otp.value.length < 4)
     return showPopup("Lỗi", "OTP không hợp lệ");
 
-  const res = await fetch("http://localhost/duan1/backend/api/Auth/forgotPassword.php?action=verifyOTP", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Auth/forgotPassword.php?action=verifyOTP", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: email.value, otp: otp.value })
@@ -125,7 +125,7 @@ const verifyOTP = async () => {
 // 📌 GỬI LẠI OTP
 // =============================
 const resendOTP = async () => {
-  const res = await fetch("http://localhost/duan1/backend/api/Auth/forgotPassword.php?action=resendOTP", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Auth/forgotPassword.php?action=resendOTP", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: email.value })
@@ -146,7 +146,7 @@ const resetPassword = async () => {
   if (newPassword.value !== confirmPassword.value)
     return showPopup("Lỗi", "Mật khẩu không trùng khớp");
 
-  const res = await fetch("http://localhost/duan1/backend/api/Auth/forgotPassword.php?action=resetPassword", {
+  const res = await fetch("https://miraeshoes.shop/backend/api/Auth/forgotPassword.php?action=resetPassword", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json");
@@ -32,24 +32,41 @@ if ($method === "GET") {
 /* ---------------------------------------------------
    THÊM TAG (POST)
 ---------------------------------------------------- */
+/* ---------------------------------------------------
+   THÊM TAG (POST)
+---------------------------------------------------- */
 if ($method === "POST") {
 
     $data = json_decode(file_get_contents("php://input"), true);
     $created = date("Y-m-d H:i:s");
 
-    $sql = "INSERT INTO baiviet_tags (tag, slug, created_at) 
-            VALUES (?, ?, ?)";
-    $stmt = $pdo->prepare($sql);
+    // CHECK slug trùng
+    $check = $pdo->prepare("SELECT COUNT(*) FROM baiviet_tags WHERE slug = ?");
+    $check->execute([$data["slug"]]);
 
-    $ok = $stmt->execute([
+    if ($check->fetchColumn() > 0) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Slug đã tồn tại, vui lòng đổi tên tag"
+        ]);
+        exit();
+    }
+
+    $stmt = $pdo->prepare("
+        INSERT INTO baiviet_tags (tag, slug, created_at) 
+        VALUES (?, ?, ?)
+    ");
+
+    $stmt->execute([
         $data["tag"],
         $data["slug"],
         $created
     ]);
 
-    echo json_encode(["success" => $ok]);
+    echo json_encode(["success" => true]);
     exit();
 }
+
 
 /* ---------------------------------------------------
    SỬA TAG (PUT)
@@ -58,18 +75,49 @@ if ($method === "PUT") {
 
     $data = json_decode(file_get_contents("php://input"), true);
 
-    $sql = "UPDATE baiviet_tags 
-            SET tag=?, slug=? 
-            WHERE id_tag=?";
-    $stmt = $pdo->prepare($sql);
+    $id = $data["id_tag"] ?? null;
 
-    $ok = $stmt->execute([
-        $data["tag"],
+    if (!$id) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Thiếu ID tag"
+        ]);
+        exit();
+    }
+
+    // ✅ CHECK slug trùng nhưng loại trừ chính nó
+    $check = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM baiviet_tags 
+        WHERE slug = ? AND id_tag != ?
+    ");
+    $check->execute([
         $data["slug"],
-        $data["id"]
+        $id
     ]);
 
-    echo json_encode(["success" => $ok]);
+    if ($check->fetchColumn() > 0) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Slug đã tồn tại, vui lòng đổi tên tag"
+        ]);
+        exit();
+    }
+
+    // ✅ UPDATE
+    $stmt = $pdo->prepare("
+        UPDATE baiviet_tags 
+        SET tag=?, slug=? 
+        WHERE id_tag=?
+    ");
+
+    $stmt->execute([
+        $data["tag"],
+        $data["slug"],
+        $id
+    ]);
+
+    echo json_encode(["success" => true]);
     exit();
 }
 

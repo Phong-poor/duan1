@@ -71,7 +71,7 @@
               <button class="heart-btn" @click="toggleWishlist(p.id_sanpham)">
                 <i :class="wishlistIds.includes(p.id_sanpham) ? 'fa-solid fa-heart active' : 'fa-regular fa-heart'"></i>
               </button>
-              <img :src="`http://localhost/duan1/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
+              <img :src="`https://miraeshoes.shop/backend/${p.hinhAnhgoc}`" @error="$event.target.src = imgSale1" />
               <h3>{{ p.tenSP }}</h3>
               <p v-if="p.coGiamGia">
                 <span style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
@@ -174,7 +174,7 @@ const selectedCategory = ref(null);
 
 const fetchCategories = async () => {
   try {
-    const res = await fetch('http://localhost/duan1/backend/api/Web/DanhMuc.php');
+    const res = await fetch('https://miraeshoes.shop/backend/api/Web/DanhMuc.php');
     const data = await res.json();
     if (data.success) {
       categories.value = data.data;
@@ -186,7 +186,7 @@ const fetchCategories = async () => {
 
 const fetchBrands = async () => {
   try {
-    const res = await fetch('http://localhost/duan1/backend/api/Web/ThuongHieu.php');
+    const res = await fetch('https://miraeshoes.shop/backend/api/Web/ThuongHieu.php');
     const data = await res.json();
     if (data.success) {
       brands.value = data.data;
@@ -221,7 +221,7 @@ const perPage = 8;
 const totalProducts = ref(0);
 
 const fetchProducts = async () => {
-  let url = `http://localhost/duan1/backend/api/Web/SanPham.php?limit=${perPage}&offset=${(currentPage.value - 1) * perPage}`;
+  let url = `https://miraeshoes.shop/backend/api/Web/SanPham.php?limit=${perPage}&offset=${(currentPage.value - 1) * perPage}`;
 
   if (selectedCategory.value) {
     url += `&id_danhmuc=${selectedCategory.value.id_danhmuc}`;
@@ -301,7 +301,7 @@ const loadWishlist = async () => {
   if (!userId) return;
 
   const res = await fetch(
-    `http://localhost/duan1/backend/api/Web/Wishlist.php?user_id=${userId}`
+    `https://miraeshoes.shop/backend/api/Web/Wishlist.php?user_id=${userId}`
   );
 
   const data = await res.json();
@@ -315,7 +315,7 @@ const toggleWishlist = async (id_sanpham) => {
     return;
   }
 
-  await fetch("http://localhost/duan1/backend/api/Web/Wishlist.php", {
+  await fetch("https://miraeshoes.shop/backend/api/Web/Wishlist.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

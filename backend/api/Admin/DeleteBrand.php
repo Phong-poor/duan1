@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Methods: GET, DELETE");
 header("Content-Type: application/json");
 

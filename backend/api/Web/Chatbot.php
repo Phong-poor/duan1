@@ -1,7 +1,6 @@
 <?php
-ob_start();
-
-header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: https://miraeshoes.shop");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 
@@ -11,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 require __DIR__ . '/../../vendor/autoload.php';
+require_once "../../config/database.php";
 
 use Dotenv\Dotenv;
 
@@ -21,11 +21,11 @@ $GEMINI_API_KEY = $_ENV['GEMINI_API_KEY'];
 define('GEMINI_API_URL', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent');
 
 // Database
-$db = new mysqli('localhost', 'root', '', 'duan1');
-$db->set_charset('utf8mb4');
+$db = (new Database())->getConnection();
 
-if ($db->connect_error) {
-    die(json_encode(['error' => 'DB lỗi'], JSON_UNESCAPED_UNICODE));
+if (!$db) {
+    echo json_encode(['error' => 'Không kết nối được database'], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 // Input
@@ -38,7 +38,7 @@ if (!$userMessage) {
 }
 
 
-function searchProducts($db, $text)
+function searchProducts(PDO $db, $text)
 {
     $text = strtolower($text);
 
@@ -76,8 +76,10 @@ function searchProducts($db, $text)
 
     // ===== COLORS =====
     $colors = [];
-    $r1 = $db->query("SELECT LOWER(mausac) AS mausac FROM bienthemausac");
-    while ($row = $r1->fetch_assoc()) $colors[] = $row['mausac'];
+    $stmt = $db->query("SELECT LOWER(mausac) AS mausac FROM bienthemausac");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $colors[] = $row['mausac'];
+    }
 
     $detectedColor = null;
     foreach ($colors as $c) {
@@ -89,8 +91,10 @@ function searchProducts($db, $text)
 
     // ===== SIZES =====
     $sizes = [];
-    $r2 = $db->query("SELECT LOWER(size) AS size FROM bienthesize");
-    while ($row = $r2->fetch_assoc()) $sizes[] = $row['size'];
+    $stmt = $db->query("SELECT LOWER(size) AS size FROM bienthesize");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $sizes[] = $row['size'];
+    }
 
     $detectedSize = null;
     foreach ($sizes as $s) {
@@ -139,7 +143,7 @@ function searchProducts($db, $text)
     ";
 
     foreach ($keywords as $k) {
-        $k = $db->real_escape_string($k);
+        $k = str_replace(["%", "_"], ["\%", "\_"], $k);
         $sql .= " AND (LOWER(sp.tenSP) LIKE '%$k%' OR LOWER(dm.tenDM) LIKE '%$k%')";
     }
 
@@ -154,9 +158,9 @@ function searchProducts($db, $text)
     $res = $db->query($sql);
     $data = [];
 
-    $baseUrl = "http://localhost/duan1/backend/";
+    $baseUrl = "http://miraeshoes.shop/backend/";
 
-    while ($row = $res->fetch_assoc()) {
+    while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
         $img = $row['hinhAnhgoc'];
         if (!str_contains($img, "uploads/Product/")) {
             $img = "uploads/Product/" . $img;
@@ -227,6 +231,8 @@ curl_close($ch);
 // 📌 XỬ LÝ TRẢ VỀ
 // =============================
 if ($http !== 200) {
+    if (ob_get_length()) ob_clean(); // ⭐ TRƯỚC ECHO
+
     echo json_encode([
         'success' => true,
         'message' => "Mình tìm thấy ".count($products)." sản phẩm như dưới đây nè!",
