@@ -285,27 +285,6 @@ const loadCategories = async () => {
   )
   categories.value = await res.json()
 }
-
-onMounted(async () => {
-  // load bài viết (code cũ của bạn)
-  const res = await fetch('https://miraeshoes.shop/backend/api/Web/BaiViet.php')
-  const json = await res.json()
-
-  const hot = Array.isArray(json.hot) ? json.hot : []
-  const normal = Array.isArray(json.normal) ? json.normal : []
-
-  news.value = [...hot, ...normal]
-
-  recent.value = normal.slice(0, 5).map(p => ({ title: p.title }))
-
-  loadCategories()
-
-  slideTimer = setInterval(() => {
-    if (hotPosts.value.length === 0) return
-    currentSlide.value =
-      (currentSlide.value + 1) % hotPosts.value.length
-  }, 5000)
-})
 function selectCategory(slug) {
   selectedCategory.value = slug
   page.value = 1
@@ -329,35 +308,12 @@ padding-top: 100px;
 .blog-content {
   display: flex;
   gap: 30px;
-  height: calc(100vh - 150px);
-  overflow: hidden;
 }
 
 /* Independent scroll columns */
 .main-posts,
 .sidebar {
-  height: 100%;
-  overflow-y: auto;
   padding-right: 10px;
-}
-
-/* Scrollbar */
-.main-posts::-webkit-scrollbar,
-.sidebar::-webkit-scrollbar {
-  width: 7px;
-}
-.main-posts::-webkit-scrollbar-track,
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.main-posts::-webkit-scrollbar-thumb,
-.sidebar::-webkit-scrollbar-thumb {
-  background: #cfcfcf;
-  border-radius: 10px;
-}
-.main-posts:hover::-webkit-scrollbar-thumb,
-.sidebar:hover::-webkit-scrollbar-thumb {
-  background: #b3b3b3;
 }
 
 /* Sidebar styling */
